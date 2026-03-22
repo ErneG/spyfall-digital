@@ -11,7 +11,7 @@ fi
 
 # Only format supported file types
 if echo "$FILE_PATH" | grep -qE '\.(ts|tsx|js|jsx|json|css|md|yaml|yml)$'; then
-  npx prettier --write "$FILE_PATH" 2>/dev/null
+  pnpm exec prettier --write "$FILE_PATH" 2>/dev/null
 fi
 
 exit 0

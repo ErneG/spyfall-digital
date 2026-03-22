@@ -37,15 +37,15 @@ src/
 ## Commands
 
 ```bash
-npm run dev           # Start dev server (Turbopack)
-npm run build         # Production build
-npm run lint          # ESLint
-npx tsc --noEmit      # Type-check
-npm run db:generate   # Generate Prisma client
-npm run db:migrate    # Run migrations
-npm run db:push       # Push schema to DB (no migration)
-npm run db:seed       # Seed locations and roles
-npm run db:studio     # Open Prisma Studio
+pnpm dev           # Start dev server (Turbopack)
+pnpm build         # Production build
+pnpm lint          # ESLint
+pnpm exec tsc --noEmit # Type-check
+pnpm db:generate   # Generate Prisma client
+pnpm db:migrate    # Run migrations
+pnpm db:push       # Push schema to DB (no migration)
+pnpm db:seed       # Seed locations and roles
+pnpm db:studio     # Open Prisma Studio
 docker compose up -d  # Start PostgreSQL
 docker compose down   # Stop PostgreSQL
 ```

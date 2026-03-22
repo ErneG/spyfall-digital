@@ -20,7 +20,7 @@ if [ -z "$ALL_CHANGED" ]; then
   exit 0
 fi
 
-TSC_OUTPUT=$(npx tsc --noEmit 2>&1 | head -30)
+TSC_OUTPUT=$(pnpm exec tsc --noEmit 2>&1 | head -30)
 TSC_EXIT=$?
 
 if [ $TSC_EXIT -ne 0 ]; then

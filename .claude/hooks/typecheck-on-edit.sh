@@ -50,7 +50,7 @@ fi
 echo "$NOW" > "$COOLDOWN_FILE" 2>/dev/null || true
 
 # Run tsc --noEmit from repo root
-TSC_OUTPUT=$(cd "$REPO_ROOT" && npx tsc --noEmit 2>&1) || true
+TSC_OUTPUT=$(cd "$REPO_ROOT" && pnpm exec tsc --noEmit 2>&1) || true
 TSC_EXIT=$?
 
 if [ $TSC_EXIT -ne 0 ] && [ -n "$TSC_OUTPUT" ]; then
