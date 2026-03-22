@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { memo, useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +18,46 @@ interface LocationGridProps {
   locations: LocationInfo[];
   revealedLocation: string | null;
   prevLocationName: string | null;
-  gameId?: string; // only for spies (to guess)
+  gameId?: string;
   playerId?: string;
 }
 
-export function LocationGrid({
+const LocationButton = memo(function LocationButton({
+  name,
+  isRevealed,
+  isPrevious,
+  isCrossed,
+  isSpy,
+  onClick,
+}: {
+  name: string;
+  isRevealed: boolean;
+  isPrevious: boolean;
+  isCrossed: boolean;
+  isSpy: boolean;
+  onClick: () => void;
+}) {
+  let className = "text-left text-xs py-1.5 px-2 rounded transition-colors cursor-pointer ";
+  if (isRevealed) {
+    className += "bg-primary/10 text-primary font-bold";
+  } else if (isPrevious) {
+    className += "bg-muted/30 text-muted-foreground line-through opacity-50";
+  } else if (isCrossed) {
+    className += "bg-muted/30 text-muted-foreground line-through";
+  } else if (isSpy) {
+    className += "bg-muted/50 hover:bg-muted";
+  } else {
+    className += "bg-muted/50 hover:bg-muted/70";
+  }
+
+  return (
+    <button onClick={onClick} className={className}>
+      {name}
+    </button>
+  );
+});
+
+export const LocationGrid = memo(function LocationGrid({
   locations,
   revealedLocation,
   prevLocationName,
@@ -46,7 +81,7 @@ export function LocationGrid({
     });
   }, []);
 
-  async function handleGuess() {
+  const handleGuess = useCallback(async () => {
     if (!gameId || !playerId || !guessTarget) return;
     setGuessing(true);
     try {
@@ -59,7 +94,27 @@ export function LocationGrid({
       setGuessing(false);
       setGuessTarget(null);
     }
-  }
+  }, [gameId, playerId, guessTarget]);
+
+  const locationButtons = useMemo(
+    () =>
+      locations.map((loc) => (
+        <LocationButton
+          key={loc.id}
+          name={loc.name}
+          isRevealed={revealedLocation === loc.name}
+          isPrevious={prevLocationName === loc.name}
+          isCrossed={crossedOut.has(loc.id)}
+          isSpy={isSpy}
+          onClick={
+            isSpy
+              ? () => setGuessTarget(loc)
+              : () => toggleCrossOut(loc.id)
+          }
+        />
+      )),
+    [locations, revealedLocation, prevLocationName, crossedOut, isSpy, toggleCrossOut],
+  );
 
   return (
     <>
@@ -72,41 +127,10 @@ export function LocationGrid({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-1.5">
-            {locations.map((loc) => {
-              const isRevealed = revealedLocation === loc.name;
-              const isPrevious = prevLocationName === loc.name;
-              const isCrossed = crossedOut.has(loc.id);
-
-              return (
-                <button
-                  key={loc.id}
-                  onClick={
-                    isSpy
-                      ? () => setGuessTarget(loc)
-                      : () => toggleCrossOut(loc.id)
-                  }
-                  className={`text-left text-xs py-1.5 px-2 rounded transition-colors cursor-pointer ${
-                    isRevealed
-                      ? "bg-primary/10 text-primary font-bold"
-                      : isPrevious
-                        ? "bg-muted/30 text-muted-foreground line-through opacity-50"
-                        : isCrossed
-                          ? "bg-muted/30 text-muted-foreground line-through"
-                          : isSpy
-                            ? "bg-muted/50 hover:bg-muted"
-                            : "bg-muted/50 hover:bg-muted/70"
-                  }`}
-                >
-                  {loc.name}
-                </button>
-              );
-            })}
-          </div>
+          <div className="grid grid-cols-2 gap-1.5">{locationButtons}</div>
         </CardContent>
       </Card>
 
-      {/* Spy Guess Confirmation */}
       <Dialog open={!!guessTarget} onOpenChange={() => setGuessTarget(null)}>
         <DialogContent>
           <DialogHeader>
@@ -128,4 +152,4 @@ export function LocationGrid({
       </Dialog>
     </>
   );
-}
+});

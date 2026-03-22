@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,20 +16,22 @@ import { Copy, Check, Users, Crown, Wifi, WifiOff } from "lucide-react";
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const router = useRouter();
-  const { session, clearSession } = useSession();
+  const { session, clearSession, loaded } = useSession();
   const { data: room, connected } = useRoomEvents(code);
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
   const [locationsOpen, setLocationsOpen] = useState(false);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Redirect if no session — only depend on specific fields, not the whole object
   useEffect(() => {
-    if (!session || session.roomCode !== code.toUpperCase()) {
+    if (loaded && (!session || session.roomCode !== code.toUpperCase())) {
       router.push("/");
     }
-  }, [session, code, router]);
+  }, [loaded, session?.roomCode, code, router]);
 
-  async function handleStart() {
+  const handleStart = useCallback(async () => {
     if (!session) return;
     setStarting(true);
     setError("");
@@ -46,20 +48,24 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     } finally {
       setStarting(false);
     }
-  }
+  }, [session]);
 
-  function handleCopy() {
+  const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(code.toUpperCase());
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+    // Clear previous timeout to prevent pile-up
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+  }, [code]);
 
-  function handleLeave() {
+  const handleLeave = useCallback(() => {
     clearSession();
     router.push("/");
-  }
+  }, [clearSession, router]);
 
-  if (!session) return null;
+  const handleOpenLocations = useCallback(() => setLocationsOpen(true), []);
+
+  if (!loaded || !session) return null;
 
   // Active game → show game view
   if (room && room.state !== "LOBBY" && room.currentGameId) {
@@ -121,7 +127,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             moderatorMode={room.moderatorMode}
             selectedLocationCount={room.selectedLocationCount}
             totalLocationCount={room.totalLocationCount}
-            onOpenLocations={() => setLocationsOpen(true)}
+            onOpenLocations={handleOpenLocations}
           />
         )}
 

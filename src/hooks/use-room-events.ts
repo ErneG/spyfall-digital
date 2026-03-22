@@ -24,9 +24,16 @@ export function useRoomEvents(code: string | null) {
   const [data, setData] = useState<RoomEvent | null>(null);
   const [connected, setConnected] = useState(false);
   const esRef = useRef<EventSource | null>(null);
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
     if (!code) return;
+
+    // Clear any pending reconnect
+    if (reconnectRef.current) {
+      clearTimeout(reconnectRef.current);
+      reconnectRef.current = null;
+    }
 
     esRef.current?.close();
     const es = new EventSource(`/api/rooms/${code}/events`);
@@ -51,7 +58,9 @@ export function useRoomEvents(code: string | null) {
     es.onerror = () => {
       setConnected(false);
       es.close();
-      setTimeout(connect, 3000);
+      // Single reconnect — clear any previous before scheduling
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
+      reconnectRef.current = setTimeout(connect, 3000);
     };
   }, [code]);
 
@@ -59,6 +68,7 @@ export function useRoomEvents(code: string | null) {
     connect();
     return () => {
       esRef.current?.close();
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
       setConnected(false);
     };
   }, [connect]);

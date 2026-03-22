@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Clock, Pause } from "lucide-react";
 
 interface TimerProps {
@@ -8,7 +9,7 @@ interface TimerProps {
   paused?: boolean;
 }
 
-export function Timer({ display, expired, paused }: TimerProps) {
+export const Timer = memo(function Timer({ display, expired, paused }: TimerProps) {
   return (
     <div
       className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-center font-mono text-3xl font-bold transition-colors ${
@@ -23,4 +24,4 @@ export function Timer({ display, expired, paused }: TimerProps) {
       {display}
     </div>
   );
-}
+});

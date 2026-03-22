@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 interface Session {
   playerId: string;
@@ -11,18 +11,20 @@ interface Session {
 
 const STORAGE_KEY = "spyfall-session";
 
-function loadSession(): Session | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function useSession() {
-  const [session, setSessionState] = useState<Session | null>(loadSession);
+  // Initialize as null to avoid hydration mismatch — load in useEffect
+  const [session, setSessionState] = useState<Session | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setSessionState(JSON.parse(raw));
+    } catch {
+      // ignore
+    }
+    setLoaded(true);
+  }, []);
 
   const setSession = useCallback((s: Session) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
@@ -34,5 +36,5 @@ export function useSession() {
     setSessionState(null);
   }, []);
 
-  return { session, setSession, clearSession };
+  return { session, setSession, clearSession, loaded };
 }

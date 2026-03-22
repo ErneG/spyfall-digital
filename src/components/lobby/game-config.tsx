@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -22,7 +22,7 @@ interface GameConfigProps {
   onOpenLocations: () => void;
 }
 
-export function GameConfig({
+export const GameConfig = memo(function GameConfig({
   roomCode,
   playerId,
   isHost,
@@ -46,8 +46,32 @@ export function GameConfig({
     [roomCode, playerId],
   );
 
+  const handleTimeSelect = useCallback(
+    (value: number) => void updateConfig({ timeLimit: value }),
+    [updateConfig],
+  );
+
+  const handleSpySelect = useCallback(
+    (count: number) => void updateConfig({ spyCount: count }),
+    [updateConfig],
+  );
+
+  const handleAutoStart = useCallback(
+    (checked: boolean) => void updateConfig({ autoStartTimer: checked }),
+    [updateConfig],
+  );
+
+  const handleHideSpy = useCallback(
+    (checked: boolean) => void updateConfig({ hideSpyCount: checked }),
+    [updateConfig],
+  );
+
+  const handleModerator = useCallback(
+    (checked: boolean) => void updateConfig({ moderatorMode: checked }),
+    [updateConfig],
+  );
+
   if (!isHost) {
-    // Non-host players see a read-only summary
     return (
       <Card>
         <CardHeader className="pb-2">
@@ -95,7 +119,7 @@ export function GameConfig({
             {TIMER_PRESETS.map((preset) => (
               <button
                 key={preset.value}
-                onClick={() => void updateConfig({ timeLimit: preset.value })}
+                onClick={() => handleTimeSelect(preset.value)}
                 className={`flex-1 rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
                   timeLimit === preset.value
                     ? "bg-primary text-primary-foreground"
@@ -115,7 +139,7 @@ export function GameConfig({
             {[1, 2].map((count) => (
               <button
                 key={count}
-                onClick={() => void updateConfig({ spyCount: count })}
+                onClick={() => handleSpySelect(count)}
                 className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   spyCount === count
                     ? "bg-primary text-primary-foreground"
@@ -146,11 +170,7 @@ export function GameConfig({
             <Label htmlFor="auto-start" className="flex items-center gap-1.5 text-sm">
               <Timer className="h-3 w-3" /> Auto-start timer
             </Label>
-            <Switch
-              id="auto-start"
-              checked={autoStartTimer}
-              onCheckedChange={(checked) => void updateConfig({ autoStartTimer: checked })}
-            />
+            <Switch id="auto-start" checked={autoStartTimer} onCheckedChange={handleAutoStart} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -158,25 +178,17 @@ export function GameConfig({
               {hideSpyCount ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
               Hide spy count
             </Label>
-            <Switch
-              id="hide-spy"
-              checked={hideSpyCount}
-              onCheckedChange={(checked) => void updateConfig({ hideSpyCount: checked })}
-            />
+            <Switch id="hide-spy" checked={hideSpyCount} onCheckedChange={handleHideSpy} />
           </div>
 
           <div className="flex items-center justify-between">
             <Label htmlFor="moderator" className="flex items-center gap-1.5 text-sm">
               <Shield className="h-3 w-3" /> Moderator mode
             </Label>
-            <Switch
-              id="moderator"
-              checked={moderatorMode}
-              onCheckedChange={(checked) => void updateConfig({ moderatorMode: checked })}
-            />
+            <Switch id="moderator" checked={moderatorMode} onCheckedChange={handleModerator} />
           </div>
         </div>
       </CardContent>
     </Card>
   );
-}
+});

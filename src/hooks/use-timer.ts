@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 export function useTimer(startedAt: string | null, timeLimit: number, running: boolean = true) {
   const [remaining, setRemaining] = useState(timeLimit);
@@ -21,9 +21,11 @@ export function useTimer(startedAt: string | null, timeLimit: number, running: b
     return () => clearInterval(interval);
   }, [tick, running]);
 
-  const minutes = Math.floor(remaining / 60);
-  const seconds = remaining % 60;
-  const display = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  const display = useMemo(() => {
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }, [remaining]);
 
   return { remaining, expired, display };
 }

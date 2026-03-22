@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,31 +20,34 @@ interface VotePanelProps {
   gameId: string;
 }
 
-export function VotePanel({ players, playerId, gameId }: VotePanelProps) {
+export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: VotePanelProps) {
   const [open, setOpen] = useState(false);
   const [voting, setVoting] = useState(false);
   const [voted, setVoted] = useState(false);
 
-  async function handleVote(suspectId: string) {
-    setVoting(true);
-    try {
-      const res = await fetch(`/api/games/${gameId}/vote`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voterId: playerId, suspectId }),
-      });
-      if (res.ok) {
-        setVoted(true);
-        setOpen(false);
+  const handleVote = useCallback(
+    async (suspectId: string) => {
+      setVoting(true);
+      try {
+        const res = await fetch(`/api/games/${gameId}/vote`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ voterId: playerId, suspectId }),
+        });
+        if (res.ok) {
+          setVoted(true);
+          setOpen(false);
+        }
+      } finally {
+        setVoting(false);
       }
-    } finally {
-      setVoting(false);
-    }
-  }
+    },
+    [gameId, playerId],
+  );
 
   if (voted) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-2">
+      <p className="text-sm text-muted-foreground text-center py-2 flex-1">
         Vote submitted. Waiting for others...
       </p>
     );
@@ -71,7 +74,7 @@ export function VotePanel({ players, playerId, gameId }: VotePanelProps) {
                 key={p.id}
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => handleVote(p.id)}
+                onClick={() => void handleVote(p.id)}
                 disabled={voting}
               >
                 {p.name}
@@ -86,4 +89,4 @@ export function VotePanel({ players, playerId, gameId }: VotePanelProps) {
       </DialogContent>
     </Dialog>
   );
-}
+});

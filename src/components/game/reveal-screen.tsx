@@ -1,11 +1,12 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, AlertTriangle, Trophy, RotateCcw, LogOut } from "lucide-react";
-import type { GameView, PlayerInfo } from "@/types/game";
+import type { GameView } from "@/types/game";
 
 interface RevealScreenProps {
   game: GameView;
@@ -15,15 +16,24 @@ interface RevealScreenProps {
   onLeave: () => void;
 }
 
-export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: RevealScreenProps) {
+export const RevealScreen = memo(function RevealScreen({
+  game,
+  playerId,
+  isHost,
+  onRestart,
+  onLeave,
+}: RevealScreenProps) {
   const spyIds = game.spies ?? [];
   const location = game.revealedLocation ?? game.location ?? "Unknown";
-
-  const spyNames = game.players
-    .filter((p: PlayerInfo) => spyIds.includes(p.id))
-    .map((p: PlayerInfo) => p.name);
-
   const wasSpy = spyIds.includes(playerId);
+
+  const spyNames = useMemo(
+    () =>
+      game.players
+        .filter((p) => spyIds.includes(p.id))
+        .map((p) => p.name),
+    [game.players, spyIds],
+  );
 
   return (
     <main className="flex flex-1 items-center justify-center p-4">
@@ -69,15 +79,12 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-2">
-              {game.players.map((p: PlayerInfo) => {
-                const isSpy = spyIds.includes(p.id);
-                return (
-                  <div key={p.id} className="flex items-center justify-between py-1.5 px-3 rounded bg-muted/50">
-                    <span className="font-medium">{p.name}</span>
-                    {isSpy && <Badge variant="destructive">Spy</Badge>}
-                  </div>
-                );
-              })}
+              {game.players.map((p) => (
+                <div key={p.id} className="flex items-center justify-between py-1.5 px-3 rounded bg-muted/50">
+                  <span className="font-medium">{p.name}</span>
+                  {spyIds.includes(p.id) && <Badge variant="destructive">Spy</Badge>}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -85,8 +92,7 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
         <div className="space-y-2">
           {isHost ? (
             <Button className="w-full h-12 text-lg gap-2" onClick={onRestart}>
-              <RotateCcw className="h-5 w-5" />
-              Play Again
+              <RotateCcw className="h-5 w-5" /> Play Again
             </Button>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -94,11 +100,10 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
             </p>
           )}
           <Button variant="ghost" className="w-full gap-2 text-muted-foreground" onClick={onLeave}>
-            <LogOut className="h-4 w-4" />
-            Leave Room
+            <LogOut className="h-4 w-4" /> Leave Room
           </Button>
         </div>
       </div>
     </main>
   );
-}
+});

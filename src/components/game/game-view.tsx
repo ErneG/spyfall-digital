@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -50,13 +50,15 @@ export function GameView({
   const [roleRevealed, setRoleRevealed] = useState(false);
   const [ending, setEnding] = useState(false);
   const beeped = useRef(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // Beep on timer expiry
+  // Beep on timer expiry — reuse AudioContext
   useEffect(() => {
     if (expired && !beeped.current) {
       beeped.current = true;
       try {
-        const ctx = new AudioContext();
+        if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+        const ctx = audioCtxRef.current;
         for (let i = 0; i < 2; i++) {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -73,15 +75,15 @@ export function GameView({
     }
   }, [expired]);
 
-  async function handleTimerToggle() {
+  const handleTimerToggle = useCallback(async () => {
     await fetch(`/api/games/${gameId}/timer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerId, action: timerRunning ? "pause" : "resume" }),
     });
-  }
+  }, [gameId, playerId, timerRunning]);
 
-  async function handleEndGame() {
+  const handleEndGame = useCallback(async () => {
     setEnding(true);
     try {
       await fetch(`/api/games/${gameId}/end`, {
@@ -92,20 +94,34 @@ export function GameView({
     } finally {
       setEnding(false);
     }
-  }
+  }, [gameId, playerId]);
 
-  async function handleRestart() {
+  const handleRestart = useCallback(async () => {
     await fetch(`/api/games/${gameId}/restart`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ playerId }),
     });
-  }
+  }, [gameId, playerId]);
 
-  function handleLeave() {
+  const handleLeave = useCallback(() => {
     clearSession();
     router.push("/");
-  }
+  }, [clearSession, router]);
+
+  const toggleRole = useCallback(() => setRoleRevealed((prev) => !prev), []);
+
+  const spyBadges = useMemo(
+    () =>
+      hideSpyCount
+        ? null
+        : Array.from({ length: spyCount }, (_, i) => (
+            <Badge key={i} variant="destructive" className="text-xs">
+              <AlertTriangle className="mr-1 h-3 w-3" /> Spy
+            </Badge>
+          )),
+    [hideSpyCount, spyCount],
+  );
 
   if (loading && !game) {
     return (
@@ -123,7 +139,6 @@ export function GameView({
     );
   }
 
-  // Reveal screen
   if (game.phase === "REVEAL" || game.phase === "FINISHED") {
     return (
       <RevealScreen
@@ -139,7 +154,7 @@ export function GameView({
   return (
     <main className="flex flex-1 flex-col items-center p-4 pb-24">
       <div className="w-full max-w-md space-y-4">
-        {/* Timer + Spy Count */}
+        {/* Timer + pause/resume */}
         <div className="flex items-center gap-2">
           <div className="flex-1">
             <Timer display={display} expired={expired} paused={!timerRunning} />
@@ -156,24 +171,13 @@ export function GameView({
           )}
         </div>
 
-        {/* Spy count indicator */}
-        {!hideSpyCount && (
-          <div className="flex justify-center gap-1">
-            {Array.from({ length: spyCount }).map((_, i) => (
-              <Badge key={i} variant="destructive" className="text-xs">
-                <AlertTriangle className="mr-1 h-3 w-3" /> Spy
-              </Badge>
-            ))}
-          </div>
-        )}
+        {/* Spy count */}
+        {spyBadges && <div className="flex justify-center gap-1">{spyBadges}</div>}
 
         {/* Role Card */}
         <Card className={game.isSpy ? "border-destructive/50 bg-destructive/5" : ""}>
           <CardContent className="pt-6 text-center space-y-3">
-            <button
-              onClick={() => setRoleRevealed(!roleRevealed)}
-              className="w-full cursor-pointer"
-            >
+            <button onClick={toggleRole} className="w-full cursor-pointer">
               {roleRevealed ? (
                 <>
                   {game.isSpy ? (
@@ -213,9 +217,7 @@ export function GameView({
         {/* Players */}
         <Card>
           <CardContent className="pt-4 pb-3">
-            <p className="text-xs text-muted-foreground mb-2">
-              Players ({game.players.length})
-            </p>
+            <p className="text-xs text-muted-foreground mb-2">Players ({game.players.length})</p>
             <div className="flex flex-wrap gap-1.5">
               {game.players.map((p) => (
                 <Badge key={p.id} variant={p.id === playerId ? "default" : "secondary"}>
@@ -226,7 +228,7 @@ export function GameView({
           </CardContent>
         </Card>
 
-        {/* Location Grid with cross-out + previous */}
+        {/* Location Grid */}
         <LocationGrid
           locations={game.allLocations}
           revealedLocation={game.isSpy ? null : game.location}
@@ -248,11 +250,7 @@ export function GameView({
               {ending ? "Ending..." : "End Game"}
             </Button>
           )}
-          <VotePanel
-            players={game.players}
-            playerId={playerId}
-            gameId={gameId}
-          />
+          <VotePanel players={game.players} playerId={playerId} gameId={gameId} />
         </div>
       </div>
     </main>
