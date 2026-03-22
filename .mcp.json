@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "stitch": {
+      "command": "npx",
+      "args": ["@_davideast/stitch-mcp", "proxy"]
+    },
+    "nano-banana": {
+      "command": "npx",
+      "args": ["@the-focus-ai/nano-banana"]
+    }
+  }
+}
