@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Game Room ───────────────────────────────────────────────
+
+model Room {
+  id        String   @id @default(cuid())
+  code      String   @unique @db.VarChar(6)
+  state     GameState @default(LOBBY)
+  hostId    String
+  timeLimit Int      @default(480) // seconds
+  spyCount  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players  Player[]
+  games    Game[]
+
+  @@index([code])
+}
+
+enum GameState {
+  LOBBY
+  PLAYING
+  VOTING
+  REVEAL
+  FINISHED
+}
+
+// ─── Player ──────────────────────────────────────────────────
+
+model Player {
+  id        String   @id @default(cuid())
+  name      String
+  avatarUrl String?
+  isHost    Boolean  @default(false)
+  isOnline  Boolean  @default(true)
+  roomId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  assignments Assignment[]
+  votes       Vote[]       @relation("voter")
+  votesAgainst Vote[]      @relation("suspect")
+
+  @@index([roomId])
+}
+
+// ─── Game (one round within a room) ──────────────────────────
+
+model Game {
+  id         String    @id @default(cuid())
+  roomId     String
+  locationId String
+  state      GameState @default(PLAYING)
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+
+  room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  location    Location     @relation(fields: [locationId], references: [id])
+  assignments Assignment[]
+  votes       Vote[]
+
+  @@index([roomId])
+}
+
+// ─── Assignment (player role in a game) ──────────────────────
+
+model Assignment {
+  id       String  @id @default(cuid())
+  gameId   String
+  playerId String
+  role     String  // role name at the location, or "SPY"
+  isSpy    Boolean @default(false)
+
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, playerId])
+}
+
+// ─── Vote ────────────────────────────────────────────────────
+
+model Vote {
+  id        String   @id @default(cuid())
+  gameId    String
+  voterId   String
+  suspectId String
+  createdAt DateTime @default(now())
+
+  game    Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  voter   Player @relation("voter", fields: [voterId], references: [id], onDelete: Cascade)
+  suspect Player @relation("suspect", fields: [suspectId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, voterId])
+}
+
+// ─── Location & Roles ────────────────────────────────────────
+
+model Location {
+  id       String @id @default(cuid())
+  name     String @unique
+  imageUrl String?
+  edition  Int    @default(1) // 1 = classic, 2 = spyfall 2
+
+  roles Role[]
+  games Game[]
+}
+
+model Role {
+  id         String @id @default(cuid())
+  name       String
+  locationId String
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId])
+}
