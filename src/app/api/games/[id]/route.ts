@@ -40,36 +40,69 @@ export async function GET(
     return NextResponse.json({ error: "Player not in this game" }, { status: 403 });
   }
 
-  // Get all locations for the location list (shown to all players)
+  // Get all locations for the location list
   const allLocations = await prisma.location.findMany({
     select: { id: true, name: true, imageUrl: true },
     orderBy: { name: "asc" },
   });
 
+  // Also include selected custom locations
+  const customLocations = await prisma.customLocation.findMany({
+    where: { roomId: game.roomId, selected: true, allSpies: false },
+    select: { id: true, name: true },
+  });
+
+  const combinedLocations = [
+    ...allLocations.map((l) => ({ ...l, edition: undefined })),
+    ...customLocations.map((cl) => ({ id: cl.id, name: cl.name, imageUrl: null })),
+  ].sort((a, b) => a.name.localeCompare(b.name));
+
   // Calculate time remaining
-  const elapsed = Math.floor((Date.now() - game.startedAt.getTime()) / 1000);
-  const timeRemaining = Math.max(0, game.room.timeLimit - elapsed);
+  let timeRemaining: number;
+  if (!game.timerRunning && game.timerPausedAt) {
+    const elapsedBeforePause = Math.floor(
+      (game.timerPausedAt.getTime() - game.startedAt.getTime()) / 1000,
+    );
+    timeRemaining = Math.max(0, game.room.timeLimit - elapsedBeforePause);
+  } else {
+    const elapsed = Math.floor((Date.now() - game.startedAt.getTime()) / 1000);
+    timeRemaining = Math.max(0, game.room.timeLimit - elapsed);
+  }
+
+  // Get previous location name
+  const prevLocation = game.room.prevLocationId
+    ? await prisma.location.findUnique({
+        where: { id: game.room.prevLocationId },
+        select: { name: true },
+      })
+    : null;
 
   return NextResponse.json({
     gameId: game.id,
     phase: game.state,
     myRole: myAssignment.role,
     isSpy: myAssignment.isSpy,
-    location: myAssignment.isSpy ? null : game.location.name,
-    allLocations,
+    location: myAssignment.isSpy ? null : game.locationName,
+    allLocations: combinedLocations,
     players: game.room.players,
     timeRemaining,
     timeLimit: game.room.timeLimit,
     startedAt: game.startedAt,
-    votes: game.state === "REVEAL"
-      ? game.votes.map((v) => ({ voterId: v.voterId, suspectId: v.suspectId }))
-      : undefined,
-    // Only reveal spies after game ends
-    spies: game.state === "REVEAL" || game.state === "FINISHED"
-      ? game.assignments.filter((a) => a.isSpy).map((a) => a.playerId)
-      : undefined,
-    revealedLocation: game.state === "REVEAL" || game.state === "FINISHED"
-      ? game.location.name
-      : undefined,
+    timerRunning: game.timerRunning,
+    hideSpyCount: game.room.hideSpyCount,
+    spyCount: game.room.spyCount,
+    prevLocationName: prevLocation?.name ?? null,
+    votes:
+      game.state === "REVEAL" || game.state === "FINISHED"
+        ? game.votes.map((v) => ({ voterId: v.voterId, suspectId: v.suspectId }))
+        : undefined,
+    spies:
+      game.state === "REVEAL" || game.state === "FINISHED"
+        ? game.assignments.filter((a) => a.isSpy).map((a) => a.playerId)
+        : undefined,
+    revealedLocation:
+      game.state === "REVEAL" || game.state === "FINISHED"
+        ? game.locationName
+        : undefined,
   });
 }

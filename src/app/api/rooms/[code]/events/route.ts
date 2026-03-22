@@ -11,7 +11,7 @@ export async function GET(
   let closed = false;
 
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
       const send = (data: unknown) => {
         if (closed) return;
         try {
@@ -21,7 +21,6 @@ export async function GET(
         }
       };
 
-      // Poll database every 1.5s and send updates
       const poll = async () => {
         while (!closed) {
           try {
@@ -30,13 +29,15 @@ export async function GET(
               include: {
                 players: {
                   orderBy: { createdAt: "asc" },
-                  select: { id: true, name: true, isHost: true, isOnline: true },
+                  select: { id: true, name: true, isHost: true, isOnline: true, moderatorRole: true },
                 },
                 games: {
                   orderBy: { startedAt: "desc" },
                   take: 1,
-                  select: { id: true, state: true, startedAt: true },
+                  select: { id: true, state: true, startedAt: true, timerRunning: true },
                 },
+                selectedLocations: { select: { locationId: true } },
+                _count: { select: { customLocations: { where: { selected: true } } } },
               },
             });
 
@@ -48,24 +49,32 @@ export async function GET(
             }
 
             const latestGame = room.games[0] ?? null;
+            const totalLocations = await prisma.location.count();
 
             send({
               state: room.state,
               players: room.players,
               timeLimit: room.timeLimit,
               spyCount: room.spyCount,
+              autoStartTimer: room.autoStartTimer,
+              hideSpyCount: room.hideSpyCount,
+              moderatorMode: room.moderatorMode,
+              moderatorLocationId: room.moderatorLocationId,
+              selectedLocationCount: room.selectedLocations.length + room._count.customLocations,
+              totalLocationCount: totalLocations,
               currentGameId: latestGame?.id ?? null,
               gameStartedAt: latestGame?.startedAt ?? null,
+              timerRunning: latestGame?.timerRunning ?? true,
             });
           } catch {
-            // DB error — skip this tick
+            // DB error — skip
           }
 
-          await new Promise((r) => setTimeout(r, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
         }
       };
 
-      poll();
+      void poll();
     },
     cancel() {
       closed = true;

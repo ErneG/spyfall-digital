@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateRoomCode, MIN_PLAYERS, MAX_PLAYERS, DEFAULT_TIME_LIMIT } from "@/lib/game-logic";
+import { generateRoomCode, DEFAULT_TIME_LIMIT } from "@/lib/game-logic";
 
 // POST /api/rooms — create a new room
 export async function POST(request: Request) {
@@ -12,37 +12,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Host name is required" }, { status: 400 });
     }
 
-    // Generate unique room code (retry if collision)
-    let code: string;
-    let attempts = 0;
-    do {
+    // Generate unique room code
+    let code = "";
+    for (let attempt = 0; attempt < 10; attempt++) {
       code = generateRoomCode();
       const existing = await prisma.room.findUnique({ where: { code } });
       if (!existing) break;
-      attempts++;
-    } while (attempts < 10);
-
-    if (attempts >= 10) {
-      return NextResponse.json({ error: "Failed to generate unique room code" }, { status: 500 });
+      if (attempt === 9) {
+        return NextResponse.json({ error: "Failed to generate unique room code" }, { status: 500 });
+      }
     }
+
+    // Get all locations to auto-select them
+    const allLocations = await prisma.location.findMany({ select: { id: true } });
 
     const room = await prisma.room.create({
       data: {
         code,
         timeLimit: timeLimit ?? DEFAULT_TIME_LIMIT,
         spyCount: spyCount ?? 1,
-        hostId: "", // will be set after host player is created
+        hostId: "",
         players: {
-          create: {
-            name: hostName.trim(),
-            isHost: true,
-          },
+          create: { name: hostName.trim(), isHost: true },
+        },
+        // Select all locations by default
+        selectedLocations: {
+          create: allLocations.map((loc) => ({ locationId: loc.id })),
         },
       },
       include: { players: true },
     });
 
-    // Update hostId to the created player
     const host = room.players[0];
     await prisma.room.update({
       where: { id: room.id },

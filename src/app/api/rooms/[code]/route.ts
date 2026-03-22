@@ -30,6 +30,10 @@ export async function GET(
     hostId: room.hostId,
     timeLimit: room.timeLimit,
     spyCount: room.spyCount,
+    autoStartTimer: room.autoStartTimer,
+    hideSpyCount: room.hideSpyCount,
+    moderatorMode: room.moderatorMode,
+    moderatorLocationId: room.moderatorLocationId,
     players: room.players,
   });
 }

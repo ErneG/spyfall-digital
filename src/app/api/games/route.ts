@@ -14,42 +14,100 @@ export async function POST(request: Request) {
 
     const room = await prisma.room.findUnique({
       where: { id: roomId },
-      include: { players: true },
+      include: {
+        players: true,
+        selectedLocations: { select: { locationId: true } },
+        customLocations: {
+          where: { selected: true },
+          include: { roles: true },
+        },
+      },
     });
 
-    if (!room) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    }
-
-    if (room.hostId !== playerId) {
-      return NextResponse.json({ error: "Only the host can start the game" }, { status: 403 });
-    }
-
+    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    if (room.hostId !== playerId) return NextResponse.json({ error: "Only the host can start" }, { status: 403 });
     if (room.players.length < MIN_PLAYERS) {
-      return NextResponse.json(
-        { error: `Need at least ${MIN_PLAYERS} players to start` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: `Need at least ${MIN_PLAYERS} players` }, { status: 400 });
     }
 
-    // Pick a random location
-    const locations = await prisma.location.findMany({
-      include: { roles: true },
-    });
+    // Build candidate locations from selected built-in + selected custom
+    const selectedLocationIds = room.selectedLocations.map((sl) => sl.locationId);
+    const builtInLocations = selectedLocationIds.length > 0
+      ? await prisma.location.findMany({
+          where: { id: { in: selectedLocationIds } },
+          include: { roles: true },
+        })
+      : [];
 
-    const location = shuffle(locations)[0];
-    const roleNames = location.roles.map((r) => r.name);
+    const selectedCustom = room.customLocations;
+
+    type LocationCandidate = {
+      type: "builtin" | "custom";
+      id: string | null;
+      name: string;
+      roles: string[];
+      allSpies: boolean;
+    };
+
+    const candidates: LocationCandidate[] = [
+      ...builtInLocations.map((loc) => ({
+        type: "builtin" as const,
+        id: loc.id,
+        name: loc.name,
+        roles: loc.roles.map((r) => r.name),
+        allSpies: false,
+      })),
+      ...selectedCustom.map((cl) => ({
+        type: "custom" as const,
+        id: cl.id,
+        name: cl.allSpies ? "?????" : cl.name,
+        roles: cl.roles.map((r) => r.name),
+        allSpies: cl.allSpies,
+      })),
+    ];
+
+    if (candidates.length === 0) {
+      return NextResponse.json({ error: "No locations selected" }, { status: 400 });
+    }
+
+    // Pick location — moderator mode or random (avoiding previous)
+    let chosen: LocationCandidate;
+    if (room.moderatorMode && room.moderatorLocationId) {
+      const modChoice = candidates.find((c) => c.id === room.moderatorLocationId);
+      chosen = modChoice ?? shuffle(candidates)[0];
+    } else {
+      // Avoid previous location if multiple candidates
+      const filtered = candidates.length > 1 && room.prevLocationId
+        ? candidates.filter((c) => c.id !== room.prevLocationId)
+        : candidates;
+      chosen = shuffle(filtered)[0];
+    }
+
     const playerIds = room.players.map((p) => p.id);
 
-    const assignments = assignRoles(playerIds, roleNames, room.spyCount);
+    // Handle moderator pre-assigned roles
+    const moderatorAssignments = room.moderatorMode
+      ? room.players
+          .filter((p) => p.moderatorRole)
+          .map((p) => ({ playerId: p.id, role: p.moderatorRole! }))
+      : [];
 
-    // Create the game and assignments in a transaction
+    // All-spies mode
+    let assignments;
+    if (chosen.allSpies) {
+      assignments = playerIds.map((pid) => ({ playerId: pid, role: "SPY", isSpy: true }));
+    } else {
+      assignments = assignRoles(playerIds, chosen.roles, room.spyCount, moderatorAssignments);
+    }
+
     const game = await prisma.$transaction(async (tx) => {
-      const g = await tx.game.create({
+      const newGame = await tx.game.create({
         data: {
           roomId: room.id,
-          locationId: location.id,
+          locationId: chosen.type === "builtin" ? chosen.id : null,
+          locationName: chosen.name,
           state: "PLAYING",
+          timerRunning: room.autoStartTimer,
           assignments: {
             create: assignments.map((a) => ({
               playerId: a.playerId,
@@ -58,26 +116,35 @@ export async function POST(request: Request) {
             })),
           },
         },
-        include: {
-          assignments: true,
-          location: { include: { roles: true } },
-        },
       });
 
       await tx.room.update({
         where: { id: room.id },
-        data: { state: "PLAYING" },
+        data: {
+          state: "PLAYING",
+          prevLocationId: chosen.type === "builtin" ? chosen.id : chosen.id,
+        },
       });
 
-      return g;
+      // Clear moderator roles for next round
+      if (room.moderatorMode) {
+        await tx.player.updateMany({
+          where: { roomId: room.id },
+          data: { moderatorRole: null },
+        });
+      }
+
+      return newGame;
     });
 
     return NextResponse.json({
       gameId: game.id,
       state: game.state,
       startedAt: game.startedAt,
+      timerRunning: game.timerRunning,
     });
-  } catch {
+  } catch (error) {
+    console.error("Failed to start game:", error);
     return NextResponse.json({ error: "Failed to start game" }, { status: 500 });
   }
 }
