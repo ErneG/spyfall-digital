@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { MAX_PLAYERS } from "@/lib/game-logic";
+import { prisma } from "@/shared/lib/prisma";
+import { MAX_PLAYERS } from "@/shared/lib/constants";
 
 // GET /api/rooms/[code] — get room state
 export async function GET(

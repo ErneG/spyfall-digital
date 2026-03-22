@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 import {
   createRoomInput,
@@ -11,7 +11,8 @@ import {
   type JoinRoomInput,
   type JoinRoomOutput,
 } from "@/domains/room/schema";
-import { generateRoomCode, DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/lib/game-logic";
+import { generateRoomCode } from "@/shared/lib/room-code";
+import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
 
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms

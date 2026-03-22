@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 const ROOM_NOT_FOUND = "Room not found";
 const HOST_ONLY = "Host only";

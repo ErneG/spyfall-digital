@@ -2,14 +2,13 @@
 
 import { use, useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useSession } from "@/hooks/use-session";
-import { useRoomEvents } from "@/hooks/use-room-events";
-import { GameConfig } from "@/components/lobby/game-config";
-import { LocationSettings } from "@/components/lobby/location-settings";
-import { GameView } from "@/components/game/game-view";
-import { RoomCodeHeader, PlayerList, StartSection } from "./room-parts";
+import { Button } from "@/shared/ui/button";
+import { Separator } from "@/shared/ui/separator";
+import { useSession } from "@/shared/hooks/use-session";
+import { useRoomEvents } from "@/domains/room/hooks";
+import { GameConfig, RoomCodeHeader, PlayerList, StartSection } from "@/domains/room/components";
+import { LocationSettings } from "@/domains/location/components/location-settings";
+import { GameView } from "@/domains/game/components/game-view";
 
 interface StartGameResponse { error?: string }
 

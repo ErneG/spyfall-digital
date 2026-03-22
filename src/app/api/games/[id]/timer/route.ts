@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 // POST /api/games/[id]/timer — pause/resume timer (host only)
 export async function POST(

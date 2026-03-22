@@ -2,7 +2,7 @@
 
 import { memo, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { Moon, Sun } from "lucide-react";
 
 export const ThemeToggle = memo(function ThemeToggle() {

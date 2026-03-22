@@ -1,0 +1,192 @@
+"use client";
+
+import { memo, useState, useCallback, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Button } from "@/shared/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/dialog";
+import { MapPin } from "lucide-react";
+import type { LocationInfo } from "@/domains/game/schema";
+import { endGame } from "@/domains/game/actions";
+
+interface LocationGridProps {
+  locations: LocationInfo[];
+  revealedLocation: string | null;
+  prevLocationName: string | null;
+  gameId?: string;
+  playerId?: string;
+}
+
+const LocationButton = memo(function LocationButton({
+  location,
+  isRevealed,
+  isPrevious,
+  isCrossed,
+  isSpy,
+  onSpyClick,
+  onCrossClick,
+}: {
+  location: LocationInfo;
+  isRevealed: boolean;
+  isPrevious: boolean;
+  isCrossed: boolean;
+  isSpy: boolean;
+  onSpyClick: (loc: LocationInfo) => void;
+  onCrossClick: (locId: string) => void;
+}) {
+  const handleClick = useCallback(() => {
+    if (isSpy) {
+      onSpyClick(location);
+    } else {
+      onCrossClick(location.id);
+    }
+  }, [isSpy, onSpyClick, onCrossClick, location]);
+
+  let className = "text-left text-xs py-1.5 px-2 rounded transition-colors cursor-pointer ";
+  if (isRevealed) {
+    className += "bg-primary/10 text-primary font-bold";
+  } else if (isPrevious) {
+    className += "bg-muted/30 text-muted-foreground line-through opacity-50";
+  } else if (isCrossed) {
+    className += "bg-muted/30 text-muted-foreground line-through";
+  } else if (isSpy) {
+    className += "bg-muted/50 hover:bg-muted";
+  } else {
+    className += "bg-muted/50 hover:bg-muted/70";
+  }
+
+  return (
+    <button onClick={handleClick} className={className}>
+      {location.name}
+    </button>
+  );
+});
+
+/* ── Guess confirmation dialog ────────────────────────── */
+
+const GuessDialog = memo(function GuessDialog({
+  guessTarget,
+  isGuessing,
+  onCancel,
+  onConfirm,
+}: {
+  guessTarget: LocationInfo | null;
+  isGuessing: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <Dialog open={!!guessTarget} onOpenChange={onCancel}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Guess the Location?</DialogTitle>
+          <DialogDescription>
+            Are you sure the location is <strong>{guessTarget?.name}</strong>?
+            If you&apos;re wrong, you lose!
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="ghost" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={onConfirm} disabled={isGuessing}>
+            {isGuessing ? "Guessing..." : "Confirm Guess"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+});
+
+/* ── Main grid ────────────────────────────────────────── */
+
+export const LocationGrid = memo(function LocationGrid({
+  locations,
+  revealedLocation,
+  prevLocationName,
+  gameId,
+  playerId,
+}: LocationGridProps) {
+  const [guessTarget, setGuessTarget] = useState<LocationInfo | null>(null);
+  const [isGuessing, setIsGuessing] = useState(false);
+  const [crossedOut, setCrossedOut] = useState<Set<string>>(new Set());
+  const isSpy = !!gameId;
+
+  const toggleCrossOut = useCallback((locId: string) => {
+    setCrossedOut((previous) => {
+      const next = new Set(previous);
+      if (next.has(locId)) {
+        next.delete(locId);
+      } else {
+        next.add(locId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleGuess = useCallback(async () => {
+    if (!gameId || !playerId || !guessTarget) return;
+    setIsGuessing(true);
+    try {
+      await endGame({ gameId, playerId, spyGuessLocationId: guessTarget.id });
+    } finally {
+      setIsGuessing(false);
+      setGuessTarget(null);
+    }
+  }, [gameId, playerId, guessTarget]);
+
+  const handleCancelGuess = useCallback(() => {
+    setGuessTarget(null);
+  }, []);
+
+  const handleConfirmGuess = useCallback(() => {
+    void handleGuess();
+  }, [handleGuess]);
+
+  const locationButtons = useMemo(
+    () =>
+      locations.map((loc) => (
+        <LocationButton
+          key={loc.id}
+          location={loc}
+          isRevealed={revealedLocation === loc.name}
+          isPrevious={prevLocationName === loc.name}
+          isCrossed={crossedOut.has(loc.id)}
+          isSpy={isSpy}
+          onSpyClick={setGuessTarget}
+          onCrossClick={toggleCrossOut}
+        />
+      )),
+    [locations, revealedLocation, prevLocationName, crossedOut, isSpy, toggleCrossOut],
+  );
+
+  return (
+    <>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm text-muted-foreground flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            Locations ({locations.length})
+            {isSpy && <span className="text-destructive ml-1">&mdash; tap to guess!</span>}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-1.5">{locationButtons}</div>
+        </CardContent>
+      </Card>
+
+      <GuessDialog
+        guessTarget={guessTarget}
+        isGuessing={isGuessing}
+        onCancel={handleCancelGuess}
+        onConfirm={handleConfirmGuess}
+      />
+    </>
+  );
+});

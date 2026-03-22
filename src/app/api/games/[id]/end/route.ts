@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 // POST /api/games/[id]/end — end the game (host only, or spy guessing location)
 export async function POST(

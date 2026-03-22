@@ -9,8 +9,8 @@ import {
   type StartGameOutput,
 } from "@/domains/game/schema";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
-import { prisma } from "@/lib/prisma";
-import { assignRoles, MIN_PLAYERS, shuffle } from "@/lib/game-logic";
+import { prisma } from "@/shared/lib/prisma";
+import { assignRoles, MIN_PLAYERS, shuffle } from "@/domains/game/logic";
 
 // ─── Helpers ────────────────────────────────────────────────
 

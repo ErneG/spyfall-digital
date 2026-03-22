@@ -722,7 +722,7 @@ const eslintConfig = defineConfig([
 
   // shadcn/ui — generated code, heavily relaxed
   {
-    files: ["src/components/ui/**/*.tsx"],
+    files: ["src/components/ui/**/*.tsx", "src/shared/ui/**/*.tsx"],
     rules: {
       "react-perf/jsx-no-new-function-as-prop": "off",
       "react-perf/jsx-no-new-object-as-prop": "off",
@@ -757,7 +757,7 @@ const eslintConfig = defineConfig([
 
   // Data/seed files — relaxed rules
   {
-    files: ["src/data/**/*.ts", "prisma/**/*.ts"],
+    files: ["src/data/**/*.ts", "src/domains/**/data.ts", "prisma/**/*.ts"],
     rules: {
       "no-magic-numbers": "off",
       "max-lines": "off",

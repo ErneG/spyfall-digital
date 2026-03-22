@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 const SSE_CONTENT_TYPE = "text/event-stream";
 

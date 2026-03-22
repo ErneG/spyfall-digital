@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 // POST /api/games/[id]/restart — return room to lobby for a new round
 export async function POST(

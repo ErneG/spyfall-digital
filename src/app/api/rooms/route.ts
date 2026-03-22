@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { generateRoomCode, DEFAULT_TIME_LIMIT } from "@/lib/game-logic";
+import { prisma } from "@/shared/lib/prisma";
+import { generateRoomCode } from "@/shared/lib/room-code";
+import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 
 // POST /api/rooms — create a new room
 export async function POST(request: Request) {

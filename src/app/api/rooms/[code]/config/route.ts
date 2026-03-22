@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 // PATCH /api/rooms/[code]/config — update room configuration (host only)
 export async function PATCH(

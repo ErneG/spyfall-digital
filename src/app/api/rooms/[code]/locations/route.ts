@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 // GET /api/rooms/[code]/locations — get all locations with selection state
 export async function GET(

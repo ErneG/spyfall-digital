@@ -2,26 +2,13 @@
 
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { useSession } from "@/hooks/use-session";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
+import { Separator } from "@/shared/ui/separator";
+import { useSession } from "@/shared/hooks/use-session";
+import { createRoom, joinRoom } from "@/domains/room/actions";
 import { Eye, Users, Crosshair } from "lucide-react";
-
-interface CreateRoomResponse {
-  playerId: string;
-  code: string;
-  roomId: string;
-  error?: string;
-}
-
-interface JoinRoomResponse {
-  playerId: string;
-  code: string;
-  roomId: string;
-  error?: string;
-}
 
 /* ── Subcomponents ────────────────────────────────────── */
 
@@ -163,11 +150,11 @@ export function useHomeState() {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/rooms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hostName: name.trim() }) });
-      const data = (await res.json()) as CreateRoomResponse;
-      if (!res.ok) throw new Error(data.error);
-      setSession({ playerId: data.playerId, roomCode: data.code, roomId: data.roomId, isHost: true });
-      router.push(`/room/${data.code}`);
+      const result = await createRoom({ hostName: name.trim() });
+      if (!result.success) throw new Error(result.error);
+      const { playerId, code: roomCode, roomId } = result.data;
+      setSession({ playerId, roomCode, roomId, isHost: true });
+      router.push(`/room/${roomCode}`);
     } catch (caughtError: unknown) {
       setError(caughtError instanceof Error ? caughtError.message : "Failed to create room");
     } finally { setIsLoading(false); }
@@ -180,11 +167,11 @@ export function useHomeState() {
     setError("");
     try {
       const code = joinCode.trim().toUpperCase();
-      const res = await fetch(`/api/rooms/${code}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ playerName: name.trim() }) });
-      const data = (await res.json()) as JoinRoomResponse;
-      if (!res.ok) throw new Error(data.error);
-      setSession({ playerId: data.playerId, roomCode: data.code, roomId: data.roomId, isHost: false });
-      router.push(`/room/${data.code}`);
+      const result = await joinRoom({ playerName: name.trim(), roomCode: code });
+      if (!result.success) throw new Error(result.error);
+      const { playerId, code: joinedCode, roomId } = result.data;
+      setSession({ playerId, roomCode: joinedCode, roomId, isHost: false });
+      router.push(`/room/${joinedCode}`);
     } catch (caughtError: unknown) {
       setError(caughtError instanceof Error ? caughtError.message : "Failed to join room");
     } finally { setIsLoading(false); }

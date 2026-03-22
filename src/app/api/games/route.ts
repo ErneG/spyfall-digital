@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { assignRoles, MIN_PLAYERS, shuffle } from "@/lib/game-logic";
+import { prisma } from "@/shared/lib/prisma";
+import { assignRoles, MIN_PLAYERS, shuffle } from "@/domains/game/logic";
 
 type LocationCandidate = {
   type: "builtin" | "custom";

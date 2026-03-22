@@ -12,7 +12,8 @@ export const createRoomInput = z.object({
   timeLimit: z.number().int().min(360).max(600).default(480),
   spyCount: z.number().int().min(1).max(2).default(1),
 });
-export type CreateRoomInput = z.infer<typeof createRoomInput>;
+export type CreateRoomInput = z.input<typeof createRoomInput>;
+export type CreateRoomData = z.infer<typeof createRoomInput>;
 
 export const joinRoomInput = z.object({
   playerName: z.string().min(1, "Name is required").max(20).trim(),

@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod/v4";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 import {
   updateLocationsInput,
