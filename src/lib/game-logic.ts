@@ -12,8 +12,7 @@
  *    The spy can also guess the location at any time — correct guess = spy wins.
  */
 
-// Room code generation (5-char alphanumeric, uppercase)
-const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no ambiguous chars (0/O, 1/I)
+const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 export function generateRoomCode(): string {
   let code = "";
@@ -23,7 +22,6 @@ export function generateRoomCode(): string {
   return code;
 }
 
-// Shuffle array (Fisher-Yates)
 export function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -39,31 +37,57 @@ export interface RoleAssignment {
   isSpy: boolean;
 }
 
+interface ModeratorPreAssignment {
+  playerId: string;
+  role: string; // "SPY" or a location role name
+}
+
 /**
  * Assign roles to players for a game round.
- * - `spyCount` players become spies
- * - Remaining players get shuffled roles from the location's role pool
+ * Supports moderator pre-assignments where specific players are locked to roles.
  */
 export function assignRoles(
   playerIds: string[],
   roles: string[],
   spyCount: number = 1,
+  moderatorAssignments: ModeratorPreAssignment[] = [],
 ): RoleAssignment[] {
-  const shuffledPlayers = shuffle(playerIds);
-  const shuffledRoles = shuffle(roles);
+  const result: RoleAssignment[] = [];
+  const preAssignedIds = new Set(moderatorAssignments.map((ma) => ma.playerId));
 
-  return shuffledPlayers.map((playerId, index) => {
-    if (index < spyCount) {
-      return { playerId, role: "SPY", isSpy: true };
+  // Apply moderator pre-assignments first
+  let remainingSpySlots = spyCount;
+  for (const ma of moderatorAssignments) {
+    const isSpy = ma.role === "SPY";
+    if (isSpy) remainingSpySlots--;
+    result.push({ playerId: ma.playerId, role: ma.role, isSpy });
+  }
+
+  // Remaining players need roles
+  const unassigned = shuffle(playerIds.filter((id) => !preAssignedIds.has(id)));
+  const availableRoles = shuffle(roles);
+
+  let roleIdx = 0;
+  for (const playerId of unassigned) {
+    if (remainingSpySlots > 0) {
+      result.push({ playerId, role: "SPY", isSpy: true });
+      remainingSpySlots--;
+    } else {
+      const role = availableRoles[roleIdx % availableRoles.length];
+      result.push({ playerId, role, isSpy: false });
+      roleIdx++;
     }
-    // Cycle through available roles if more players than roles
-    const roleIndex = (index - spyCount) % shuffledRoles.length;
-    return { playerId, role: shuffledRoles[roleIndex], isSpy: false };
-  });
+  }
+
+  return result;
 }
 
-// Game constraints (matching the reference project)
+// Audio beep for timer expiration (base64 WAV)
+export const BEEP_AUDIO =
+  "data:audio/wav;base64,UklGRl9vT19teleQQFMATWIBAAEAEQBRAAAiIQACABAAAGRhdGE/b09f";
+
+// Game constraints
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 12;
-export const DEFAULT_TIME_LIMIT = 480; // 8 minutes in seconds
+export const DEFAULT_TIME_LIMIT = 480;
 export const MAX_ROLES_PER_LOCATION = 10;

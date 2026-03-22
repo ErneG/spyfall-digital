@@ -10,17 +10,24 @@ datasource db {
 // ─── Game Room ───────────────────────────────────────────────
 
 model Room {
-  id        String   @id @default(cuid())
-  code      String   @unique @db.VarChar(6)
-  state     GameState @default(LOBBY)
-  hostId    String
-  timeLimit Int      @default(480) // seconds
-  spyCount  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(cuid())
+  code           String    @unique @db.VarChar(6)
+  state          GameState @default(LOBBY)
+  hostId         String
+  timeLimit      Int       @default(480) // seconds (360-600)
+  spyCount       Int       @default(1)   // 1 or 2
+  autoStartTimer Boolean   @default(false)
+  hideSpyCount   Boolean   @default(false)
+  moderatorMode  Boolean   @default(false)
+  moderatorLocationId String? // host-chosen location (null = random)
+  prevLocationId String?   // last game's location (avoid repeats)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  players  Player[]
-  games    Game[]
+  players          Player[]
+  games            Game[]
+  selectedLocations RoomLocation[]
+  customLocations  CustomLocation[]
 
   @@index([code])
 }
@@ -33,17 +40,57 @@ enum GameState {
   FINISHED
 }
 
+// ─── Room ↔ Location selection (which locations are enabled) ─
+
+model RoomLocation {
+  id         String @id @default(cuid())
+  roomId     String
+  locationId String
+
+  room     Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, locationId])
+  @@index([roomId])
+}
+
+// ─── Custom Locations (per room) ─────────────────────────────
+
+model CustomLocation {
+  id        String  @id @default(cuid())
+  roomId    String
+  name      String
+  allSpies  Boolean @default(false) // all-spies mode
+  selected  Boolean @default(true)
+
+  room  Room               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roles CustomLocationRole[]
+
+  @@index([roomId])
+}
+
+model CustomLocationRole {
+  id               String @id @default(cuid())
+  name             String
+  customLocationId String
+
+  customLocation CustomLocation @relation(fields: [customLocationId], references: [id], onDelete: Cascade)
+
+  @@index([customLocationId])
+}
+
 // ─── Player ──────────────────────────────────────────────────
 
 model Player {
-  id        String   @id @default(cuid())
-  name      String
-  avatarUrl String?
-  isHost    Boolean  @default(false)
-  isOnline  Boolean  @default(true)
-  roomId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String  @id @default(cuid())
+  name           String
+  avatarUrl      String?
+  isHost         Boolean @default(false)
+  isOnline       Boolean @default(true)
+  moderatorRole  String? // pre-assigned role in moderator mode
+  roomId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
   assignments Assignment[]
@@ -56,15 +103,18 @@ model Player {
 // ─── Game (one round within a room) ──────────────────────────
 
 model Game {
-  id         String    @id @default(cuid())
-  roomId     String
-  locationId String
-  state      GameState @default(PLAYING)
-  startedAt  DateTime  @default(now())
-  endedAt    DateTime?
+  id            String    @id @default(cuid())
+  roomId        String
+  locationId    String?   // null for all-spies custom location
+  locationName  String    // denormalized for custom locations
+  state         GameState @default(PLAYING)
+  timerRunning  Boolean   @default(true)
+  timerPausedAt DateTime? // when paused, store the remaining time calc point
+  startedAt     DateTime  @default(now())
+  endedAt       DateTime?
 
   room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  location    Location     @relation(fields: [locationId], references: [id])
+  location    Location?    @relation(fields: [locationId], references: [id])
   assignments Assignment[]
   votes       Vote[]
 
@@ -110,8 +160,9 @@ model Location {
   imageUrl String?
   edition  Int    @default(1) // 1 = classic, 2 = spyfall 2
 
-  roles Role[]
-  games Game[]
+  roles         Role[]
+  games         Game[]
+  roomLocations RoomLocation[]
 }
 
 model Role {
