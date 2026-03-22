@@ -6,33 +6,62 @@ A digital adaptation of the social deduction game Spyfall, built as a PWA with N
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router, React Compiler enabled)
+- **Framework**: Next.js 16 (App Router, React Compiler, Server Actions)
 - **UI**: shadcn/ui + Tailwind CSS v4 (dark mode by default)
 - **Database**: PostgreSQL + Prisma 7 (adapter pattern with `@prisma/adapter-pg`)
+- **Validation**: Zod 4 (single source of truth for all types)
 - **PWA**: @ducanh2912/next-pwa
-- **Real-time**: SSE (Server-Sent Events) for room state, polling for game state
-- **Design tooling**: Stitch MCP (Google Stitch design proxy)
-- **Asset generation**: Nano Banana MCP (AI image generation)
+- **Real-time**: SSE for room state, polling for game state
 - **Infra**: Docker Compose (PostgreSQL on port 5433)
+- **Design**: Stitch MCP + Nano Banana MCP
 
-## Project Structure
+## Architecture — Domain-Driven Design
 
 ```
 src/
-├── app/              # Next.js App Router pages & API routes
-│   ├── room/[code]/  # Room lobby + active game page
-│   └── api/          # REST API routes
-│       ├── rooms/    # Room CRUD + SSE events
-│       └── games/    # Game lifecycle (start, vote, end, restart)
-├── components/
-│   ├── ui/           # shadcn/ui primitives (base-ui, not radix)
-│   └── game/         # In-game components (timer, location-grid, vote-panel, reveal)
-├── data/             # Static data (46 location seeds)
-├── hooks/            # Custom React hooks (useRoomEvents, useGameState, useTimer, useSession)
-├── lib/              # Utilities (prisma client, game logic)
-├── types/            # TypeScript type definitions
-└── generated/        # Prisma generated client (gitignored)
+├── app/                     # Routes only (THIN — import from domains)
+│   ├── page.tsx             # Home page
+│   ├── home-parts.tsx       # Home subcomponents + useHomeState hook
+│   ├── loading.tsx          # Global loading skeleton
+│   ├── error.tsx            # Global error boundary
+│   ├── room/[code]/         # Room page + loading/error boundaries
+│   └── api/                 # GET routes only (SSE + polling)
+│       ├── rooms/[code]/events/  # SSE stream
+│       └── games/[id]/          # Game state polling
+├── domains/                 # Business logic organized by domain
+│   ├── room/
+│   │   ├── schema.ts        # Zod schemas → inferred types
+│   │   ├── actions.ts       # Server Actions (createRoom, joinRoom, updateConfig)
+│   │   ├── hooks.ts         # useRoomEvents (SSE with Zod validation)
+│   │   └── components/      # GameConfig, RoomCodeHeader, PlayerList, StartSection
+│   ├── game/
+│   │   ├── schema.ts        # Zod schemas → GameView, inputs/outputs
+│   │   ├── actions.ts       # Server Actions (startGame, castVote, endGame, etc.)
+│   │   ├── hooks.ts         # useGameState (polling with Zod), useTimer
+│   │   ├── logic.ts         # Pure game logic (no DB, no React)
+│   │   └── components/      # GameView, Timer, VotePanel, LocationGrid, RevealScreen
+│   └── location/
+│       ├── schema.ts        # Zod schemas for locations
+│       ├── actions.ts       # Server Actions (CRUD for location selections)
+│       ├── data.ts          # 54 seed locations
+│       └── components/      # LocationSettings dialog
+├── shared/                  # Infrastructure + cross-domain concerns
+│   ├── lib/                 # prisma, utils, constants, room-code generator
+│   ├── ui/                  # shadcn/ui components (base-ui, not radix)
+│   ├── hooks/               # useSession (cross-domain)
+│   └── types/               # ActionResult<T>, GamePhase, PlayerInfo
+└── generated/               # Prisma client (gitignored)
 ```
+
+## Dependency Direction
+
+```
+app/ → domains/ → shared/
+```
+- **Never** import from `app/` into `domains/` or `shared/`
+- **Never** import between domains directly — use `shared/types/`
+- Components must not import Prisma — use Server Actions
+- ESLint enforces these boundaries
 
 ## Commands
 
@@ -59,25 +88,42 @@ Inspired by [adrianocola/spyfall](https://github.com/adrianocola/spyfall):
 - **Timer**: Default 8 minutes (configurable)
 - **Flow**: LOBBY → PLAYING → VOTING → REVEAL → FINISHED
 - **Room codes**: 5-char alphanumeric (no ambiguous chars: no 0/O/1/I)
-- **Locations**: 46 built-in (28 edition 1, 18 edition 2), each with 6 roles
+- **Locations**: 54 built-in (28 edition 1, 26 edition 2), each with 6 roles
 - **Spy can guess location** at any time — correct guess = spy wins
 
 ## Conventions
 
-- **Check proposals on start** — If `.claude/proposals/` has files, review and apply approved ones
-- **Search before fix** — Grep all affected files before refactoring (see `.claude/rules/`)
-- **Use shadcn/ui components** for all UI — don't write raw HTML elements
-- **Dark mode is default** — the `dark` class is on `<html>`
-- **All database access** goes through `src/lib/prisma.ts` singleton
-- **Prisma v7** requires adapter: `new PrismaClient({ adapter: new PrismaPg(...) })`
-- **Import Prisma from** `@/generated/prisma/client` (not `@/generated/prisma`)
-- **Game logic** lives in `src/lib/game-logic.ts` — keep it framework-agnostic, pure functions
-- **Types** in `src/types/` — Prisma types for DB, custom types for client state
-- **API routes** return JSON with consistent error shape: `{ error: string }`
-- **State transitions** (game phase changes) use `prisma.$transaction` for atomicity
-- **No `any`** — use specific types, generics, or `unknown` with narrowing
-- **Commit often** — a background hook auto-commits when 6+ files change without recent commit
+### Architecture (SOLID + Clean Architecture)
+- **Zod-first types** — all types inferred from Zod schemas via `z.infer<>`. NEVER hand-write interfaces for data crossing boundaries
+- **Server Actions for mutations** — all POST/PATCH/DELETE use Server Actions in `domains/*/actions.ts`
+- **GET stays as API routes** — SSE and polling endpoints remain in `app/api/`
+- **Domain isolation** — domains don't import from each other. Use `shared/types/` for cross-domain types
+- **Pure game logic** — `domains/game/logic.ts` has no DB, no React, no Next.js imports
+- **ActionResult<T>** — all Server Actions return `{ success: true, data } | { success: false, error }`
+- **Validate at boundaries** — Zod `.safeParse()` at every Server Action entry point
+
+### Code Quality
+- **No `any`** — use Zod validation or `unknown` with narrowing
+- **React.memo** on all leaf components receiving props
+- **useCallback** for every function passed as a prop
+- **useMemo** for computed arrays/objects derived from state
+- **SRP** — each file has one reason to change. Split when too large
 - **shadcn/ui uses base-ui** (not radix) — use `render` prop instead of `asChild`
+- **Commit often** — background hook auto-commits when 6+ files change
+
+### Infrastructure
+- **Database** — `shared/lib/prisma.ts` singleton. Prisma v7 adapter pattern
+- **UI** — `shared/ui/` for shadcn components. Import from `@/shared/ui/`
+- **Constants** — `shared/lib/constants.ts` for game limits (MIN_PLAYERS, etc.)
+- **State transitions** use `prisma.$transaction` for atomicity
+
+### Rules (see `.claude/rules/`)
+- `clean-architecture.md` — SOLID, dependency direction, domain structure
+- `zod-types.md` — schema conventions, naming, validation patterns
+- `server-actions.md` — Server Action patterns, error handling, auth
+- `nextjs-optimizations.md` — Suspense, loading/error boundaries, Server Components
+- `react-performance.md` — memo, useCallback, useMemo, polling, hydration
+- `hooks-patterns.md` — interval refs, SSE reconnection, fetch polling
 
 ## Hooks & Automation
 
