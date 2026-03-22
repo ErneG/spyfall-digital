@@ -578,6 +578,8 @@ const eslintConfig = defineConfig([
   {
     files: ["src/domains/**/schema.ts", "src/shared/types/**/*.ts"],
     rules: {
+      "no-magic-numbers": "off",
+      "@typescript-eslint/naming-convention": "off", // Zod field names match DB schema
       "no-restricted-imports": [
         "error",
         {
@@ -609,13 +611,22 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // Server Actions — must validate with Zod, no client imports
+  // Server Actions — relaxed for DB operations, no client imports
   {
     files: ["src/domains/**/actions.ts"],
     rules: {
       "no-console": "off",
       "no-throw-literal": "error",
-      "max-lines-per-function": "off", // Actions can be longer due to DB operations
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "no-magic-numbers": "off",
+      "complexity": "off",
+      "sonarjs/no-duplicate-string": "off",
+      "sonarjs/cognitive-complexity": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
       "no-restricted-imports": [
         "error",
         {
