@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useGameState } from "@/hooks/use-game-state";
@@ -13,7 +13,7 @@ import { Timer } from "@/components/game/timer";
 import { LocationGrid } from "@/components/game/location-grid";
 import { VotePanel } from "@/components/game/vote-panel";
 import { RevealScreen } from "@/components/game/reveal-screen";
-import { Eye, EyeOff, MapPin, Shield, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, MapPin, Shield, AlertTriangle, Pause, Play } from "lucide-react";
 
 interface GameViewProps {
   gameId: string;
@@ -22,15 +22,64 @@ interface GameViewProps {
   roomCode: string;
   timeLimit: number;
   gameStartedAt: string | null;
+  hideSpyCount: boolean;
+  spyCount: number;
+  timerRunning: boolean;
 }
 
-export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameStartedAt }: GameViewProps) {
+export function GameView({
+  gameId,
+  playerId,
+  isHost,
+  roomCode,
+  timeLimit,
+  gameStartedAt,
+  hideSpyCount,
+  spyCount,
+  timerRunning: initialTimerRunning,
+}: GameViewProps) {
   const router = useRouter();
   const { clearSession } = useSession();
   const { game, loading } = useGameState(gameId, playerId);
-  const { display, expired } = useTimer(gameStartedAt, timeLimit);
+  const timerRunning = game?.timerRunning ?? initialTimerRunning;
+  const { display, expired } = useTimer(
+    game?.startedAt ?? gameStartedAt,
+    game?.timeLimit ?? timeLimit,
+    timerRunning,
+  );
   const [roleRevealed, setRoleRevealed] = useState(false);
   const [ending, setEnding] = useState(false);
+  const beeped = useRef(false);
+
+  // Beep on timer expiry
+  useEffect(() => {
+    if (expired && !beeped.current) {
+      beeped.current = true;
+      try {
+        const ctx = new AudioContext();
+        for (let i = 0; i < 2; i++) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 800;
+          gain.gain.value = 0.3;
+          osc.start(ctx.currentTime + i * 0.3);
+          osc.stop(ctx.currentTime + i * 0.3 + 0.15);
+        }
+      } catch {
+        // Audio not available
+      }
+    }
+  }, [expired]);
+
+  async function handleTimerToggle() {
+    await fetch(`/api/games/${gameId}/timer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerId, action: timerRunning ? "pause" : "resume" }),
+    });
+  }
 
   async function handleEndGame() {
     setEnding(true);
@@ -46,15 +95,11 @@ export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameSt
   }
 
   async function handleRestart() {
-    try {
-      await fetch(`/api/games/${gameId}/restart`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId }),
-      });
-    } catch {
-      // handled by polling
-    }
+    await fetch(`/api/games/${gameId}/restart`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerId }),
+    });
   }
 
   function handleLeave() {
@@ -78,14 +123,14 @@ export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameSt
     );
   }
 
-  // Reveal / Results screen
+  // Reveal screen
   if (game.phase === "REVEAL" || game.phase === "FINISHED") {
     return (
       <RevealScreen
         game={game}
         playerId={playerId}
         isHost={isHost}
-        onRestart={handleRestart}
+        onRestart={() => void handleRestart()}
         onLeave={handleLeave}
       />
     );
@@ -94,8 +139,33 @@ export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameSt
   return (
     <main className="flex flex-1 flex-col items-center p-4 pb-24">
       <div className="w-full max-w-md space-y-4">
-        {/* Timer Bar */}
-        <Timer display={display} expired={expired} />
+        {/* Timer + Spy Count */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <Timer display={display} expired={expired} paused={!timerRunning} />
+          </div>
+          {isHost && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-12 w-12 shrink-0"
+              onClick={() => void handleTimerToggle()}
+            >
+              {timerRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+            </Button>
+          )}
+        </div>
+
+        {/* Spy count indicator */}
+        {!hideSpyCount && (
+          <div className="flex justify-center gap-1">
+            {Array.from({ length: spyCount }).map((_, i) => (
+              <Badge key={i} variant="destructive" className="text-xs">
+                <AlertTriangle className="mr-1 h-3 w-3" /> Spy
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Role Card */}
         <Card className={game.isSpy ? "border-destructive/50 bg-destructive/5" : ""}>
@@ -142,18 +212,13 @@ export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameSt
 
         {/* Players */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
+          <CardContent className="pt-4 pb-3">
+            <p className="text-xs text-muted-foreground mb-2">
               Players ({game.players.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
+            </p>
+            <div className="flex flex-wrap gap-1.5">
               {game.players.map((p) => (
-                <Badge
-                  key={p.id}
-                  variant={p.id === playerId ? "default" : "secondary"}
-                >
+                <Badge key={p.id} variant={p.id === playerId ? "default" : "secondary"}>
                   {p.name}
                 </Badge>
               ))}
@@ -161,43 +226,33 @@ export function GameView({ gameId, playerId, isHost, roomCode, timeLimit, gameSt
           </CardContent>
         </Card>
 
-        {/* Location Grid */}
+        {/* Location Grid with cross-out + previous */}
         <LocationGrid
           locations={game.allLocations}
           revealedLocation={game.isSpy ? null : game.location}
+          prevLocationName={game.prevLocationName}
           gameId={game.isSpy ? gameId : undefined}
           playerId={game.isSpy ? playerId : undefined}
         />
 
-        {/* Vote / End Game */}
+        {/* Actions */}
         <Separator />
-
-        {game.phase === "VOTING" && (
-          <VotePanel
-            players={game.players}
-            playerId={playerId}
-            gameId={gameId}
-          />
-        )}
-
         <div className="flex gap-2">
           {isHost && (
             <Button
               variant="destructive"
               className="flex-1"
-              onClick={handleEndGame}
+              onClick={() => void handleEndGame()}
               disabled={ending}
             >
               {ending ? "Ending..." : "End Game"}
             </Button>
           )}
-          {game.phase === "PLAYING" && (
-            <VotePanel
-              players={game.players}
-              playerId={playerId}
-              gameId={gameId}
-            />
-          )}
+          <VotePanel
+            players={game.players}
+            playerId={playerId}
+            gameId={gameId}
+          />
         </div>
       </div>
     </main>

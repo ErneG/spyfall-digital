@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "@/hooks/use-session";
 import { useRoomEvents } from "@/hooks/use-room-events";
+import { GameConfig } from "@/components/lobby/game-config";
+import { LocationSettings } from "@/components/lobby/location-settings";
 import { GameView } from "@/components/game/game-view";
 import { Copy, Check, Users, Crown, Wifi, WifiOff } from "lucide-react";
 
@@ -19,8 +21,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  const [locationsOpen, setLocationsOpen] = useState(false);
 
-  // Redirect if no session
   useEffect(() => {
     if (!session || session.roomCode !== code.toUpperCase()) {
       router.push("/");
@@ -31,7 +33,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     if (!session) return;
     setStarting(true);
     setError("");
-
     try {
       const res = await fetch("/api/games", {
         method: "POST",
@@ -48,7 +49,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }
 
   function handleCopy() {
-    navigator.clipboard.writeText(code.toUpperCase());
+    void navigator.clipboard.writeText(code.toUpperCase());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -60,7 +61,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   if (!session) return null;
 
-  // If game is active, show game view
+  // Active game → show game view
   if (room && room.state !== "LOBBY" && room.currentGameId) {
     return (
       <GameView
@@ -70,13 +71,16 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         roomCode={code}
         timeLimit={room.timeLimit}
         gameStartedAt={room.gameStartedAt}
+        hideSpyCount={room.hideSpyCount}
+        spyCount={room.spyCount}
+        timerRunning={room.timerRunning}
       />
     );
   }
 
   return (
     <main className="flex flex-1 items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-4">
         {/* Room Code Header */}
         <div className="text-center space-y-2">
           <p className="text-sm text-muted-foreground">Room Code</p>
@@ -93,12 +97,41 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           </button>
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             {connected ? (
-              <><Wifi className="h-3 w-3 text-green-500" /> Connected</>
+              <>
+                <Wifi className="h-3 w-3 text-green-500" /> Connected
+              </>
             ) : (
-              <><WifiOff className="h-3 w-3 text-destructive" /> Reconnecting...</>
+              <>
+                <WifiOff className="h-3 w-3 text-destructive" /> Reconnecting...
+              </>
             )}
           </div>
         </div>
+
+        {/* Game Config */}
+        {room && (
+          <GameConfig
+            roomCode={code}
+            playerId={session.playerId}
+            isHost={session.isHost}
+            timeLimit={room.timeLimit}
+            spyCount={room.spyCount}
+            autoStartTimer={room.autoStartTimer}
+            hideSpyCount={room.hideSpyCount}
+            moderatorMode={room.moderatorMode}
+            selectedLocationCount={room.selectedLocationCount}
+            totalLocationCount={room.totalLocationCount}
+            onOpenLocations={() => setLocationsOpen(true)}
+          />
+        )}
+
+        {/* Location Settings Dialog */}
+        <LocationSettings
+          open={locationsOpen}
+          onOpenChange={setLocationsOpen}
+          roomCode={code}
+          playerId={session.playerId}
+        />
 
         {/* Players List */}
         <Card>
@@ -139,14 +172,14 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           </CardContent>
         </Card>
 
-        {/* Actions */}
+        {/* Start / Status */}
         {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
         {session.isHost ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Button
               className="w-full h-12 text-lg"
-              onClick={handleStart}
+              onClick={() => void handleStart()}
               disabled={starting || !room || room.players.length < 3}
             >
               {starting ? "Starting..." : "Start Game"}

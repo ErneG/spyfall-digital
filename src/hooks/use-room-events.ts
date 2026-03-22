@@ -8,8 +8,15 @@ interface RoomEvent {
   players: PlayerInfo[];
   timeLimit: number;
   spyCount: number;
+  autoStartTimer: boolean;
+  hideSpyCount: boolean;
+  moderatorMode: boolean;
+  moderatorLocationId: string | null;
+  selectedLocationCount: number;
+  totalLocationCount: number;
   currentGameId: string | null;
   gameStartedAt: string | null;
+  timerRunning: boolean;
   error?: string;
 }
 
@@ -37,14 +44,13 @@ export function useRoomEvents(code: string | null) {
         }
         setData(parsed);
       } catch {
-        // ignore malformed data
+        // ignore
       }
     };
 
     es.onerror = () => {
       setConnected(false);
       es.close();
-      // Auto-reconnect after 3s
       setTimeout(connect, 3000);
     };
   }, [code]);

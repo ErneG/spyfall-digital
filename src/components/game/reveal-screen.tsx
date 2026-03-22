@@ -8,10 +8,7 @@ import { MapPin, AlertTriangle, Trophy, RotateCcw, LogOut } from "lucide-react";
 import type { GameView, PlayerInfo } from "@/types/game";
 
 interface RevealScreenProps {
-  game: GameView & {
-    spies?: string[];
-    revealedLocation?: string;
-  };
+  game: GameView;
   playerId: string;
   isHost: boolean;
   onRestart: () => void;
@@ -31,13 +28,11 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        {/* Result Header */}
         <div className="space-y-3">
           <Trophy className="h-12 w-12 mx-auto text-yellow-500" />
           <h1 className="text-3xl font-bold">Game Over!</h1>
         </div>
 
-        {/* Location Reveal */}
         <Card>
           <CardContent className="pt-6 space-y-4">
             <div className="space-y-1">
@@ -63,27 +58,14 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
               </div>
             </div>
 
-            {wasSpy && (
-              <>
-                <Separator />
-                <p className="text-sm text-muted-foreground">
-                  You were the spy! Your role: <span className="font-semibold text-foreground">{game.myRole}</span>
-                </p>
-              </>
-            )}
-
-            {!wasSpy && (
-              <>
-                <Separator />
-                <p className="text-sm text-muted-foreground">
-                  Your role was: <span className="font-semibold text-foreground">{game.myRole}</span>
-                </p>
-              </>
-            )}
+            <Separator />
+            <p className="text-sm text-muted-foreground">
+              {wasSpy ? "You were the spy!" : "Your role was:"}{" "}
+              <span className="font-semibold text-foreground">{game.myRole}</span>
+            </p>
           </CardContent>
         </Card>
 
-        {/* All Players and Their Roles */}
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-2">
@@ -100,15 +82,13 @@ export function RevealScreen({ game, playerId, isHost, onRestart, onLeave }: Rev
           </CardContent>
         </Card>
 
-        {/* Actions */}
         <div className="space-y-2">
-          {isHost && (
+          {isHost ? (
             <Button className="w-full h-12 text-lg gap-2" onClick={onRestart}>
               <RotateCcw className="h-5 w-5" />
               Play Again
             </Button>
-          )}
-          {!isHost && (
+          ) : (
             <p className="text-sm text-muted-foreground">
               Waiting for the host to start a new round...
             </p>
