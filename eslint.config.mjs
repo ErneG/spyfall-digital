@@ -7,6 +7,7 @@ import sonarjs from "eslint-plugin-sonarjs";
 import unicorn from "eslint-plugin-unicorn";
 import promise from "eslint-plugin-promise";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import reactPerf from "eslint-plugin-react-perf";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -324,6 +325,31 @@ const eslintConfig = defineConfig([
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 5b. REACT PERFORMANCE — PREVENT RE-RENDER ISSUES
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    files: ["src/**/*.tsx"],
+    plugins: { "react-perf": reactPerf },
+    rules: {
+      // ── No JSX literal objects as props (creates new ref each render) ──
+      // e.g. <Comp style={{ color: 'red' }} /> — extract to const or useMemo
+      "react-perf/jsx-no-new-object-as-prop": "warn",
+
+      // ── No JSX literal arrays as props ──
+      // e.g. <Comp items={[1,2,3]} /> — extract to const or useMemo
+      "react-perf/jsx-no-new-array-as-prop": "warn",
+
+      // ── No inline arrow functions as JSX props ──
+      // e.g. <Comp onClick={() => doThing()} /> — use useCallback
+      "react-perf/jsx-no-new-function-as-prop": "warn",
+
+      // ── No JSX spread of new objects ──
+      // e.g. <Comp {...{ a: 1 }} /> — use named variable
+      "react-perf/jsx-no-jsx-as-prop": "warn",
+    },
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 6. ACCESSIBILITY — WCAG COMPLIANCE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
@@ -402,6 +428,10 @@ const eslintConfig = defineConfig([
 
       // ── No find-dom-node ──
       "react/no-find-dom-node": "error",
+
+      // ── React hooks rules (applies to ALL components, not just hooks/) ──
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
     },
   },
 
