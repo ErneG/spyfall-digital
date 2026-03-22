@@ -554,90 +554,147 @@ const eslintConfig = defineConfig([
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 9. ARCHITECTURE BOUNDARIES — SEPARATION OF CONCERNS
+  // 9. DOMAIN ARCHITECTURE BOUNDARIES
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  // Game logic — pure functions only (no framework deps)
+  // Domain logic files — pure functions (no framework, no DB)
   {
-    files: ["src/lib/game-logic.ts"],
+    files: ["src/domains/**/logic.ts", "src/lib/game-logic.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            {
-              group: ["next/*", "react", "react-dom"],
-              message: "Game logic must be framework-agnostic",
-            },
-            {
-              group: ["@/generated/*", "@prisma/*", "@/lib/prisma"],
-              message: "Game logic must not depend on database",
-            },
+            { group: ["next/*", "react", "react-dom"], message: "Logic must be framework-agnostic" },
+            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Logic must not depend on database" },
           ],
         },
       ],
-      // Stricter for game logic — must be easily testable
-      "max-lines-per-function": [
-        "warn",
-        { max: 50, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": ["warn", { max: 50, skipBlankLines: true, skipComments: true }],
     },
   },
 
-  // Types — no implementation, just type definitions
+  // Domain schemas — Zod only, no framework deps
   {
-    files: ["src/types/**/*.ts"],
+    files: ["src/domains/**/schema.ts", "src/shared/types/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            {
-              group: ["react", "next/*"],
-              message: "Type files should be framework-agnostic",
-            },
+            { group: ["react", "react-dom", "next/*"], message: "Schema files must be framework-agnostic" },
+            { group: ["@/generated/*", "@prisma/*"], message: "Schemas must not depend on Prisma types directly" },
           ],
         },
       ],
     },
   },
 
-  // Hooks — enforce React hook rules
+  // Domain hooks — React hooks, max 60 lines
   {
-    files: ["src/hooks/**/*.ts"],
+    files: ["src/domains/**/hooks.ts", "src/hooks/**/*.ts"],
     rules: {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      // Hooks should be focused
-      "max-lines-per-function": [
-        "warn",
-        { max: 60, skipBlankLines: true, skipComments: true },
+      "max-lines-per-function": ["warn", { max: 60, skipBlankLines: true, skipComments: true }],
+      // Hooks must not access DB directly
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Hooks must not import database modules. Use server actions." },
+          ],
+        },
       ],
     },
   },
 
-  // API routes — server-only, stricter error handling
+  // Server Actions — must validate with Zod, no client imports
+  {
+    files: ["src/domains/**/actions.ts"],
+    rules: {
+      "no-console": "off",
+      "no-throw-literal": "error",
+      "max-lines-per-function": "off", // Actions can be longer due to DB operations
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["@/domains/*/components/*", "@/domains/*/hooks*"], message: "Server actions must not import client-side code" },
+          ],
+        },
+      ],
+    },
+  },
+
+  // Domain components — no direct DB access
+  {
+    files: ["src/domains/**/components/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Components must not import database modules. Use server actions or hooks." },
+          ],
+        },
+      ],
+    },
+  },
+
+  // Cross-domain boundary — domains must not import from each other
+  {
+    files: ["src/domains/room/**/*.ts", "src/domains/room/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            { group: ["@/domains/game/*", "@/domains/player/*", "@/domains/location/*"], message: "Domains should not import directly from other domains. Use shared types." },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/domains/game/**/*.ts", "src/domains/game/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            { group: ["@/domains/room/*", "@/domains/player/*", "@/domains/location/*"], message: "Domains should not import directly from other domains. Use shared types." },
+          ],
+        },
+      ],
+    },
+  },
+
+  // App pages — thin layer, import from domains only
+  {
+    files: ["src/app/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Pages should not access DB directly. Use server actions or domain hooks." },
+          ],
+        },
+      ],
+    },
+  },
+
+  // API routes (GET only after migration) — relaxed for DB access
   {
     files: ["src/app/api/**/*.ts"],
     rules: {
       "no-console": "off",
       "no-throw-literal": "error",
-      // No importing client-side code in API routes
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["@/hooks/*", "@/components/*"],
-              message: "API routes must not import client-side code",
-            },
-          ],
-        },
-      ],
     },
   },
 
-  // Client components — no server-only imports
+  // Legacy compatibility (keep until migration complete)
   {
     files: ["src/components/**/*.tsx"],
     rules: {
@@ -645,10 +702,7 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
-            {
-              group: ["@/lib/prisma", "@prisma/*"],
-              message: "Components must not import server-only modules (prisma). Use API routes.",
-            },
+            { group: ["@/lib/prisma", "@prisma/*", "@/generated/*"], message: "Components must not import server-only modules. Use server actions." },
           ],
         },
       ],
