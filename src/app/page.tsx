@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,18 +9,35 @@ import { Separator } from "@/components/ui/separator";
 import { useSession } from "@/hooks/use-session";
 import { Eye, Users, Crosshair } from "lucide-react";
 
+interface CreateRoomResponse {
+  playerId: string;
+  code: string;
+  roomId: string;
+  error?: string;
+}
+
+interface JoinRoomResponse {
+  playerId: string;
+  code: string;
+  roomId: string;
+  error?: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const { setSession } = useSession();
   const [mode, setMode] = useState<"idle" | "create" | "join">("idle");
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleCreate() {
-    if (!name.trim()) return setError("Enter your name");
-    setLoading(true);
+  const handleCreate = useCallback(async () => {
+    if (!name.trim()) {
+      setError("Enter your name");
+      return;
+    }
+    setIsLoading(true);
     setError("");
 
     try {
@@ -29,7 +46,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ hostName: name.trim() }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as CreateRoomResponse;
       if (!res.ok) throw new Error(data.error);
 
       setSession({
@@ -39,17 +56,23 @@ export default function Home() {
         isHost: true,
       });
       router.push(`/room/${data.code}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create room");
+    } catch (caughtError: unknown) {
+      setError(caughtError instanceof Error ? caughtError.message : "Failed to create room");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  }, [name, router, setSession]);
 
-  async function handleJoin() {
-    if (!name.trim()) return setError("Enter your name");
-    if (!joinCode.trim()) return setError("Enter a room code");
-    setLoading(true);
+  const handleJoin = useCallback(async () => {
+    if (!name.trim()) {
+      setError("Enter your name");
+      return;
+    }
+    if (!joinCode.trim()) {
+      setError("Enter a room code");
+      return;
+    }
+    setIsLoading(true);
     setError("");
 
     try {
@@ -59,7 +82,7 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ playerName: name.trim() }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as JoinRoomResponse;
       if (!res.ok) throw new Error(data.error);
 
       setSession({
@@ -69,12 +92,51 @@ export default function Home() {
         isHost: false,
       });
       router.push(`/room/${data.code}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to join room");
+    } catch (caughtError: unknown) {
+      setError(caughtError instanceof Error ? caughtError.message : "Failed to join room");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  }, [name, joinCode, router, setSession]);
+
+  const handleSetModeCreate = useCallback(() => setMode("create"), []);
+  const handleSetModeJoin = useCallback(() => setMode("join"), []);
+  const handleBack = useCallback(() => {
+    setMode("idle");
+    setError("");
+  }, []);
+
+  const handleNameChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value),
+    [],
+  );
+
+  const handleJoinCodeChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => setJoinCode(event.target.value.toUpperCase()),
+    [],
+  );
+
+  const handleCreateKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") void handleCreate();
+    },
+    [handleCreate],
+  );
+
+  const handleJoinKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") void handleJoin();
+    },
+    [handleJoin],
+  );
+
+  const handleCreateClick = useCallback(() => {
+    void handleCreate();
+  }, [handleCreate]);
+
+  const handleJoinClick = useCallback(() => {
+    void handleJoin();
+  }, [handleJoin]);
 
   return (
     <main className="flex flex-1 items-center justify-center p-4">
@@ -94,7 +156,7 @@ export default function Home() {
           <div className="space-y-3">
             <Button
               className="w-full h-14 text-lg gap-2"
-              onClick={() => setMode("create")}
+              onClick={handleSetModeCreate}
             >
               <Users className="h-5 w-5" />
               Create Room
@@ -102,7 +164,7 @@ export default function Home() {
             <Button
               variant="outline"
               className="w-full h-14 text-lg gap-2"
-              onClick={() => setMode("join")}
+              onClick={handleSetModeJoin}
             >
               <Crosshair className="h-5 w-5" />
               Join Room
@@ -120,18 +182,18 @@ export default function Home() {
               <Input
                 placeholder="Your name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={handleNameChange}
                 maxLength={20}
                 autoFocus
-                onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                onKeyDown={handleCreateKeyDown}
               />
               {error && <p className="text-sm text-destructive">{error}</p>}
               <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => { setMode("idle"); setError(""); }}>
+                <Button variant="ghost" onClick={handleBack}>
                   Back
                 </Button>
-                <Button className="flex-1" onClick={handleCreate} disabled={loading}>
-                  {loading ? "Creating..." : "Create"}
+                <Button className="flex-1" onClick={handleCreateClick} disabled={isLoading}>
+                  {isLoading ? "Creating..." : "Create"}
                 </Button>
               </div>
             </CardContent>
@@ -148,25 +210,25 @@ export default function Home() {
               <Input
                 placeholder="Your name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={handleNameChange}
                 maxLength={20}
                 autoFocus
               />
               <Input
                 placeholder="Room code"
                 value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                onChange={handleJoinCodeChange}
                 maxLength={5}
                 className="text-center text-2xl tracking-[0.3em] font-mono uppercase"
-                onKeyDown={(e) => e.key === "Enter" && handleJoin()}
+                onKeyDown={handleJoinKeyDown}
               />
               {error && <p className="text-sm text-destructive">{error}</p>}
               <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => { setMode("idle"); setError(""); }}>
+                <Button variant="ghost" onClick={handleBack}>
                   Back
                 </Button>
-                <Button className="flex-1" onClick={handleJoin} disabled={loading}>
-                  {loading ? "Joining..." : "Join"}
+                <Button className="flex-1" onClick={handleJoinClick} disabled={isLoading}>
+                  {isLoading ? "Joining..." : "Join"}
                 </Button>
               </div>
             </CardContent>

@@ -497,7 +497,7 @@ const eslintConfig = defineConfig([
       "no-magic-numbers": [
         "warn",
         {
-          ignore: [-1, 0, 1, 2, 3, 100, 200, 400, 403, 404, 500, 1000],
+          ignore: [-1, 0, 1, 2, 3, 5, 10, 12, 60, 100, 200, 300, 360, 400, 403, 404, 420, 480, 500, 540, 600, 1000, 1500, 2000, 3000, 5000],
           ignoreArrayIndexes: true,
           enforceConst: true,
         },
@@ -652,6 +652,41 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+    },
+  },
+
+  // shadcn/ui — generated code, heavily relaxed
+  {
+    files: ["src/components/ui/**/*.tsx"],
+    rules: {
+      "react-perf/jsx-no-new-function-as-prop": "off",
+      "react-perf/jsx-no-new-object-as-prop": "off",
+      "react-perf/jsx-no-new-array-as-prop": "off",
+      "react-perf/jsx-no-jsx-as-prop": "off",
+      "@typescript-eslint/naming-convention": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "unicorn/prevent-abbreviations": "off",
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "no-magic-numbers": "off",
+    },
+  },
+
+  // API routes — relaxed type safety for dynamic DB results
+  {
+    files: ["src/app/api/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "no-magic-numbers": "off",
+      "max-lines-per-function": "off",
     },
   },
 

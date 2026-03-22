@@ -22,31 +22,32 @@ interface RoomEvent {
 
 export function useRoomEvents(code: string | null) {
   const [data, setData] = useState<RoomEvent | null>(null);
-  const [connected, setConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const esRef = useRef<EventSource | null>(null);
-  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectRef = useRef<() => void>(null);
 
   const connect = useCallback(() => {
     if (!code) return;
 
     // Clear any pending reconnect
-    if (reconnectRef.current) {
-      clearTimeout(reconnectRef.current);
-      reconnectRef.current = null;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
 
     esRef.current?.close();
     const es = new EventSource(`/api/rooms/${code}/events`);
     esRef.current = es;
 
-    es.onopen = () => setConnected(true);
+    es.onopen = () => setIsConnected(true);
 
-    es.onmessage = (event) => {
+    es.onmessage = (event: MessageEvent<string>) => {
       try {
         const parsed = JSON.parse(event.data) as RoomEvent;
         if (parsed.error) {
           es.close();
-          setConnected(false);
+          setIsConnected(false);
           return;
         }
         setData(parsed);
@@ -56,22 +57,26 @@ export function useRoomEvents(code: string | null) {
     };
 
     es.onerror = () => {
-      setConnected(false);
+      setIsConnected(false);
       es.close();
       // Single reconnect — clear any previous before scheduling
-      if (reconnectRef.current) clearTimeout(reconnectRef.current);
-      reconnectRef.current = setTimeout(connect, 3000);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), 3000);
     };
   }, [code]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     connect();
     return () => {
       esRef.current?.close();
-      if (reconnectRef.current) clearTimeout(reconnectRef.current);
-      setConnected(false);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      setIsConnected(false);
     };
   }, [connect]);
 
-  return { data, connected };
+  return { data, isConnected };
 }

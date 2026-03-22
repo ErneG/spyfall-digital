@@ -122,7 +122,7 @@ export async function POST(request: Request) {
         where: { id: room.id },
         data: {
           state: "PLAYING",
-          prevLocationId: chosen.type === "builtin" ? chosen.id : chosen.id,
+          prevLocationId: chosen.id,
         },
       });
 

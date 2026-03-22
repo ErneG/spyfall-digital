@@ -13,27 +13,31 @@ import { LocationSettings } from "@/components/lobby/location-settings";
 import { GameView } from "@/components/game/game-view";
 import { Copy, Check, Users, Crown, Wifi, WifiOff } from "lucide-react";
 
+interface StartGameResponse {
+  error?: string;
+}
+
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const router = useRouter();
-  const { session, clearSession, loaded } = useSession();
-  const { data: room, connected } = useRoomEvents(code);
-  const [copied, setCopied] = useState(false);
-  const [starting, setStarting] = useState(false);
+  const { session, clearSession, isLoaded } = useSession();
+  const { data: room, isConnected } = useRoomEvents(code);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState("");
-  const [locationsOpen, setLocationsOpen] = useState(false);
+  const [isLocationsOpen, setIsLocationsOpen] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Redirect if no session — only depend on specific fields, not the whole object
   useEffect(() => {
-    if (loaded && (!session || session.roomCode !== code.toUpperCase())) {
+    if (isLoaded && (!session || session.roomCode !== code.toUpperCase())) {
       router.push("/");
     }
-  }, [loaded, session?.roomCode, code, router]);
+  }, [isLoaded, session, code, router]);
 
   const handleStart = useCallback(async () => {
     if (!session) return;
-    setStarting(true);
+    setIsStarting(true);
     setError("");
     try {
       const res = await fetch("/api/games", {
@@ -41,21 +45,21 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomId: session.roomId, playerId: session.playerId }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as StartGameResponse;
       if (!res.ok) throw new Error(data.error);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to start game");
+    } catch (caughtError: unknown) {
+      setError(caughtError instanceof Error ? caughtError.message : "Failed to start game");
     } finally {
-      setStarting(false);
+      setIsStarting(false);
     }
   }, [session]);
 
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(code.toUpperCase());
-    setCopied(true);
+    setIsCopied(true);
     // Clear previous timeout to prevent pile-up
     if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    copyTimeoutRef.current = setTimeout(() => setIsCopied(false), 2000);
   }, [code]);
 
   const handleLeave = useCallback(() => {
@@ -63,11 +67,15 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     router.push("/");
   }, [clearSession, router]);
 
-  const handleOpenLocations = useCallback(() => setLocationsOpen(true), []);
+  const handleOpenLocations = useCallback(() => setIsLocationsOpen(true), []);
 
-  if (!loaded || !session) return null;
+  const handleStartClick = useCallback(() => {
+    void handleStart();
+  }, [handleStart]);
 
-  // Active game → show game view
+  if (!isLoaded || !session) return null;
+
+  // Active game -> show game view
   if (room && room.state !== "LOBBY" && room.currentGameId) {
     return (
       <GameView
@@ -79,7 +87,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         gameStartedAt={room.gameStartedAt}
         hideSpyCount={room.hideSpyCount}
         spyCount={room.spyCount}
-        timerRunning={room.timerRunning}
+        isTimerRunning={room.timerRunning}
       />
     );
   }
@@ -95,14 +103,14 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             className="inline-flex items-center gap-2 text-4xl font-mono font-bold tracking-[0.3em] hover:text-primary transition-colors cursor-pointer"
           >
             {code.toUpperCase()}
-            {copied ? (
+            {isCopied ? (
               <Check className="h-5 w-5 text-green-500" />
             ) : (
               <Copy className="h-5 w-5 text-muted-foreground" />
             )}
           </button>
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            {connected ? (
+            {isConnected ? (
               <>
                 <Wifi className="h-3 w-3 text-green-500" /> Connected
               </>
@@ -133,8 +141,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
         {/* Location Settings Dialog */}
         <LocationSettings
-          open={locationsOpen}
-          onOpenChange={setLocationsOpen}
+          open={isLocationsOpen}
+          onOpenChange={setIsLocationsOpen}
           roomCode={code}
           playerId={session.playerId}
         />
@@ -185,10 +193,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           <div className="space-y-2">
             <Button
               className="w-full h-12 text-lg"
-              onClick={() => void handleStart()}
-              disabled={starting || !room || room.players.length < 3}
+              onClick={handleStartClick}
+              disabled={isStarting || !room || room.players.length < 3}
             >
-              {starting ? "Starting..." : "Start Game"}
+              {isStarting ? "Starting..." : "Start Game"}
             </Button>
             {room && room.players.length < 3 && (
               <p className="text-xs text-muted-foreground text-center">

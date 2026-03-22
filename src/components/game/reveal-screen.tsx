@@ -23,9 +23,9 @@ export const RevealScreen = memo(function RevealScreen({
   onRestart,
   onLeave,
 }: RevealScreenProps) {
-  const spyIds = game.spies ?? [];
+  const spyIds = useMemo(() => game.spies ?? [], [game.spies]);
   const location = game.revealedLocation ?? game.location ?? "Unknown";
-  const wasSpy = spyIds.includes(playerId);
+  const didSpy = spyIds.includes(playerId);
 
   const spyNames = useMemo(
     () =>
@@ -70,7 +70,7 @@ export const RevealScreen = memo(function RevealScreen({
 
             <Separator />
             <p className="text-sm text-muted-foreground">
-              {wasSpy ? "You were the spy!" : "Your role was:"}{" "}
+              {didSpy ? "You were the spy!" : "Your role was:"}{" "}
               <span className="font-semibold text-foreground">{game.myRole}</span>
             </p>
           </CardContent>
