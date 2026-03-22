@@ -6,7 +6,7 @@ import tsParser from "@typescript-eslint/parser";
 import sonarjs from "eslint-plugin-sonarjs";
 import unicorn from "eslint-plugin-unicorn";
 import promise from "eslint-plugin-promise";
-import jsxA11y from "eslint-plugin-jsx-a11y";
+// eslint-plugin-jsx-a11y loaded by eslint-config-next (no explicit import needed)
 import reactPerf from "eslint-plugin-react-perf";
 
 const eslintConfig = defineConfig([

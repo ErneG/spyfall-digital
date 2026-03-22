@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useSyncExternalStore } from "react";
+import { useState, useCallback } from "react";
 
 interface Session {
   playerId: string;
@@ -11,7 +11,8 @@ interface Session {
 
 const STORAGE_KEY = "spyfall-session";
 
-function getSnapshot(): Session | null {
+function readSession(): Session | null {
+  if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw) as Session;
@@ -21,35 +22,24 @@ function getSnapshot(): Session | null {
   return null;
 }
 
-function getServerSnapshot(): Session | null {
-  return null;
-}
-
-function subscribe(callback: () => void): () => void {
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-}
+// On the client, the lazy initializer reads localStorage immediately.
+// On the server, readSession() returns null. This means the first client
+// render may differ from SSR — that's acceptable for session data and
+// the consumer gates on `isLoaded` before redirecting.
+const isClient = typeof window !== "undefined";
 
 export function useSession() {
-  const session = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [session, setSessionState] = useState<Session | null>(() => readSession());
 
-  // Mark loaded after first client render
-  if (typeof window !== "undefined" && !isLoaded) {
-    setIsLoaded(true);
-  }
-
-  const setSession = useCallback((s: Session) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    // Trigger re-render by dispatching storage event won't work same-window
-    // Force re-render via state update
-    window.dispatchEvent(new Event("storage"));
+  const setSession = useCallback((newSession: Session) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
+    setSessionState(newSession);
   }, []);
 
   const clearSession = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    window.dispatchEvent(new Event("storage"));
+    setSessionState(null);
   }, []);
 
-  return { session, setSession, clearSession, isLoaded };
+  return { session, setSession, clearSession, isLoaded: isClient };
 }

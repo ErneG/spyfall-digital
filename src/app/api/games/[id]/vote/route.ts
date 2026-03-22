@@ -38,8 +38,8 @@ export async function POST(
     }
 
     // Check both players are in the game
-    const playerIds = game.room.players.map((p) => p.id);
-    if (!playerIds.includes(voterId) || !playerIds.includes(suspectId)) {
+    const playerIds = new Set(game.room.players.map((p) => p.id));
+    if (!playerIds.has(voterId) || !playerIds.has(suspectId)) {
       return NextResponse.json({ error: "Invalid player" }, { status: 400 });
     }
 

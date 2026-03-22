@@ -38,7 +38,7 @@ export async function PATCH(
     if (config.autoStartTimer !== undefined) updateData.autoStartTimer = config.autoStartTimer;
     if (config.hideSpyCount !== undefined) updateData.hideSpyCount = config.hideSpyCount;
     if (config.moderatorMode !== undefined) updateData.moderatorMode = config.moderatorMode;
-    if (config.moderatorLocationId !== undefined) updateData.moderatorLocationId = config.moderatorLocationId || null;
+    if (config.moderatorLocationId !== undefined) updateData.moderatorLocationId = config.moderatorLocationId ?? null;
 
     const updated = await prisma.room.update({
       where: { id: room.id },

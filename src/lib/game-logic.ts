@@ -23,12 +23,12 @@ export function generateRoomCode(): string {
 }
 
 export function shuffle<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  return arr;
+  return shuffled;
 }
 
 export interface RoleAssignment {
@@ -67,15 +67,15 @@ export function assignRoles(
   const unassigned = shuffle(playerIds.filter((id) => !preAssignedIds.has(id)));
   const availableRoles = shuffle(roles);
 
-  let roleIdx = 0;
+  let roleIndex = 0;
   for (const playerId of unassigned) {
     if (remainingSpySlots > 0) {
       result.push({ playerId, role: "SPY", isSpy: true });
       remainingSpySlots--;
     } else {
-      const role = availableRoles[roleIdx % availableRoles.length];
+      const role = availableRoles[roleIndex % availableRoles.length];
       result.push({ playerId, role, isSpy: false });
-      roleIdx++;
+      roleIndex++;
     }
   }
 

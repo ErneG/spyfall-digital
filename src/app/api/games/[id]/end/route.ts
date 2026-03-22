@@ -38,7 +38,7 @@ export async function POST(
 
     // Spy guessing location
     if (spyGuessLocationId && assignment.isSpy) {
-      const correct = spyGuessLocationId === game.locationId;
+      const isCorrectGuess = spyGuessLocationId === game.locationId;
       await prisma.$transaction([
         prisma.game.update({
           where: { id },
@@ -52,8 +52,8 @@ export async function POST(
 
       return NextResponse.json({
         ended: true,
-        spyGuessedCorrectly: correct,
-        spyWins: correct,
+        spyGuessedCorrectly: isCorrectGuess,
+        spyWins: isCorrectGuess,
       });
     }
 

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const ROOM_NOT_FOUND = "Room not found";
+const HOST_ONLY = "Host only";
+
 // POST /api/rooms/[code]/custom-locations — create a custom location
 export async function POST(
   request: Request,
@@ -14,16 +17,16 @@ export async function POST(
     if (!playerId) return NextResponse.json({ error: "playerId required" }, { status: 400 });
 
     const room = await prisma.room.findUnique({ where: { code: code.toUpperCase() } });
-    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    if (room.hostId !== playerId) return NextResponse.json({ error: "Host only" }, { status: 403 });
+    if (!room) return NextResponse.json({ error: ROOM_NOT_FOUND }, { status: 404 });
+    if (room.hostId !== playerId) return NextResponse.json({ error: HOST_ONLY }, { status: 403 });
 
     const customLocation = await prisma.customLocation.create({
       data: {
         roomId: room.id,
-        name: name || "New Location",
-        allSpies: allSpies || false,
+        name: name ?? "New Location",
+        allSpies: allSpies ?? false,
         roles: {
-          create: (roles || []).map((r: string) => ({ name: r })),
+          create: (roles ?? []).map((r: string) => ({ name: r })),
         },
       },
       include: { roles: true },
@@ -56,8 +59,8 @@ export async function PATCH(
     }
 
     const room = await prisma.room.findUnique({ where: { code: code.toUpperCase() } });
-    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    if (room.hostId !== playerId) return NextResponse.json({ error: "Host only" }, { status: 403 });
+    if (!room) return NextResponse.json({ error: ROOM_NOT_FOUND }, { status: 404 });
+    if (room.hostId !== playerId) return NextResponse.json({ error: HOST_ONLY }, { status: 403 });
 
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) updateData.name = name;
@@ -99,8 +102,8 @@ export async function DELETE(
     }
 
     const room = await prisma.room.findUnique({ where: { code: code.toUpperCase() } });
-    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    if (room.hostId !== playerId) return NextResponse.json({ error: "Host only" }, { status: 403 });
+    if (!room) return NextResponse.json({ error: ROOM_NOT_FOUND }, { status: 404 });
+    if (room.hostId !== playerId) return NextResponse.json({ error: HOST_ONLY }, { status: 403 });
 
     await prisma.customLocation.delete({ where: { id: locationId } });
     return NextResponse.json({ success: true });

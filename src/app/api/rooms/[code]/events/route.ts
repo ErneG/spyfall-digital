@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
+const SSE_CONTENT_TYPE = "text/event-stream";
+
 // GET /api/rooms/[code]/events — SSE stream for room state updates
 export async function GET(
   _request: Request,
@@ -8,21 +10,21 @@ export async function GET(
   const { code } = await params;
 
   const encoder = new TextEncoder();
-  let closed = false;
+  let isClosed = false;
 
   const stream = new ReadableStream({
     start(controller) {
       const send = (data: unknown) => {
-        if (closed) return;
+        if (isClosed) return;
         try {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         } catch {
-          closed = true;
+          isClosed = true;
         }
       };
 
       const poll = async () => {
-        while (!closed) {
+        while (!isClosed) {
           try {
             const room = await prisma.room.findUnique({
               where: { code: code.toUpperCase() },
@@ -43,13 +45,18 @@ export async function GET(
 
             if (!room) {
               send({ error: "Room not found" });
-              closed = true;
+              isClosed = true;
               controller.close();
               return;
             }
 
-            const latestGame = room.games[0] ?? null;
+            const latestGame: (typeof room.games)[number] | undefined = room.games[0];
             const totalLocations = await prisma.location.count();
+
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- games[0] can be undefined at runtime
+            const gameFields = latestGame
+              ? { currentGameId: latestGame.id, gameStartedAt: latestGame.startedAt, timerRunning: latestGame.timerRunning }
+              : { currentGameId: null, gameStartedAt: null, timerRunning: true };
 
             send({
               state: room.state,
@@ -62,12 +69,10 @@ export async function GET(
               moderatorLocationId: room.moderatorLocationId,
               selectedLocationCount: room.selectedLocations.length + room._count.customLocations,
               totalLocationCount: totalLocations,
-              currentGameId: latestGame?.id ?? null,
-              gameStartedAt: latestGame?.startedAt ?? null,
-              timerRunning: latestGame?.timerRunning ?? true,
+              ...gameFields,
             });
           } catch {
-            // DB error — skip
+            // DB error — skip this tick
           }
 
           await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -77,13 +82,13 @@ export async function GET(
       void poll();
     },
     cancel() {
-      closed = true;
+      isClosed = true;
     },
   });
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
+      "Content-Type": SSE_CONTENT_TYPE,
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     },

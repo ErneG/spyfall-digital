@@ -1,6 +1,37 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+function calculateTimeRemaining(
+  isTimerRunning: boolean,
+  timerPausedAt: Date | null,
+  startedAt: Date,
+  timeLimit: number,
+): number {
+  if (!isTimerRunning && timerPausedAt) {
+    const elapsedBeforePause = Math.floor((timerPausedAt.getTime() - startedAt.getTime()) / 1000);
+    return Math.max(0, timeLimit - elapsedBeforePause);
+  }
+  const elapsed = Math.floor((Date.now() - startedAt.getTime()) / 1000);
+  return Math.max(0, timeLimit - elapsed);
+}
+
+async function fetchCombinedLocations(roomId: string) {
+  const [allLocations, customLocations] = await Promise.all([
+    prisma.location.findMany({ select: { id: true, name: true, imageUrl: true }, orderBy: { name: "asc" } }),
+    prisma.customLocation.findMany({
+      where: { roomId, selected: true, allSpies: false },
+      select: { id: true, name: true },
+    }),
+  ]);
+
+  return [
+    ...allLocations,
+    ...customLocations.map((cl) => ({ id: cl.id, name: cl.name, imageUrl: null })),
+  ].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+const REVEAL_STATES = new Set(["REVEAL", "FINISHED"]);
+
 // GET /api/games/[id]?playerId=xxx — get game state for a specific player
 export async function GET(
   request: Request,
@@ -31,51 +62,23 @@ export async function GET(
     },
   });
 
-  if (!game) {
-    return NextResponse.json({ error: "Game not found" }, { status: 404 });
-  }
+  if (!game) return NextResponse.json({ error: "Game not found" }, { status: 404 });
 
   const myAssignment = game.assignments.find((a) => a.playerId === playerId);
-  if (!myAssignment) {
-    return NextResponse.json({ error: "Player not in this game" }, { status: 403 });
-  }
+  if (!myAssignment) return NextResponse.json({ error: "Player not in this game" }, { status: 403 });
 
-  // Get all locations for the location list
-  const allLocations = await prisma.location.findMany({
-    select: { id: true, name: true, imageUrl: true },
-    orderBy: { name: "asc" },
-  });
+  const [combinedLocations, previousLocation] = await Promise.all([
+    fetchCombinedLocations(game.roomId),
+    game.room.prevLocationId
+      ? prisma.location.findUnique({ where: { id: game.room.prevLocationId }, select: { name: true } })
+      : null,
+  ]);
 
-  // Also include selected custom locations
-  const customLocations = await prisma.customLocation.findMany({
-    where: { roomId: game.roomId, selected: true, allSpies: false },
-    select: { id: true, name: true },
-  });
+  const timeRemaining = calculateTimeRemaining(
+    game.timerRunning, game.timerPausedAt, game.startedAt, game.room.timeLimit,
+  );
 
-  const combinedLocations = [
-    ...allLocations.map((l) => ({ ...l, edition: undefined })),
-    ...customLocations.map((cl) => ({ id: cl.id, name: cl.name, imageUrl: null })),
-  ].sort((a, b) => a.name.localeCompare(b.name));
-
-  // Calculate time remaining
-  let timeRemaining: number;
-  if (!game.timerRunning && game.timerPausedAt) {
-    const elapsedBeforePause = Math.floor(
-      (game.timerPausedAt.getTime() - game.startedAt.getTime()) / 1000,
-    );
-    timeRemaining = Math.max(0, game.room.timeLimit - elapsedBeforePause);
-  } else {
-    const elapsed = Math.floor((Date.now() - game.startedAt.getTime()) / 1000);
-    timeRemaining = Math.max(0, game.room.timeLimit - elapsed);
-  }
-
-  // Get previous location name
-  const prevLocation = game.room.prevLocationId
-    ? await prisma.location.findUnique({
-        where: { id: game.room.prevLocationId },
-        select: { name: true },
-      })
-    : null;
+  const isRevealPhase = REVEAL_STATES.has(game.state);
 
   return NextResponse.json({
     gameId: game.id,
@@ -91,18 +94,13 @@ export async function GET(
     timerRunning: game.timerRunning,
     hideSpyCount: game.room.hideSpyCount,
     spyCount: game.room.spyCount,
-    prevLocationName: prevLocation?.name ?? null,
-    votes:
-      game.state === "REVEAL" || game.state === "FINISHED"
-        ? game.votes.map((v) => ({ voterId: v.voterId, suspectId: v.suspectId }))
-        : undefined,
-    spies:
-      game.state === "REVEAL" || game.state === "FINISHED"
-        ? game.assignments.filter((a) => a.isSpy).map((a) => a.playerId)
-        : undefined,
-    revealedLocation:
-      game.state === "REVEAL" || game.state === "FINISHED"
-        ? game.locationName
-        : undefined,
+    prevLocationName: previousLocation?.name ?? null,
+    votes: isRevealPhase
+      ? game.votes.map((v) => ({ voterId: v.voterId, suspectId: v.suspectId }))
+      : undefined,
+    spies: isRevealPhase
+      ? game.assignments.filter((a) => a.isSpy).map((a) => a.playerId)
+      : undefined,
+    revealedLocation: isRevealPhase ? game.locationName : undefined,
   });
 }
