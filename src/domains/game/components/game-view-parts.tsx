@@ -13,6 +13,7 @@ import type { PlayerInfo } from "@/shared/types/common";
 import { toggleTimer, endGame, restartGame } from "@/domains/game/actions";
 import { gameKeys } from "@/domains/game/hooks";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
+import { useTranslation } from "@/shared/i18n/context";
 
 const BEEP_FREQUENCY = 800;
 const BEEP_VOLUME = 0.3;
@@ -27,6 +28,7 @@ export const RoleCard = memo(function RoleCard({
 }: {
   isSpy: boolean; isRoleRevealed: boolean; location: string | null; myRole: string | null; onToggle: () => void;
 }) {
+  const { t, translateLocation, translateRole } = useTranslation();
   return (
     <Card className={isSpy ? "border-destructive/50 bg-destructive/5" : ""}>
       <CardContent className="pt-6 text-center space-y-3">
@@ -36,9 +38,9 @@ export const RoleCard = memo(function RoleCard({
               {isSpy ? (
                 <div className="space-y-2">
                   <AlertTriangle className="h-8 w-8 mx-auto text-destructive" />
-                  <p className="text-2xl font-bold text-destructive">You are the SPY</p>
+                  <p className="text-2xl font-bold text-destructive">{t.game.youAreTheSpy}</p>
                   <p className="text-sm text-muted-foreground">
-                    Figure out the location from other players&apos; questions!
+                    {t.game.spyHint}
                   </p>
                 </div>
               ) : (
@@ -46,21 +48,21 @@ export const RoleCard = memo(function RoleCard({
                   <Shield className="h-8 w-8 mx-auto text-primary" />
                   <div className="flex items-center justify-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <p className="text-lg font-bold">{location}</p>
+                    <p className="text-lg font-bold">{location ? translateLocation(location) : location}</p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Your role: <span className="font-semibold text-foreground">{myRole}</span>
+                    {t.game.yourRole} <span className="font-semibold text-foreground">{myRole ? translateRole(myRole) : myRole}</span>
                   </p>
                 </div>
               )}
               <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1">
-                <EyeOff className="h-3 w-3" /> Tap to hide
+                <EyeOff className="h-3 w-3" /> {t.game.tapToHide}
               </p>
             </>
           ) : (
             <div className="space-y-2 py-4">
               <Eye className="h-8 w-8 mx-auto text-muted-foreground" />
-              <p className="text-muted-foreground">Tap to reveal your role</p>
+              <p className="text-muted-foreground">{t.game.tapToReveal}</p>
             </div>
           )}
         </button>
@@ -74,10 +76,11 @@ export const PlayerList = memo(function PlayerList({
 }: {
   players: PlayerInfo[]; currentPlayerId: string;
 }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardContent className="pt-4 pb-3">
-        <p className="text-xs text-muted-foreground mb-2">Players ({players.length})</p>
+        <p className="text-xs text-muted-foreground mb-2">{t.players.title} ({players.length})</p>
         <div className="flex flex-wrap gap-1.5">
           {players.map((p) => (
             <Badge key={p.id} variant={p.id === currentPlayerId ? "default" : "secondary"}>
@@ -114,11 +117,12 @@ export const GameActions = memo(function GameActions({
 }: {
   isHost: boolean; isEnding: boolean; onEndGame: () => void; game: GameViewData; playerId: string; gameId: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-2">
       {isHost && (
         <Button variant="destructive" className="flex-1" onClick={onEndGame} disabled={isEnding}>
-          {isEnding ? "Ending..." : "End Game"}
+          {isEnding ? t.game.ending : t.game.endGame}
         </Button>
       )}
       <VotePanel players={game.players} playerId={playerId} gameId={gameId} />

@@ -14,6 +14,7 @@ import {
 import { MapPin } from "lucide-react";
 import type { LocationInfo } from "@/domains/game/schema";
 import { endGame } from "@/domains/game/actions";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface LocationGridProps {
   locations: LocationInfo[];
@@ -40,6 +41,7 @@ const LocationButton = memo(function LocationButton({
   onSpyClick: (loc: LocationInfo) => void;
   onCrossClick: (locId: string) => void;
 }) {
+  const { translateLocation } = useTranslation();
   const handleClick = useCallback(() => {
     if (isSpy) {
       onSpyClick(location);
@@ -63,7 +65,7 @@ const LocationButton = memo(function LocationButton({
 
   return (
     <button onClick={handleClick} className={className}>
-      {location.name}
+      {translateLocation(location.name)}
     </button>
   );
 });
@@ -81,22 +83,23 @@ const GuessDialog = memo(function GuessDialog({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const { t, translateLocation } = useTranslation();
   return (
     <Dialog open={!!guessTarget} onOpenChange={onCancel}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Guess the Location?</DialogTitle>
+          <DialogTitle>{t.locationGrid.guessTitle}</DialogTitle>
           <DialogDescription>
-            Are you sure the location is <strong>{guessTarget?.name}</strong>?
-            If you&apos;re wrong, you lose!
+            Are you sure the location is <strong>{guessTarget ? translateLocation(guessTarget.name) : ""}</strong>?
+            {t.locationGrid.guessConfirm}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="ghost" onClick={onCancel}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isGuessing}>
-            {isGuessing ? "Guessing..." : "Confirm Guess"}
+            {isGuessing ? t.locationGrid.guessing : t.locationGrid.confirmGuess}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -113,6 +116,7 @@ export const LocationGrid = memo(function LocationGrid({
   gameId,
   playerId,
 }: LocationGridProps) {
+  const { t } = useTranslation();
   const [guessTarget, setGuessTarget] = useState<LocationInfo | null>(null);
   const [isGuessing, setIsGuessing] = useState(false);
   const [crossedOut, setCrossedOut] = useState<Set<string>>(new Set());
@@ -172,8 +176,8 @@ export const LocationGrid = memo(function LocationGrid({
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-muted-foreground flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            Locations ({locations.length})
-            {isSpy && <span className="text-destructive ml-1">&mdash; tap to guess!</span>}
+            {t.locationGrid.title} ({locations.length})
+            {isSpy && <span className="text-destructive ml-1">{t.locationGrid.tapToGuess}</span>}
           </CardTitle>
         </CardHeader>
         <CardContent>

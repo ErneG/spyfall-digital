@@ -7,6 +7,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Separator } from "@/shared/ui/separator";
 import { MapPin, AlertTriangle, Trophy, RotateCcw, LogOut } from "lucide-react";
 import type { GameView } from "@/domains/game/schema";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface RevealScreenProps {
   game: GameView;
@@ -23,6 +24,7 @@ export const RevealScreen = memo(function RevealScreen({
   onRestart,
   onLeave,
 }: RevealScreenProps) {
+  const { t, translateLocation, translateRole } = useTranslation();
   const spyIds = useMemo(() => game.spies ?? [], [game.spies]);
   const location = game.revealedLocation ?? game.location ?? "Unknown";
   const didSpy = spyIds.includes(playerId);
@@ -40,16 +42,16 @@ export const RevealScreen = memo(function RevealScreen({
       <div className="w-full max-w-md space-y-6 text-center">
         <div className="space-y-3">
           <Trophy className="h-12 w-12 mx-auto text-yellow-500" />
-          <h1 className="text-3xl font-bold">Game Over!</h1>
+          <h1 className="text-3xl font-bold">{t.game.gameOver}</h1>
         </div>
 
         <Card>
           <CardContent className="pt-6 space-y-4">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                <MapPin className="h-3 w-3" /> The location was
+                <MapPin className="h-3 w-3" /> {t.game.locationWas}
               </p>
-              <p className="text-2xl font-bold">{location}</p>
+              <p className="text-2xl font-bold">{translateLocation(location)}</p>
             </div>
 
             <Separator />
@@ -57,7 +59,7 @@ export const RevealScreen = memo(function RevealScreen({
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
-                {spyNames.length === 1 ? "The spy was" : "The spies were"}
+                {spyNames.length === 1 ? t.game.spyWas : t.game.spiesWere}
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 {spyNames.map((name) => (
@@ -70,8 +72,8 @@ export const RevealScreen = memo(function RevealScreen({
 
             <Separator />
             <p className="text-sm text-muted-foreground">
-              {didSpy ? "You were the spy!" : "Your role was:"}{" "}
-              <span className="font-semibold text-foreground">{game.myRole}</span>
+              {didSpy ? t.game.youWereSpy : t.game.yourRoleWas}{" "}
+              <span className="font-semibold text-foreground">{game.myRole ? translateRole(game.myRole) : game.myRole}</span>
             </p>
           </CardContent>
         </Card>
@@ -82,7 +84,7 @@ export const RevealScreen = memo(function RevealScreen({
               {game.players.map((p) => (
                 <div key={p.id} className="flex items-center justify-between py-1.5 px-3 rounded bg-muted/50">
                   <span className="font-medium">{p.name}</span>
-                  {spyIds.includes(p.id) && <Badge variant="destructive">Spy</Badge>}
+                  {spyIds.includes(p.id) && <Badge variant="destructive">{t.common.spy}</Badge>}
                 </div>
               ))}
             </div>
@@ -92,15 +94,15 @@ export const RevealScreen = memo(function RevealScreen({
         <div className="space-y-2">
           {isHost ? (
             <Button className="w-full h-12 text-lg gap-2" onClick={onRestart}>
-              <RotateCcw className="h-5 w-5" /> Play Again
+              <RotateCcw className="h-5 w-5" /> {t.game.playAgain}
             </Button>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Waiting for the host to start a new round...
+              {t.game.waitingForNewRound}
             </p>
           )}
           <Button variant="ghost" className="w-full gap-2 text-muted-foreground" onClick={onLeave}>
-            <LogOut className="h-4 w-4" /> Leave Room
+            <LogOut className="h-4 w-4" /> {t.game.leaveRoom}
           </Button>
         </div>
       </div>

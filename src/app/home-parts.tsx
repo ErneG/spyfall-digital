@@ -16,20 +16,22 @@ import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { TIMER_PRESETS } from "@/domains/room/schema";
 import { MIN_PLAYERS, MAX_PLAYERS, DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import { Eye, EyeOff, Users, Crosshair, Smartphone, Plus, X, Clock } from "lucide-react";
+import { useTranslation } from "@/shared/i18n/context";
 
 const SPY_OPTIONS = [1, 2] as const;
 
 /* ── Subcomponents ────────────────────────────────────── */
 
 export const HeroSection = React.memo(function HeroSection() {
+  const { t } = useTranslation();
   return (
     <div className="text-center space-y-3">
       <div className="flex items-center justify-center gap-2">
         <Eye className="h-10 w-10 text-primary" />
       </div>
-      <h1 className="text-4xl font-bold tracking-tight">Spyfall</h1>
+      <h1 className="text-4xl font-bold tracking-tight">{t.home.title}</h1>
       <p className="text-muted-foreground">
-        Find the spy before they figure out where you are.
+        {t.home.subtitle}
       </p>
     </div>
   );
@@ -42,19 +44,20 @@ interface ModeSelectorProps {
 }
 
 export const ModeSelector = React.memo(function ModeSelector({ onCreateMode, onJoinMode, onPassAndPlayMode }: ModeSelectorProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <Button className="w-full h-14 text-lg gap-2" onClick={onCreateMode}>
         <Users className="h-5 w-5" />
-        Create Room
+        {t.home.createRoom}
       </Button>
       <Button variant="outline" className="w-full h-14 text-lg gap-2" onClick={onJoinMode}>
         <Crosshair className="h-5 w-5" />
-        Join Room
+        {t.home.joinRoom}
       </Button>
       <Button variant="outline" className="w-full h-14 text-lg gap-2" onClick={onPassAndPlayMode}>
         <Smartphone className="h-5 w-5" />
-        Pass &amp; Play
+        {t.home.passAndPlay}
       </Button>
     </div>
   );
@@ -73,19 +76,20 @@ interface CreateRoomFormProps {
 export const CreateRoomForm = React.memo(function CreateRoomForm({
   name, error, isLoading, onNameChange, onKeyDown, onBack, onCreate,
 }: CreateRoomFormProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create a Room</CardTitle>
-        <CardDescription>You&apos;ll be the host of this game.</CardDescription>
+        <CardTitle>{t.home.createRoom}</CardTitle>
+        <CardDescription>{t.home.createRoomDesc}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Input placeholder="Your name" value={name} onChange={onNameChange} maxLength={20} autoFocus onKeyDown={onKeyDown} />
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <Input placeholder={t.home.yourName} value={name} onChange={onNameChange} maxLength={20} autoFocus onKeyDown={onKeyDown} />
+        {error && <p className="text-sm text-destructive">{t.errors[error as keyof typeof t.errors] ?? error}</p>}
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack}>Back</Button>
+          <Button variant="ghost" onClick={onBack}>{t.common.back}</Button>
           <Button className="flex-1" onClick={onCreate} disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create"}
+            {isLoading ? t.home.creating : t.home.create}
           </Button>
         </div>
       </CardContent>
@@ -108,27 +112,28 @@ interface JoinRoomFormProps {
 export const JoinRoomForm = React.memo(function JoinRoomForm({
   name, joinCode, error, isLoading, onNameChange, onJoinCodeChange, onKeyDown, onBack, onJoin,
 }: JoinRoomFormProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Join a Room</CardTitle>
-        <CardDescription>Enter the 5-letter code from the host.</CardDescription>
+        <CardTitle>{t.home.joinRoom}</CardTitle>
+        <CardDescription>{t.home.joinRoomDesc}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Input placeholder="Your name" value={name} onChange={onNameChange} maxLength={20} autoFocus />
+        <Input placeholder={t.home.yourName} value={name} onChange={onNameChange} maxLength={20} autoFocus />
         <Input
-          placeholder="Room code"
+          placeholder={t.home.roomCode}
           value={joinCode}
           onChange={onJoinCodeChange}
           maxLength={5}
           className="text-center text-2xl tracking-[0.3em] font-mono uppercase"
           onKeyDown={onKeyDown}
         />
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-sm text-destructive">{t.errors[error as keyof typeof t.errors] ?? error}</p>}
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack}>Back</Button>
+          <Button variant="ghost" onClick={onBack}>{t.common.back}</Button>
           <Button className="flex-1" onClick={onJoin} disabled={isLoading}>
-            {isLoading ? "Joining..." : "Join"}
+            {isLoading ? t.home.joining : t.home.join}
           </Button>
         </div>
       </CardContent>
@@ -143,6 +148,7 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   onNameChange: (index: number, value: string) => void;
   onRemove: (index: number) => void;
 }) {
+  const { t } = useTranslation();
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => onNameChange(index, event.target.value),
     [index, onNameChange],
@@ -150,7 +156,7 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   const handleRemove = useCallback(() => onRemove(index), [index, onRemove]);
   return (
     <div className="flex gap-2">
-      <Input placeholder={`Player ${index + 1}`} value={name} onChange={handleChange} maxLength={20} />
+      <Input placeholder={`${t.home.playerN} ${index + 1}`} value={name} onChange={handleChange} maxLength={20} />
       {canRemove && (
         <Button variant="ghost" size="icon" className="shrink-0" onClick={handleRemove}>
           <X className="h-4 w-4" />
@@ -199,11 +205,12 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
   onTimeLimitChange, onSpyCountChange, onHideSpyCountChange,
   onBack, onStart,
 }: PassAndPlayFormProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pass &amp; Play</CardTitle>
-        <CardDescription>One device, passed between players.</CardDescription>
+        <CardTitle>{t.home.passAndPlay}</CardTitle>
+        <CardDescription>{t.home.passAndPlayDesc}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -220,14 +227,14 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
         </div>
         {playerNames.length < MAX_PLAYERS && (
           <Button variant="outline" size="sm" className="w-full gap-1" onClick={onAddPlayer}>
-            <Plus className="h-4 w-4" /> Add Player
+            <Plus className="h-4 w-4" /> {t.home.addPlayer}
           </Button>
         )}
 
         <Separator />
 
         <div className="space-y-2">
-          <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> Timer</Label>
+          <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> {t.config.timer}</Label>
           <div className="flex gap-1.5">
             {TIMER_PRESETS.map((preset) => (
               <PnPPresetButton key={preset.value} label={preset.label} value={preset.value} isSelected={timeLimit === preset.value} onClick={onTimeLimitChange} />
@@ -236,10 +243,10 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Spies</Label>
+          <Label className="text-sm text-muted-foreground">{t.config.spies}</Label>
           <div className="flex gap-1.5">
             {SPY_OPTIONS.map((count) => (
-              <PnPPresetButton key={count} label={`${count} ${count === 1 ? "Spy" : "Spies"}`} value={count} isSelected={spyCount === count} onClick={onSpyCountChange} />
+              <PnPPresetButton key={count} label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`} value={count} isSelected={spyCount === count} onClick={onSpyCountChange} />
             ))}
           </div>
         </div>
@@ -247,16 +254,16 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
         <div className="flex items-center justify-between">
           <Label htmlFor="pnp-hide-spy" className="flex items-center gap-1.5 text-sm">
             {hideSpyCount ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-            Hide spy count
+            {t.config.hideSpyCount}
           </Label>
           <Switch id="pnp-hide-spy" checked={hideSpyCount} onCheckedChange={onHideSpyCountChange} />
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-sm text-destructive">{t.errors[error as keyof typeof t.errors] ?? error}</p>}
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack}>Back</Button>
+          <Button variant="ghost" onClick={onBack}>{t.common.back}</Button>
           <Button className="flex-1" onClick={onStart} disabled={isLoading}>
-            {isLoading ? "Starting..." : "Start Game"}
+            {isLoading ? t.home.starting : t.home.startGame}
           </Button>
         </div>
       </CardContent>
@@ -265,12 +272,13 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
 });
 
 export const FooterInfo = React.memo(function FooterInfo() {
+  const { t } = useTranslation();
   return (
     <>
       <Separator />
       <div className="text-center text-xs text-muted-foreground space-y-1">
-        <p>3-12 players &middot; 8 minute rounds &middot; 54 locations</p>
-        <p>Inspired by the board game Spyfall</p>
+        <p>{t.home.footer}</p>
+        <p>{t.home.footerInspired}</p>
       </div>
     </>
   );
@@ -334,23 +342,23 @@ export function useHomeState() {
   const handlePnpHideSpyCountChange = useCallback((checked: boolean) => setPnpHideSpyCount(checked), []);
 
   const handleCreateClick = useCallback(() => {
-    if (!name.trim()) { setError("Enter your name"); return; }
+    if (!name.trim()) { setError("enterName"); return; }
     setError("");
     createRoomMutation.mutate(name.trim());
   }, [name, createRoomMutation]);
 
   const handleJoinClick = useCallback(() => {
-    if (!name.trim()) { setError("Enter your name"); return; }
-    if (!joinCode.trim()) { setError("Enter a room code"); return; }
+    if (!name.trim()) { setError("enterName"); return; }
+    if (!joinCode.trim()) { setError("enterRoomCode"); return; }
     setError("");
     joinRoomMutation.mutate({ playerName: name.trim(), roomCode: joinCode.trim().toUpperCase() });
   }, [name, joinCode, joinRoomMutation]);
 
   const handlePassAndPlayClick = useCallback(() => {
     const trimmed = playerNames.map((n) => n.trim());
-    if (trimmed.some((n) => !n)) { setError("All player names are required"); return; }
+    if (trimmed.some((n) => !n)) { setError("allNamesRequired"); return; }
     const unique = new Set(trimmed.map((n) => n.toLowerCase()));
-    if (unique.size !== trimmed.length) { setError("Player names must be unique"); return; }
+    if (unique.size !== trimmed.length) { setError("uniqueNames"); return; }
     setError("");
     passAndPlayMutation.mutate(trimmed);
   }, [playerNames, passAndPlayMutation]);

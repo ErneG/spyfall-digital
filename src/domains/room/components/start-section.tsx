@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/shared/ui/button";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface StartSectionProps {
   isHost: boolean;
@@ -18,6 +19,7 @@ export const StartSection = React.memo(function StartSection({
   error,
   onStart,
 }: StartSectionProps) {
+  const { t } = useTranslation();
   return (
     <>
       {error && <p className="text-sm text-destructive text-center">{error}</p>}
@@ -29,17 +31,17 @@ export const StartSection = React.memo(function StartSection({
             onClick={onStart}
             disabled={isStarting || playerCount < 3}
           >
-            {isStarting ? "Starting..." : "Start Game"}
+            {isStarting ? t.home.starting : t.home.startGame}
           </Button>
           {playerCount < 3 && (
             <p className="text-xs text-muted-foreground text-center">
-              Need at least 3 players to start
+              {t.players.needMinPlayers}
             </p>
           )}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground text-center">
-          Waiting for the host to start the game...
+          {t.players.waitingForHost}
         </p>
       )}
     </>

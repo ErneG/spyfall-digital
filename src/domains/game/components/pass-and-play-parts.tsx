@@ -8,6 +8,7 @@ import {
   Hand, ChevronRight,
 } from "lucide-react";
 import type { PeekRole } from "@/domains/game/hooks";
+import { useTranslation } from "@/shared/i18n/context";
 
 export type { PeekRole };
 
@@ -37,11 +38,12 @@ export const PeekPlayerPicker = memo(function PeekPlayerPicker({
   subtitle?: string;
   error?: string | null;
 }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardContent className="pt-6 space-y-4">
         <div className="text-center space-y-1">
-          <p className="font-semibold">{title ?? "Who are you?"}</p>
+          <p className="font-semibold">{title ?? t.passAndPlay.whoAreYou}</p>
           {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </div>
         {error && <p className="text-sm text-destructive text-center">{error}</p>}
@@ -50,7 +52,7 @@ export const PeekPlayerPicker = memo(function PeekPlayerPicker({
             <PeekPlayerButton key={p.id} player={p} onSelect={onSelectPlayer} />
           ))}
         </div>
-        <Button variant="ghost" className="w-full" onClick={onBack}>Back to game</Button>
+        <Button variant="ghost" className="w-full" onClick={onBack}>{t.passAndPlay.backToGame}</Button>
       </CardContent>
     </Card>
   );
@@ -68,19 +70,20 @@ export const PeekRevealCard = memo(function PeekRevealCard({
   onHide: () => void;
   onBack: () => void;
 }) {
+  const { t, translateLocation, translateRole } = useTranslation();
   if (!isRevealed || !role) {
     return (
       <Card>
         <CardContent className="pt-8 pb-8 text-center space-y-6">
           <Eye className="h-12 w-12 mx-auto text-muted-foreground" />
           <p className="text-lg font-semibold">{playerName}</p>
-          {hasError && <p className="text-sm text-destructive">Failed to load role. Tap to retry.</p>}
+          {hasError && <p className="text-sm text-destructive">{t.passAndPlay.fetchError}</p>}
           <Button size="lg" variant="outline" className="w-full h-14 text-lg" onClick={onReveal} disabled={isLoading}>
-            {isLoading && "Loading..."}
-            {!isLoading && hasError && "Retry"}
-            {!isLoading && !hasError && "Reveal My Role"}
+            {isLoading && t.common.loading}
+            {!isLoading && hasError && t.passAndPlay.retry}
+            {!isLoading && !hasError && t.passAndPlay.revealMyRole}
           </Button>
-          <Button variant="ghost" className="w-full" onClick={onBack}>Back</Button>
+          <Button variant="ghost" className="w-full" onClick={onBack}>{t.common.back}</Button>
         </CardContent>
       </Card>
     );
@@ -92,22 +95,22 @@ export const PeekRevealCard = memo(function PeekRevealCard({
         {role.isSpy ? (
           <div className="space-y-3">
             <AlertTriangle className="h-12 w-12 mx-auto text-destructive" />
-            <p className="text-2xl font-bold text-destructive">You are the SPY</p>
+            <p className="text-2xl font-bold text-destructive">{t.game.youAreTheSpy}</p>
           </div>
         ) : (
           <div className="space-y-3">
             <Shield className="h-12 w-12 mx-auto text-primary" />
             <div className="flex items-center justify-center gap-2">
               <MapPin className="h-5 w-5 text-muted-foreground" />
-              <p className="text-2xl font-bold">{role.location}</p>
+              <p className="text-2xl font-bold">{role.location ? translateLocation(role.location) : role.location}</p>
             </div>
             <p className="text-muted-foreground">
-              Your role: <span className="font-semibold text-foreground">{role.myRole}</span>
+              {t.game.yourRole} <span className="font-semibold text-foreground">{role.myRole ? translateRole(role.myRole) : role.myRole}</span>
             </p>
           </div>
         )}
         <Button size="lg" className="w-full h-14 text-lg gap-2" onClick={onHide}>
-          <EyeOff className="h-5 w-5" /> Hide
+          <EyeOff className="h-5 w-5" /> {t.passAndPlay.hide}
         </Button>
       </CardContent>
     </Card>
@@ -119,20 +122,21 @@ export const PeekRevealCard = memo(function PeekRevealCard({
 export const VoteHandoff = memo(function VoteHandoff({
   playerName, onReady, onCancel,
 }: { playerName: string; onReady: () => void; onCancel?: () => void }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardContent className="pt-8 pb-8 text-center space-y-6">
         <Hand className="h-12 w-12 mx-auto text-muted-foreground" />
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Hand the device to</p>
+          <p className="text-sm text-muted-foreground">{t.passAndPlay.handDeviceTo}</p>
           <p className="text-3xl font-bold">{playerName}</p>
         </div>
         <Button size="lg" className="w-full h-14 text-lg gap-2" onClick={onReady}>
-          I&apos;m {playerName} <ChevronRight className="h-5 w-5" />
+          {t.passAndPlay.imReady} {playerName} <ChevronRight className="h-5 w-5" />
         </Button>
         {onCancel && (
           <Button variant="ghost" className="w-full text-muted-foreground" onClick={onCancel}>
-            Cancel Voting
+            {t.passAndPlay.cancelVoting}
           </Button>
         )}
       </CardContent>
@@ -163,12 +167,13 @@ export const VotePicker = memo(function VotePicker({
   isVoting: boolean;
   onVote: (suspectId: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardContent className="pt-6 space-y-4">
         <div className="text-center space-y-1">
           <p className="text-lg font-semibold">{voterName}</p>
-          <p className="text-sm text-muted-foreground">Who do you think is the spy?</p>
+          <p className="text-sm text-muted-foreground">{t.passAndPlay.whoDoYouThink}</p>
         </div>
         <div className="space-y-2">
           {candidates.map((p) => (

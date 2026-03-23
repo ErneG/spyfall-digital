@@ -13,11 +13,13 @@ import { GameView } from "@/domains/game/components/game-view";
 import { PassAndPlayGameView } from "@/domains/game/components/pass-and-play-game-view";
 import { startGame } from "@/domains/game/actions";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
+import { useTranslation } from "@/shared/i18n/context";
 
 const EMPTY_PLAYERS: never[] = [];
 
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
+  const { t } = useTranslation();
   const router = useRouter();
   const { session, clearSession, isLoaded } = useSession();
   const { data: room, isConnected } = useRoomEvents(code);
@@ -105,7 +107,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         <PlayerList players={players} currentPlayerId={session.playerId} />
         <StartSection isHost={session.isHost} isStarting={startGameMutation.isPending} playerCount={players.length} error={error} onStart={handleStartClick} />
         <Separator />
-        <Button variant="ghost" className="w-full text-muted-foreground" onClick={handleLeave}>Leave Room</Button>
+        <Button variant="ghost" className="w-full text-muted-foreground" onClick={handleLeave}>{t.room.leaveRoom}</Button>
       </div>
     </main>
   );

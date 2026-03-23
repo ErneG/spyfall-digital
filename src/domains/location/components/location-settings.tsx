@@ -17,6 +17,7 @@ import { MapPin, Search, X, Plus, Trash2, Check } from "lucide-react";
 import { updateLocationSelections, createCustomLocation, updateCustomLocation, deleteCustomLocation } from "@/domains/location/actions";
 import { fetchLocations } from "@/domains/location/hooks";
 import type { LocationItem, CustomLocationItem } from "@/domains/location/schema";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface LocationSettingsProps {
   open: boolean;
@@ -32,6 +33,7 @@ const LocationButton = memo(function LocationButton({
 }: {
   id: string; name: string; selected: boolean; onToggle: (id: string) => void;
 }) {
+  const { translateLocation } = useTranslation();
   const handleClick = useCallback(() => { onToggle(id); }, [onToggle, id]);
   return (
     <button
@@ -40,7 +42,7 @@ const LocationButton = memo(function LocationButton({
         selected ? "bg-primary/10 text-primary font-medium" : "bg-muted/30 text-muted-foreground line-through"
       }`}
     >
-      {name}
+      {translateLocation(name)}
     </button>
   );
 });
@@ -50,6 +52,7 @@ const LocationGroup = memo(function LocationGroup({
 }: {
   title: string; locations: LocationItem[]; onToggle: (id: string) => void; onSelectAll: () => void; onDeselectAll: () => void;
 }) {
+  const { t } = useTranslation();
   const selected = useMemo(() => locations.filter((l) => l.selected).length, [locations]);
   return (
     <div className="space-y-2">
@@ -58,8 +61,8 @@ const LocationGroup = memo(function LocationGroup({
           {title} <span className="text-muted-foreground">({selected}/{locations.length})</span>
         </h3>
         <div className="flex gap-1">
-          <Button variant="ghost" size="sm" onClick={onSelectAll} className="h-6 text-xs">All</Button>
-          <Button variant="ghost" size="sm" onClick={onDeselectAll} className="h-6 text-xs">None</Button>
+          <Button variant="ghost" size="sm" onClick={onSelectAll} className="h-6 text-xs">{t.locationSettings.all}</Button>
+          <Button variant="ghost" size="sm" onClick={onDeselectAll} className="h-6 text-xs">{t.locationSettings.none}</Button>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-1">
@@ -181,6 +184,7 @@ function useLocationData(roomCode: string, playerId: string, isOpen: boolean, on
 export const LocationSettings = memo(function LocationSettings({
   open, onOpenChange, roomCode, playerId,
 }: LocationSettingsProps) {
+  const { t } = useTranslation();
   const data = useLocationData(roomCode, playerId, open, onOpenChange);
   const [filter, setFilter] = useState("");
 
@@ -203,14 +207,14 @@ export const LocationSettings = memo(function LocationSettings({
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" /> Locations ({selectedCount} selected)
+            <MapPin className="h-4 w-4" /> {t.locationSettings.title} ({selectedCount} {t.config.locationsSelected})
           </DialogTitle>
-          <DialogDescription>Choose which locations to include in the game.</DialogDescription>
+          <DialogDescription>{t.locationSettings.description}</DialogDescription>
         </DialogHeader>
 
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Filter locations..." value={filter} onChange={handleFilterChange} className="pl-9" />
+          <Input placeholder={t.locationSettings.filter} value={filter} onChange={handleFilterChange} className="pl-9" />
           {filter && (
             <button onClick={clearFilter} className="absolute right-3 top-1/2 -translate-y-1/2">
               <X className="h-4 w-4 text-muted-foreground" />
@@ -219,20 +223,20 @@ export const LocationSettings = memo(function LocationSettings({
         </div>
 
         {data.isLoading ? (
-          <p className="py-8 text-center text-muted-foreground">Loading...</p>
+          <p className="py-8 text-center text-muted-foreground">{t.common.loading}</p>
         ) : (
           <div className="space-y-4">
-            <LocationGroup title="Spyfall 1" locations={edition1} onToggle={data.toggleLocation} onSelectAll={data.selectAllEd1} onDeselectAll={data.deselectAllEd1} />
+            <LocationGroup title={t.locationSettings.edition1} locations={edition1} onToggle={data.toggleLocation} onSelectAll={data.selectAllEd1} onDeselectAll={data.deselectAllEd1} />
             <Separator />
-            <LocationGroup title="Spyfall 2" locations={edition2} onToggle={data.toggleLocation} onSelectAll={data.selectAllEd2} onDeselectAll={data.deselectAllEd2} />
+            <LocationGroup title={t.locationSettings.edition2} locations={edition2} onToggle={data.toggleLocation} onSelectAll={data.selectAllEd2} onDeselectAll={data.deselectAllEd2} />
             {(data.customLocations.length > 0 || !filter) && (
               <>
                 <Separator />
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">Custom Locations</h3>
+                    <h3 className="text-sm font-medium">{t.locationSettings.customLocations}</h3>
                     <Button variant="outline" size="sm" onClick={data.handleAddCustom} className="gap-1">
-                      <Plus className="h-3 w-3" /> Add
+                      <Plus className="h-3 w-3" /> {t.locationSettings.add}
                     </Button>
                   </div>
                   {data.customLocations.map((cl) => (
@@ -245,8 +249,8 @@ export const LocationSettings = memo(function LocationSettings({
         )}
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button variant="ghost" onClick={handleClose}>Cancel</Button>
-          <Button onClick={data.handleSave} className="gap-1"><Check className="h-4 w-4" /> Save</Button>
+          <Button variant="ghost" onClick={handleClose}>{t.common.cancel}</Button>
+          <Button onClick={data.handleSave} className="gap-1"><Check className="h-4 w-4" /> {t.common.save}</Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Users, Crown } from "lucide-react";
 import type { PlayerInfo } from "@/domains/room/schema";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface PlayerListProps {
   players: PlayerInfo[];
@@ -15,12 +16,13 @@ export const PlayerList = React.memo(function PlayerList({
   players,
   currentPlayerId,
 }: PlayerListProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <Users className="h-4 w-4" />
-          Players ({players.length}/12)
+          {t.players.title} ({players.length}/12)
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -33,13 +35,13 @@ export const PlayerList = React.memo(function PlayerList({
               <span className="font-medium">
                 {player.name}
                 {player.id === currentPlayerId && (
-                  <span className="text-muted-foreground ml-1">(you)</span>
+                  <span className="text-muted-foreground ml-1">{t.players.you}</span>
                 )}
               </span>
               <div className="flex items-center gap-2">
                 {player.isHost && (
                   <Badge variant="secondary" className="gap-1">
-                    <Crown className="h-3 w-3" /> Host
+                    <Crown className="h-3 w-3" /> {t.players.host}
                   </Badge>
                 )}
               </div>
@@ -47,7 +49,7 @@ export const PlayerList = React.memo(function PlayerList({
           ))}
           {players.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Waiting for players...
+              {t.players.waitingForPlayers}
             </p>
           )}
         </div>

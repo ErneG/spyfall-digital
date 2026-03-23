@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageToggle } from "@/components/language-toggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,7 +47,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>
-          <header className="flex justify-end p-2">
+          <header className="flex justify-end gap-1 p-2">
+            <LanguageToggle />
             <ThemeToggle />
           </header>
           {children}

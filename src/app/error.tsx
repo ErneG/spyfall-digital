@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { Button } from "@/shared/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "@/shared/i18n/context";
 
 export default function Error({
   error,
@@ -11,6 +12,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTranslation();
   const handleRetry = useCallback(() => {
     reset();
   }, [reset]);
@@ -19,12 +21,12 @@ export default function Error({
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex max-w-md flex-col items-center gap-4 text-center">
         <AlertTriangle className="h-10 w-10 text-destructive" />
-        <h2 className="text-lg font-semibold">Something went wrong</h2>
+        <h2 className="text-lg font-semibold">{t.errors.somethingWentWrong}</h2>
         <p className="text-sm text-muted-foreground">
-          {error.message || "An unexpected error occurred. Please try again."}
+          {error.message || t.errors.unexpectedError}
         </p>
         <Button onClick={handleRetry} variant="outline">
-          Try again
+          {t.errors.tryAgain}
         </Button>
       </div>
     </div>

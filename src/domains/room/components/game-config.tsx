@@ -10,6 +10,7 @@ import { TIMER_PRESETS, type RoomEvent } from "@/domains/room/schema";
 import { updateRoomConfig } from "@/domains/room/actions";
 import { roomKeys } from "@/domains/room/hooks";
 import { Settings, Clock, Eye, EyeOff, Shield, Timer } from "lucide-react";
+import { useTranslation } from "@/shared/i18n/context";
 
 const SECONDS_PER_MINUTE = 60;
 const SPY_OPTIONS = [1, 2] as const;
@@ -41,11 +42,12 @@ interface ConfigPatch {
 const GameConfigSummary = memo(function GameConfigSummary({
   timeLimit, spyCount, selectedLocationCount, totalLocationCount, moderatorMode,
 }: Pick<GameConfigProps, "timeLimit" | "spyCount" | "selectedLocationCount" | "totalLocationCount" | "moderatorMode">) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Settings className="h-4 w-4" /> Game Settings
+          <Settings className="h-4 w-4" /> {t.config.gameSettings}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -54,9 +56,9 @@ const GameConfigSummary = memo(function GameConfigSummary({
             <Clock className="mr-1 h-3 w-3" />
             {Math.floor(timeLimit / SECONDS_PER_MINUTE)}:{String(timeLimit % SECONDS_PER_MINUTE).padStart(2, "0")}
           </Badge>
-          <Badge variant="secondary">{spyCount} {spyCount === 1 ? "spy" : "spies"}</Badge>
-          <Badge variant="secondary">{selectedLocationCount}/{totalLocationCount} locations</Badge>
-          {moderatorMode && <Badge variant="outline"><Shield className="mr-1 h-3 w-3" /> Moderator</Badge>}
+          <Badge variant="secondary">{spyCount} {spyCount === 1 ? t.config.spy : t.config.spiesPlural}</Badge>
+          <Badge variant="secondary">{selectedLocationCount}/{totalLocationCount} {t.config.locationsSelected}</Badge>
+          {moderatorMode && <Badge variant="outline"><Shield className="mr-1 h-3 w-3" /> {t.config.moderatorMode}</Badge>}
         </div>
       </CardContent>
     </Card>
@@ -88,24 +90,25 @@ const ConfigToggles = memo(function ConfigToggles({
   autoStartTimer: boolean; hideSpyCount: boolean; moderatorMode: boolean;
   onAutoStart: (checked: boolean) => void; onHideSpy: (checked: boolean) => void; onModerator: (checked: boolean) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label htmlFor="auto-start" className="flex items-center gap-1.5 text-sm">
-          <Timer className="h-3 w-3" /> Auto-start timer
+          <Timer className="h-3 w-3" /> {t.config.autoStartTimer}
         </Label>
         <Switch id="auto-start" checked={autoStartTimer} onCheckedChange={onAutoStart} />
       </div>
       <div className="flex items-center justify-between">
         <Label htmlFor="hide-spy" className="flex items-center gap-1.5 text-sm">
           {hideSpyCount ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          Hide spy count
+          {t.config.hideSpyCount}
         </Label>
         <Switch id="hide-spy" checked={hideSpyCount} onCheckedChange={onHideSpy} />
       </div>
       <div className="flex items-center justify-between">
         <Label htmlFor="moderator" className="flex items-center gap-1.5 text-sm">
-          <Shield className="h-3 w-3" /> Moderator mode
+          <Shield className="h-3 w-3" /> {t.config.moderatorMode}
         </Label>
         <Switch id="moderator" checked={moderatorMode} onCheckedChange={onModerator} />
       </div>
@@ -146,6 +149,8 @@ export const GameConfig = memo(function GameConfig({
   const handleHideSpy = useCallback((checked: boolean) => { configMutation.mutate({ hideSpyCount: checked }); }, [configMutation]);
   const handleModerator = useCallback((checked: boolean) => { configMutation.mutate({ moderatorMode: checked }); }, [configMutation]);
 
+  const { t } = useTranslation();
+
   if (!isHost) {
     return <GameConfigSummary timeLimit={timeLimit} spyCount={spyCount} selectedLocationCount={selectedLocationCount} totalLocationCount={totalLocationCount} moderatorMode={moderatorMode} />;
   }
@@ -153,11 +158,11 @@ export const GameConfig = memo(function GameConfig({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base"><Settings className="h-4 w-4" /> Game Settings</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base"><Settings className="h-4 w-4" /> {t.config.gameSettings}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> Timer</Label>
+          <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> {t.config.timer}</Label>
           <div className="flex gap-1.5">
             {TIMER_PRESETS.map((preset) => (
               <PresetButton key={preset.value} label={preset.label} value={preset.value} isSelected={timeLimit === preset.value} onClick={handleTimeSelect} />
@@ -165,18 +170,18 @@ export const GameConfig = memo(function GameConfig({
           </div>
         </div>
         <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Spies</Label>
+          <Label className="text-sm text-muted-foreground">{t.config.spies}</Label>
           <div className="flex gap-1.5">
             {SPY_OPTIONS.map((count) => (
-              <PresetButton key={count} label={`${count} ${count === 1 ? "Spy" : "Spies"}`} value={count} isSelected={spyCount === count} onClick={handleSpySelect} />
+              <PresetButton key={count} label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`} value={count} isSelected={spyCount === count} onClick={handleSpySelect} />
             ))}
           </div>
         </div>
         <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Locations</Label>
+          <Label className="text-sm text-muted-foreground">{t.config.locations}</Label>
           <button onClick={onOpenLocations} className="w-full rounded-md bg-muted px-3 py-2 text-left text-sm hover:bg-muted/80 transition-colors">
-            {selectedLocationCount} of {totalLocationCount} locations selected
-            <span className="float-right text-muted-foreground">Edit &rarr;</span>
+            {selectedLocationCount} / {totalLocationCount} {t.config.locationsSelected}
+            <span className="float-right text-muted-foreground">{t.config.edit} &rarr;</span>
           </button>
         </div>
         <ConfigToggles autoStartTimer={autoStartTimer} hideSpyCount={hideSpyCount} moderatorMode={moderatorMode} onAutoStart={handleAutoStart} onHideSpy={handleHideSpy} onModerator={handleModerator} />

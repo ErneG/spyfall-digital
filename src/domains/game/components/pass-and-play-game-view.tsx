@@ -24,6 +24,7 @@ import {
   VotePicker,
 } from "@/domains/game/components/pass-and-play-parts";
 import { Eye, AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
+import { useTranslation } from "@/shared/i18n/context";
 
 const REVEAL_PHASES = new Set(["REVEAL", "FINISHED"]);
 
@@ -43,6 +44,7 @@ export function PassAndPlayGameView({
   gameId, hostPlayerId, allPlayers, roomCode: _roomCode, timeLimit,
   gameStartedAt, hideSpyCount, spyCount, isTimerRunning: initialTimerRunning,
 }: PassAndPlayGameViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const { clearSession } = useSession();
   const { game, isLoading } = useGameState(gameId, hostPlayerId);
@@ -276,7 +278,7 @@ export function PassAndPlayGameView({
           {isShowingGrid ? (
             <div className="space-y-4">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground">{spyGuessPlayer.name}, tap a location to guess</p>
+                <p className="text-sm text-muted-foreground">{spyGuessPlayer.name}, {t.passAndPlay.spyTapToGuess}</p>
               </div>
               <LocationGrid
                 locations={game.allLocations}
@@ -285,15 +287,15 @@ export function PassAndPlayGameView({
                 gameId={gameId}
                 playerId={spyGuessPlayer.id}
               />
-              <Button variant="ghost" className="w-full" onClick={handleSpyGuessBack}>Cancel</Button>
+              <Button variant="ghost" className="w-full" onClick={handleSpyGuessBack}>{t.common.cancel}</Button>
             </div>
           ) : (
             <PeekPlayerPicker
               players={allPlayers}
               onSelectPlayer={handleSelectSpyPlayer}
               onBack={handleSpyGuessBack}
-              title="Spy: Guess the Location"
-              subtitle="Select your name to verify you're the spy."
+              title={t.passAndPlay.spyGuessTitle}
+              subtitle={t.passAndPlay.spyGuessSubtitle}
               error={spyVerifyError}
             />
           )}
@@ -307,7 +309,7 @@ export function PassAndPlayGameView({
       <main className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
           <div className="text-center text-sm text-muted-foreground">
-            Vote {voteIndex + 1} of {allPlayers.length}
+            {t.passAndPlay.voteNofM} {voteIndex + 1} of {allPlayers.length}
           </div>
           {voteStep === "handoff" ? (
             <VoteHandoff playerName={currentVoter.name} onReady={handleVoteReady} onCancel={handleCancelVoting} />
@@ -327,7 +329,7 @@ export function PassAndPlayGameView({
 
         <Card>
           <CardContent className="pt-4 pb-3">
-            <p className="text-xs text-muted-foreground mb-2">Players ({allPlayers.length})</p>
+            <p className="text-xs text-muted-foreground mb-2">{t.players.title} ({allPlayers.length})</p>
             <div className="flex flex-wrap gap-1.5">
               {allPlayers.map((p) => (
                 <Badge key={p.id} variant="secondary">{p.name}</Badge>
@@ -337,7 +339,7 @@ export function PassAndPlayGameView({
         </Card>
 
         <Button variant="outline" className="w-full h-12 gap-2" onClick={handlePeek}>
-          <Eye className="h-4 w-4" /> Peek at My Role
+          <Eye className="h-4 w-4" /> {t.passAndPlay.peekAtRole}
         </Button>
 
         {game && (
@@ -351,20 +353,20 @@ export function PassAndPlayGameView({
         <Separator />
 
         <Button variant="outline" className="w-full h-12 gap-2 border-destructive/50 text-destructive" onClick={handleStartSpyGuess}>
-          <Crosshair className="h-4 w-4" /> Spy: Guess Location
+          <Crosshair className="h-4 w-4" /> {t.passAndPlay.spyGuessLocation}
         </Button>
 
         <div className="flex gap-2">
           <Button variant="destructive" className="flex-1" onClick={onEndGameClick} disabled={endMutation.isPending}>
-            {endMutation.isPending ? "Ending..." : "End Game"}
+            {endMutation.isPending ? t.game.ending : t.game.endGame}
           </Button>
           <Button variant="outline" className="flex-1 gap-2" onClick={handleStartVoting}>
-            <Hand className="h-4 w-4" /> Vote
+            <Hand className="h-4 w-4" /> {t.game.vote}
           </Button>
         </div>
 
         <Button variant="ghost" className="w-full text-muted-foreground gap-2" onClick={handleLeave}>
-          <LogOut className="h-4 w-4" /> Leave Game
+          <LogOut className="h-4 w-4" /> {t.game.leaveGame}
         </Button>
       </div>
     </main>

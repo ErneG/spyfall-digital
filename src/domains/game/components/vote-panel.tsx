@@ -17,6 +17,7 @@ import type { PlayerInfo } from "@/shared/types/common";
 import { castVote } from "@/domains/game/actions";
 import { gameKeys } from "@/domains/game/hooks";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
+import { useTranslation } from "@/shared/i18n/context";
 
 interface VotePanelProps {
   players: PlayerInfo[];
@@ -50,6 +51,7 @@ const VotePlayerButton = memo(function VotePlayerButton({
 });
 
 export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: VotePanelProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const queryClient = useQueryClient();
@@ -86,7 +88,7 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
   if (hasVoted) {
     return (
       <p className="text-sm text-muted-foreground text-center py-2 flex-1">
-        Vote submitted. Waiting for others...
+        {t.voting.voteSubmitted}
       </p>
     );
   }
@@ -95,12 +97,12 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger render={triggerElement}>
         <Hand className="h-4 w-4" />
-        Vote
+        {t.game.vote}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Who is the Spy?</DialogTitle>
-          <DialogDescription>Select a player you suspect is the spy.</DialogDescription>
+          <DialogTitle>{t.voting.whoIsSpy}</DialogTitle>
+          <DialogDescription>{t.voting.selectSuspect}</DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
           {otherPlayers.map((p) => (
@@ -109,7 +111,7 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={handleCancel}>
-            Cancel
+            {t.voting.cancel}
           </Button>
         </DialogFooter>
       </DialogContent>
