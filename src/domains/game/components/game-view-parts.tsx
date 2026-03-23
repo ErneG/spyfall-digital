@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useCallback, memo } from "react";
+import { useEffect, useRef, memo } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
@@ -10,6 +11,8 @@ import { Eye, EyeOff, MapPin, Shield, AlertTriangle, Pause, Play } from "lucide-
 import type { GameView as GameViewData } from "@/domains/game/schema";
 import type { PlayerInfo } from "@/shared/types/common";
 import { toggleTimer, endGame, restartGame } from "@/domains/game/actions";
+import { gameKeys } from "@/domains/game/hooks";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 const BEEP_FREQUENCY = 800;
 const BEEP_VOLUME = 0.3;
@@ -153,17 +156,24 @@ export function useExpiryBeep(isExpired: boolean) {
 }
 
 export function useGameActions(gameId: string, playerId: string) {
-  const handleTimerToggle = useCallback(async (isTimerRunning: boolean) => {
-    await toggleTimer({ gameId, playerId, action: isTimerRunning ? "pause" : "resume" });
-  }, [gameId, playerId]);
+  const queryClient = useQueryClient();
+  const queryKey = gameKeys.state(gameId, playerId);
 
-  const handleEndGame = useCallback(async () => {
-    await endGame({ gameId, playerId });
-  }, [gameId, playerId]);
+  const timerMutation = useMutation({
+    mutationFn: (isCurrentlyRunning: boolean) =>
+      toggleTimer({ gameId, playerId, action: isCurrentlyRunning ? "pause" : "resume" }).then(unwrapAction),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
 
-  const handleRestart = useCallback(async () => {
-    await restartGame({ gameId, playerId });
-  }, [gameId, playerId]);
+  const endMutation = useMutation({
+    mutationFn: () => endGame({ gameId, playerId }).then(unwrapAction),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
 
-  return { handleTimerToggle, handleEndGame, handleRestart };
+  const restartMutation = useMutation({
+    mutationFn: () => restartGame({ gameId, playerId }).then(unwrapAction),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
+  return { timerMutation, endMutation, restartMutation };
 }

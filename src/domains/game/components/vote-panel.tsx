@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState, useCallback, useMemo } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -14,6 +15,8 @@ import {
 import { Hand } from "lucide-react";
 import type { PlayerInfo } from "@/shared/types/common";
 import { castVote } from "@/domains/game/actions";
+import { gameKeys } from "@/domains/game/hooks";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 interface VotePanelProps {
   players: PlayerInfo[];
@@ -48,28 +51,22 @@ const VotePlayerButton = memo(function VotePlayerButton({
 
 export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: VotePanelProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isVoting, setIsVoting] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleVote = useCallback(
-    async (suspectId: string) => {
-      setIsVoting(true);
-      try {
-        const result = await castVote({ gameId, voterId: playerId, suspectId });
-        if (result.success) {
-          setHasVoted(true);
-          setIsOpen(false);
-        }
-      } finally {
-        setIsVoting(false);
-      }
+  const voteMutation = useMutation({
+    mutationFn: (suspectId: string) =>
+      castVote({ gameId, voterId: playerId, suspectId }).then(unwrapAction),
+    onSuccess: () => {
+      setHasVoted(true);
+      setIsOpen(false);
+      void queryClient.invalidateQueries({ queryKey: gameKeys.state(gameId, playerId) });
     },
-    [gameId, playerId],
-  );
+  });
 
   const onVote = useCallback(
-    (suspectId: string) => { void handleVote(suspectId); },
-    [handleVote],
+    (suspectId: string) => { voteMutation.mutate(suspectId); },
+    [voteMutation],
   );
 
   const handleCancel = useCallback(() => {
@@ -107,7 +104,7 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
         </DialogHeader>
         <div className="space-y-2">
           {otherPlayers.map((p) => (
-            <VotePlayerButton key={p.id} player={p} isVoting={isVoting} onVote={onVote} />
+            <VotePlayerButton key={p.id} player={p} isVoting={voteMutation.isPending} onVote={onVote} />
           ))}
         </div>
         <DialogFooter>

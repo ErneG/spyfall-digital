@@ -15,7 +15,8 @@ import {
 } from "@/shared/ui/dialog";
 import { MapPin, Search, X, Plus, Trash2, Check } from "lucide-react";
 import { updateLocationSelections, createCustomLocation, updateCustomLocation, deleteCustomLocation } from "@/domains/location/actions";
-import type { LocationItem, CustomLocationItem, LocationsResponse } from "@/domains/location/schema";
+import { fetchLocations } from "@/domains/location/hooks";
+import type { LocationItem, CustomLocationItem } from "@/domains/location/schema";
 
 interface LocationSettingsProps {
   open: boolean;
@@ -96,10 +97,9 @@ function useLocationData(roomCode: string, playerId: string, isOpen: boolean, on
   const [customLocations, setCustomLocations] = useState<CustomLocationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchLocations = useCallback(async () => {
-    const res = await fetch(`/api/rooms/${roomCode}/locations`);
-    if (res.ok) {
-      const data = (await res.json()) as LocationsResponse;
+  const loadLocations = useCallback(async () => {
+    const data = await fetchLocations(roomCode);
+    if (data) {
       setLocations(data.locations);
       setCustomLocations(data.customLocations);
     }
@@ -109,9 +109,9 @@ function useLocationData(roomCode: string, playerId: string, isOpen: boolean, on
   useEffect(() => {
     if (isOpen) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate data fetch on dialog open
-      void fetchLocations();
+      void loadLocations();
     }
-  }, [isOpen, fetchLocations]);
+  }, [isOpen, loadLocations]);
 
   const toggleLocation = useCallback((locationId: string) => {
     setLocations((previous) =>

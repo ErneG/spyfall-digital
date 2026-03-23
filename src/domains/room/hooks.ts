@@ -1,14 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { roomEventSchema, type RoomEvent } from "@/domains/room/schema";
 
 // Re-export useSession from shared for backward compatibility
 export { useSession } from "@/shared/hooks/use-session";
 
-/** SSE hook for real-time room state updates. Validates with Zod. */
+// ─── Query key factory ──────────────────────────────────────
+
+export const roomKeys = {
+  all: ["room"] as const,
+  events: (code: string) => ["room", code, "events"] as const,
+} as const;
+
+// ─── SSE hook — writes to query cache ───────────────────────
+
+const RECONNECT_DELAY = 3000;
+
+/** SSE hook for real-time room state updates. Feeds data into TanStack Query cache. */
 export function useRoomEvents(code: string | null) {
-  const [data, setData] = useState<RoomEvent | null>(null);
+  const queryClient = useQueryClient();
   const [isConnected, setIsConnected] = useState(false);
   const esRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,7 +56,8 @@ export function useRoomEvents(code: string | null) {
           setIsConnected(false);
           return;
         }
-        setData(result.data);
+        // Write validated data into query cache
+        queryClient.setQueryData(roomKeys.events(code), result.data);
       } catch {
         // ignore
       }
@@ -54,9 +67,9 @@ export function useRoomEvents(code: string | null) {
       setIsConnected(false);
       es.close();
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), 3000);
+      reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), RECONNECT_DELAY);
     };
-  }, [code]);
+  }, [code, queryClient]);
 
   useEffect(() => {
     connectRef.current = connect;
@@ -70,6 +83,13 @@ export function useRoomEvents(code: string | null) {
       setIsConnected(false);
     };
   }, [connect]);
+
+  // Read data from query cache (SSE is the writer, no HTTP fetching)
+  const { data = null } = useQuery<RoomEvent | null>({
+    queryKey: roomKeys.events(code ?? ""),
+    enabled: false,
+    initialData: null,
+  });
 
   return { data, isConnected };
 }

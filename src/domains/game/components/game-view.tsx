@@ -44,18 +44,13 @@ export function GameView({
   const effectiveTimeLimit = game?.timeLimit ?? timeLimit;
   const { display, isExpired } = useTimer(startedAt, effectiveTimeLimit, isTimerRunning);
   const [isRoleRevealed, setIsRoleRevealed] = useState(false);
-  const [isEnding, setIsEnding] = useState(false);
-  const { handleTimerToggle, handleEndGame, handleRestart } = useGameActions(gameId, playerId);
+  const { timerMutation, endMutation, restartMutation } = useGameActions(gameId, playerId);
 
   useExpiryBeep(isExpired);
 
-  const onTimerToggle = useCallback(() => { void handleTimerToggle(isTimerRunning); }, [handleTimerToggle, isTimerRunning]);
-  const onEndGame = useCallback(async () => {
-    setIsEnding(true);
-    try { await handleEndGame(); } finally { setIsEnding(false); }
-  }, [handleEndGame]);
-  const onEndGameClick = useCallback(() => { void onEndGame(); }, [onEndGame]);
-  const onRestart = useCallback(() => { void handleRestart(); }, [handleRestart]);
+  const onTimerToggle = useCallback(() => { timerMutation.mutate(isTimerRunning); }, [timerMutation, isTimerRunning]);
+  const onEndGameClick = useCallback(() => { endMutation.mutate(); }, [endMutation]);
+  const onRestart = useCallback(() => { restartMutation.mutate(); }, [restartMutation]);
   const handleLeave = useCallback(() => { clearSession(); router.push("/"); }, [clearSession, router]);
   const toggleRole = useCallback(() => { setIsRoleRevealed((previous) => !previous); }, []);
 
@@ -96,7 +91,7 @@ export function GameView({
           playerId={spyPlayerId}
         />
         <Separator />
-        <GameActions isHost={isHost} isEnding={isEnding} onEndGame={onEndGameClick} game={game} playerId={playerId} gameId={gameId} />
+        <GameActions isHost={isHost} isEnding={endMutation.isPending} onEndGame={onEndGameClick} game={game} playerId={playerId} gameId={gameId} />
       </div>
     </main>
   );

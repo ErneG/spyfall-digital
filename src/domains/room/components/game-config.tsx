@@ -1,12 +1,14 @@
 "use client";
 
-import { memo, useCallback, useTransition } from "react";
+import { memo, useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 import { Badge } from "@/shared/ui/badge";
-import { TIMER_PRESETS } from "@/domains/room/schema";
+import { TIMER_PRESETS, type RoomEvent } from "@/domains/room/schema";
 import { updateRoomConfig } from "@/domains/room/actions";
+import { roomKeys } from "@/domains/room/hooks";
 import { Settings, Clock, Eye, EyeOff, Shield, Timer } from "lucide-react";
 
 const SECONDS_PER_MINUTE = 60;
@@ -24,6 +26,14 @@ interface GameConfigProps {
   selectedLocationCount: number;
   totalLocationCount: number;
   onOpenLocations: () => void;
+}
+
+interface ConfigPatch {
+  timeLimit?: number;
+  spyCount?: number;
+  autoStartTimer?: boolean;
+  hideSpyCount?: boolean;
+  moderatorMode?: boolean;
 }
 
 /* -- Sub-components ----------------------------------------- */
@@ -109,22 +119,32 @@ export const GameConfig = memo(function GameConfig({
   roomCode, playerId, isHost, timeLimit, spyCount, autoStartTimer,
   hideSpyCount, moderatorMode, selectedLocationCount, totalLocationCount, onOpenLocations,
 }: GameConfigProps) {
-  const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
+  const cacheKey = roomKeys.events(roomCode);
 
-  const sendUpdate = useCallback(
-    (patch: Record<string, unknown>) => {
-      startTransition(async () => {
-        await updateRoomConfig({ roomCode, playerId, ...patch });
-      });
+  const configMutation = useMutation({
+    mutationFn: (patch: ConfigPatch) =>
+      updateRoomConfig({ roomCode, playerId, ...patch }),
+    onMutate: async (patch) => {
+      await queryClient.cancelQueries({ queryKey: cacheKey });
+      const previous = queryClient.getQueryData<RoomEvent>(cacheKey);
+      if (previous) {
+        queryClient.setQueryData(cacheKey, { ...previous, ...patch });
+      }
+      return { previous };
     },
-    [roomCode, playerId],
-  );
+    onError: (_error, _patch, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(cacheKey, context.previous);
+      }
+    },
+  });
 
-  const handleTimeSelect = useCallback((value: number) => { sendUpdate({ timeLimit: value }); }, [sendUpdate]);
-  const handleSpySelect = useCallback((count: number) => { sendUpdate({ spyCount: count }); }, [sendUpdate]);
-  const handleAutoStart = useCallback((checked: boolean) => { sendUpdate({ autoStartTimer: checked }); }, [sendUpdate]);
-  const handleHideSpy = useCallback((checked: boolean) => { sendUpdate({ hideSpyCount: checked }); }, [sendUpdate]);
-  const handleModerator = useCallback((checked: boolean) => { sendUpdate({ moderatorMode: checked }); }, [sendUpdate]);
+  const handleTimeSelect = useCallback((value: number) => { configMutation.mutate({ timeLimit: value }); }, [configMutation]);
+  const handleSpySelect = useCallback((count: number) => { configMutation.mutate({ spyCount: count }); }, [configMutation]);
+  const handleAutoStart = useCallback((checked: boolean) => { configMutation.mutate({ autoStartTimer: checked }); }, [configMutation]);
+  const handleHideSpy = useCallback((checked: boolean) => { configMutation.mutate({ hideSpyCount: checked }); }, [configMutation]);
+  const handleModerator = useCallback((checked: boolean) => { configMutation.mutate({ moderatorMode: checked }); }, [configMutation]);
 
   if (!isHost) {
     return <GameConfigSummary timeLimit={timeLimit} spyCount={spyCount} selectedLocationCount={selectedLocationCount} totalLocationCount={totalLocationCount} moderatorMode={moderatorMode} />;
@@ -135,7 +155,7 @@ export const GameConfig = memo(function GameConfig({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base"><Settings className="h-4 w-4" /> Game Settings</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-5" aria-busy={isPending}>
+      <CardContent className="space-y-5">
         <div className="space-y-2">
           <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> Timer</Label>
           <div className="flex gap-1.5">

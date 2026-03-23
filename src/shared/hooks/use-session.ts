@@ -2,11 +2,13 @@
 
 import { useState, useCallback } from "react";
 
-interface Session {
+export interface Session {
   playerId: string;
   roomCode: string;
   roomId: string;
   isHost: boolean;
+  passAndPlay?: boolean;
+  allPlayers?: Array<{ id: string; name: string }>;
 }
 
 const STORAGE_KEY = "spyfall-session";

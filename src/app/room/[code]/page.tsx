@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState, useCallback, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
@@ -9,19 +10,9 @@ import { useRoomEvents } from "@/domains/room/hooks";
 import { GameConfig, RoomCodeHeader, PlayerList, StartSection } from "@/domains/room/components";
 import { LocationSettings } from "@/domains/location/components/location-settings";
 import { GameView } from "@/domains/game/components/game-view";
-
-interface StartGameResponse { error?: string }
-
-async function startGame(roomId: string, playerId: string): Promise<string | null> {
-  const res = await fetch("/api/games", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ roomId, playerId }),
-  });
-  const data = (await res.json()) as StartGameResponse;
-  if (!res.ok) return data.error ?? "Failed to start game";
-  return null;
-}
+import { PassAndPlayGameView } from "@/domains/game/components/pass-and-play-game-view";
+import { startGame } from "@/domains/game/actions";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 const EMPTY_PLAYERS: never[] = [];
 
@@ -31,10 +22,16 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const { session, clearSession, isLoaded } = useSession();
   const { data: room, isConnected } = useRoomEvents(code);
   const [isCopied, setIsCopied] = useState(false);
-  const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState("");
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoStartRef = useRef(false);
+
+  const startGameMutation = useMutation({
+    mutationFn: ({ roomId, playerId }: { roomId: string; playerId: string }) =>
+      startGame({ roomId, playerId }).then(unwrapAction),
+    onError: (caughtError) => setError(caughtError.message),
+  });
 
   useEffect(() => {
     if (isLoaded && (!session || session.roomCode !== code.toUpperCase())) {
@@ -42,14 +39,15 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     }
   }, [isLoaded, session, code, router]);
 
-  const handleStart = useCallback(async () => {
-    if (!session) return;
-    setIsStarting(true);
-    setError("");
-    const errorMessage = await startGame(session.roomId, session.playerId);
-    if (errorMessage) setError(errorMessage);
-    setIsStarting(false);
-  }, [session]);
+  // Auto-start new game for pass-and-play when room returns to LOBBY (after "Play Again")
+  useEffect(() => {
+    if (!session?.passAndPlay || !room || room.state !== "LOBBY" || autoStartRef.current) return;
+    autoStartRef.current = true;
+    startGameMutation.mutate(
+      { roomId: session.roomId, playerId: session.playerId },
+      { onSettled: () => { autoStartRef.current = false; } },
+    );
+  }, [session, room, startGameMutation]);
 
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(code.toUpperCase());
@@ -60,11 +58,25 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   const handleLeave = useCallback(() => { clearSession(); router.push("/"); }, [clearSession, router]);
   const handleOpenLocations = useCallback(() => setIsLocationsOpen(true), []);
-  const handleStartClick = useCallback(() => { void handleStart(); }, [handleStart]);
+  const handleStartClick = useCallback(() => {
+    if (!session) return;
+    setError("");
+    startGameMutation.mutate({ roomId: session.roomId, playerId: session.playerId });
+  }, [session, startGameMutation]);
 
   if (!isLoaded || !session) return null;
 
   if (room && room.state !== "LOBBY" && room.currentGameId) {
+    if (session.passAndPlay && session.allPlayers) {
+      return (
+        <PassAndPlayGameView
+          gameId={room.currentGameId} hostPlayerId={session.playerId}
+          allPlayers={session.allPlayers} roomCode={code}
+          timeLimit={room.timeLimit} gameStartedAt={room.gameStartedAt}
+          hideSpyCount={room.hideSpyCount} spyCount={room.spyCount} isTimerRunning={room.timerRunning}
+        />
+      );
+    }
     return (
       <GameView
         gameId={room.currentGameId} playerId={session.playerId} isHost={session.isHost}
@@ -91,7 +103,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         )}
         <LocationSettings open={isLocationsOpen} onOpenChange={setIsLocationsOpen} roomCode={code} playerId={session.playerId} />
         <PlayerList players={players} currentPlayerId={session.playerId} />
-        <StartSection isHost={session.isHost} isStarting={isStarting} playerCount={players.length} error={error} onStart={handleStartClick} />
+        <StartSection isHost={session.isHost} isStarting={startGameMutation.isPending} playerCount={players.length} error={error} onStart={handleStartClick} />
         <Separator />
         <Button variant="ghost" className="w-full text-muted-foreground" onClick={handleLeave}>Leave Room</Button>
       </div>

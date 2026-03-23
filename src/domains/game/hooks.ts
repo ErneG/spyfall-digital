@@ -1,64 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { gameViewSchema, type GameView } from "@/domains/game/schema";
 
-const POLL_INTERVAL = 5000; // 5s — reduced from 2s
+// ─── Query key factory ──────────────────────────────────────
+
+export const gameKeys = {
+  all: ["game"] as const,
+  state: (gameId: string, playerId: string) => ["game", gameId, playerId] as const,
+  playerRole: (gameId: string, playerId: string) => ["game", gameId, "role", playerId] as const,
+} as const;
+
+// ─── Shared fetch functions ─────────────────────────────────
+
+const POLL_INTERVAL = 5000;
+
+async function fetchGameState(gameId: string, playerId: string): Promise<GameView> {
+  const res = await fetch(`/api/games/${gameId}?playerId=${playerId}`);
+  if (!res.ok) {
+    const errorData = (await res.json()) as { error?: string };
+    throw new Error(errorData.error ?? "Failed to fetch game");
+  }
+  const json: unknown = await res.json();
+  return gameViewSchema.parse(json);
+}
+
+export interface PeekRole {
+  myRole: string;
+  isSpy: boolean;
+  location: string | null;
+}
+
+export async function fetchPlayerRole(gameId: string, playerId: string): Promise<PeekRole | null> {
+  try {
+    const res = await fetch(`/api/games/${gameId}?playerId=${playerId}`);
+    if (!res.ok) return null;
+    const json: unknown = await res.json();
+    const parsed = gameViewSchema.safeParse(json);
+    if (!parsed.success) return null;
+    return { myRole: parsed.data.myRole, isSpy: parsed.data.isSpy, location: parsed.data.location };
+  } catch {
+    return null;
+  }
+}
+
+// ─── Hooks ──────────────────────────────────────────────────
 
 export function useGameState(gameId: string | null, playerId: string | null) {
-  const [game, setGame] = useState<GameView | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { data: game = null, isLoading, error, refetch } = useQuery({
+    queryKey: gameKeys.state(gameId ?? "", playerId ?? ""),
+    queryFn: () => fetchGameState(gameId!, playerId!),
+    enabled: Boolean(gameId && playerId),
+    refetchInterval: POLL_INTERVAL,
+  });
 
-  const fetchGame = useCallback(async () => {
-    if (!gameId || !playerId) return;
-
-    try {
-      const res = await fetch(`/api/games/${gameId}?playerId=${playerId}`);
-      if (!res.ok) {
-        const errorData = (await res.json()) as { error?: string };
-        setError(errorData.error ?? "Failed to fetch game");
-        return;
-      }
-      const json: unknown = await res.json();
-      const parsed = gameViewSchema.safeParse(json);
-      if (!parsed.success) {
-        setError("Invalid game data received");
-        return;
-      }
-      setGame(parsed.data);
-      setError(null);
-    } catch {
-      setError("Connection error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [gameId, playerId]);
-
-  useEffect(() => {
-    let isActive = true;
-    const run = async () => {
-      if (isActive) await fetchGame();
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    run();
-
-    // Clean up previous interval before setting a new one
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      run();
-    }, POLL_INTERVAL);
-
-    return () => {
-      isActive = false;
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [fetchGame]);
-
-  return { game, isLoading, error, refetch: fetchGame };
+  return { game, isLoading, error: error?.message ?? null, refetch };
 }
 
 function computeRemaining(startedAt: string | null, timeLimit: number): number {

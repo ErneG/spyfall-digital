@@ -6,10 +6,12 @@ import {
   createRoomInput,
   joinRoomInput,
   updateRoomConfigInput,
+  createPassAndPlayInput,
   type CreateRoomInput,
   type CreateRoomOutput,
   type JoinRoomInput,
   type JoinRoomOutput,
+  type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
 import { generateRoomCode } from "@/shared/lib/room-code";
 import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
@@ -203,5 +205,80 @@ export async function updateRoomConfig(
   } catch (error) {
     console.error("updateRoomConfig failed:", error);
     return fail("Failed to update config");
+  }
+}
+
+// ─── createPassAndPlayRoom ─────────────────────────────────
+// Creates room + all players in one go (single-device mode).
+// Client then calls startGame from game/actions.ts to begin.
+
+export async function createPassAndPlayRoom(
+  input: unknown,
+): Promise<ActionResult<CreatePassAndPlayOutput>> {
+  const parsed = createPassAndPlayInput.safeParse(input);
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+  }
+
+  const { playerNames, timeLimit, spyCount, hideSpyCount: shouldHideSpyCount } = parsed.data;
+
+  try {
+    // Generate unique room code
+    let code = "";
+    for (let attempt = 0; attempt < 10; attempt++) {
+      code = generateRoomCode();
+      const existing = await prisma.room.findUnique({ where: { code } });
+      if (!existing) break;
+      if (attempt === 9) return fail("Failed to generate unique room code");
+    }
+
+    // Fetch all locations to auto-select them
+    const allLocations = await prisma.location.findMany({
+      select: { id: true },
+    });
+
+    // Create room + all players in a transaction
+    const room = await prisma.$transaction(async (tx) => {
+      const created = await tx.room.create({
+        data: {
+          code,
+          timeLimit: timeLimit ?? DEFAULT_TIME_LIMIT,
+          spyCount: spyCount ?? 1,
+          hideSpyCount: shouldHideSpyCount ?? false,
+          autoStartTimer: false, // Timer starts paused for role reveal
+          hostId: "",
+          players: {
+            create: playerNames.map((name, index) => ({
+              name,
+              isHost: index === 0,
+            })),
+          },
+          selectedLocations: {
+            create: allLocations.map((loc) => ({ locationId: loc.id })),
+          },
+        },
+        include: { players: { orderBy: { createdAt: "asc" } } },
+      });
+
+      const host = created.players[0];
+      await tx.room.update({
+        where: { id: created.id },
+        data: { hostId: host.id },
+      });
+
+      return created;
+    });
+
+    const host = room.players[0];
+
+    return ok({
+      roomId: room.id,
+      code: room.code,
+      hostPlayerId: host.id,
+      players: room.players.map((p) => ({ id: p.id, name: p.name })),
+    });
+  } catch (error) {
+    console.error("createPassAndPlayRoom failed:", error);
+    return fail("Failed to create pass-and-play room");
   }
 }

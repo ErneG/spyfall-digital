@@ -8,6 +8,7 @@ import unicorn from "eslint-plugin-unicorn";
 import promise from "eslint-plugin-promise";
 // eslint-plugin-jsx-a11y loaded by eslint-config-next (no explicit import needed)
 import reactPerf from "eslint-plugin-react-perf";
+import queryPlugin from "@tanstack/eslint-plugin-query";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -350,6 +351,19 @@ const eslintConfig = defineConfig([
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 5c. TANSTACK QUERY — DATA FETCHING PATTERNS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    plugins: { "@tanstack/query": queryPlugin },
+    rules: {
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/no-rest-destructuring": "warn",
+      "@tanstack/query/stable-query-client": "error",
+    },
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 6. ACCESSIBILITY — WCAG COMPLIANCE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
@@ -638,7 +652,7 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // Domain components — no direct DB access
+  // Domain components — no direct DB access, no direct fetch
   {
     files: ["src/domains/**/components/**/*.tsx"],
     rules: {
@@ -649,6 +663,11 @@ const eslintConfig = defineConfig([
             { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Components must not import database modules. Use server actions or hooks." },
           ],
         },
+      ],
+      "no-restricted-globals": [
+        "error",
+        { name: "fetch", message: "Use TanStack Query (useQuery/useMutation) or a query function from hooks.ts instead of direct fetch()." },
+        { name: "setInterval", message: "Use useQuery with refetchInterval instead of setInterval for polling." },
       ],
     },
   },
@@ -681,7 +700,7 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // App pages — thin layer, import from domains only
+  // App pages — thin layer, import from domains only, no direct fetch
   {
     files: ["src/app/**/*.tsx"],
     rules: {
@@ -692,6 +711,11 @@ const eslintConfig = defineConfig([
             { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Pages should not access DB directly. Use server actions or domain hooks." },
           ],
         },
+      ],
+      "no-restricted-globals": [
+        "error",
+        { name: "fetch", message: "Use TanStack Query (useQuery/useMutation) or a query function from hooks.ts instead of direct fetch()." },
+        { name: "setInterval", message: "Use useQuery with refetchInterval instead of setInterval for polling." },
       ],
     },
   },

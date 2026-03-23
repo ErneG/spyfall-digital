@@ -68,6 +68,27 @@ export const roomEventSchema = z.object({
 });
 export type RoomEvent = z.infer<typeof roomEventSchema>;
 
+// ─── Pass & Play schemas ────────────────────────────────────
+
+export const createPassAndPlayInput = z.object({
+  playerNames: z
+    .array(z.string().min(1, "Name is required").max(20).trim())
+    .min(3, "Need at least 3 players")
+    .max(12, "Maximum 12 players"),
+  timeLimit: z.number().int().min(360).max(600).default(480),
+  spyCount: z.number().int().min(1).max(2).default(1),
+  hideSpyCount: z.boolean().default(false),
+});
+export type CreatePassAndPlayInput = z.input<typeof createPassAndPlayInput>;
+
+export const createPassAndPlayOutput = z.object({
+  roomId: z.string(),
+  code: z.string(),
+  hostPlayerId: z.string(),
+  players: z.array(z.object({ id: z.string(), name: z.string() })),
+});
+export type CreatePassAndPlayOutput = z.infer<typeof createPassAndPlayOutput>;
+
 export const TIMER_PRESETS = [
   { label: "6:00", value: 360 },
   { label: "7:00", value: 420 },
