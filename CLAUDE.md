@@ -10,7 +10,7 @@ A digital adaptation of the social deduction game Spyfall, built as a PWA with N
 - **UI**: shadcn/ui + Tailwind CSS v4 (dark mode by default)
 - **Database**: PostgreSQL + Prisma 7 (adapter pattern with `@prisma/adapter-pg`)
 - **Validation**: Zod 4 (single source of truth for all types)
-- **PWA**: @ducanh2912/next-pwa
+- **PWA**: Built-in Next.js manifest (`app/manifest.ts`)
 - **Real-time**: SSE for room state, polling for game state
 - **Infra**: Docker Compose (PostgreSQL on port 5433)
 - **Design**: Stitch MCP + Nano Banana MCP
@@ -175,7 +175,7 @@ This project has a self-improving hook system adapted from the final-medusa proj
 ## Known Pitfalls
 
 - **UserPromptSubmit hooks must NEVER use `set -e`/`set -u`/`pipefail`** — non-zero exit blocks ALL user prompts
-- `next-pwa` uses webpack internally — `turbopack: {}` in next.config.ts silences the compatibility warning
+- `turbopack: {}` in next.config.ts enables Turbopack for dev server
 - shadcn Dialog uses base-ui's `render` prop, not radix's `asChild`
 - Prisma v7: no `url` in schema datasource — connection string lives in `prisma.config.ts`
 
