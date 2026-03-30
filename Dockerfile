@@ -14,7 +14,16 @@ WORKDIR /app
 COPY . .
 RUN pnpm db:generate
 ENV NEXT_TELEMETRY_DISABLED=1
+# Dummy URL so Next.js can compile server actions without a real DB connection
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN pnpm build
+
+# ─── Migration runner (db push + seed) ───────────────────────
+FROM deps AS migrator
+WORKDIR /app
+COPY . .
+RUN pnpm db:generate
+CMD ["sh", "-c", "pnpm db:push && pnpm db:seed"]
 
 # ─── Production image ────────────────────────────────────────
 FROM node:22-alpine AS runner
