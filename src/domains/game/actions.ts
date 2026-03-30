@@ -7,12 +7,47 @@ import {
   restartGameInput,
   timerToggleInput,
   type StartGameOutput,
+  type GameView,
 } from "@/domains/game/schema";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 import { prisma } from "@/shared/lib/prisma";
 import { assignRoles, MIN_PLAYERS, shuffle } from "@/domains/game/logic";
 
 // ─── Helpers ────────────────────────────────────────────────
+
+function calculateTimeRemaining(
+  isTimerRunning: boolean,
+  timerPausedAt: Date | null,
+  startedAt: Date,
+  timeLimit: number,
+): number {
+  if (!isTimerRunning && timerPausedAt) {
+    const elapsedBeforePause = Math.floor((timerPausedAt.getTime() - startedAt.getTime()) / 1000);
+    return Math.max(0, timeLimit - elapsedBeforePause);
+  }
+  const elapsed = Math.floor((Date.now() - startedAt.getTime()) / 1000);
+  return Math.max(0, timeLimit - elapsed);
+}
+
+async function fetchCombinedLocations(roomId: string) {
+  const [allLocations, customLocations] = await Promise.all([
+    prisma.location.findMany({
+      select: { id: true, name: true, imageUrl: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.customLocation.findMany({
+      where: { roomId, selected: true, allSpies: false },
+      select: { id: true, name: true },
+    }),
+  ]);
+
+  return [
+    ...allLocations,
+    ...customLocations.map((cl) => ({ id: cl.id, name: cl.name, imageUrl: null })),
+  ].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+const REVEAL_STATES = new Set(["REVEAL", "FINISHED"]);
 
 type LocationCandidate = {
   type: "builtin" | "custom";
@@ -64,9 +99,7 @@ function pickLocation(
   previousLocationId: string | null,
 ): LocationCandidate {
   if (isModeratorMode && moderatorLocationId) {
-    const moderatorChoice = candidates.find(
-      (c) => c.id === moderatorLocationId,
-    );
+    const moderatorChoice = candidates.find((c) => c.id === moderatorLocationId);
     return moderatorChoice ?? shuffle(candidates)[0];
   }
 
@@ -81,9 +114,7 @@ function pickLocation(
 // ─── Server Actions ─────────────────────────────────────────
 
 /** Start a new game round in a room (host only). */
-export async function startGame(
-  input: unknown,
-): Promise<ActionResult<StartGameOutput>> {
+export async function startGame(input: unknown): Promise<ActionResult<StartGameOutput>> {
   const parsed = startGameInput.safeParse(input);
   if (!parsed.success) {
     return fail("roomId and playerId are required");
@@ -139,12 +170,7 @@ export async function startGame(
           role: "SPY",
           isSpy: true,
         }))
-      : assignRoles(
-          playerIds,
-          chosen.roles,
-          room.spyCount,
-          moderatorAssignments,
-        );
+      : assignRoles(playerIds, chosen.roles, room.spyCount, moderatorAssignments);
 
     const game = await prisma.$transaction(async (tx) => {
       const newGame = await tx.game.create({
@@ -194,9 +220,7 @@ export async function startGame(
 /** Cast a vote against a suspect. */
 export async function castVote(
   input: unknown,
-): Promise<
-  ActionResult<{ success: true; votesIn: number; totalPlayers: number }>
-> {
+): Promise<ActionResult<{ success: true; votesIn: number; totalPlayers: number }>> {
   const parsed = castVoteInput.safeParse(input);
   if (!parsed.success) {
     return fail("gameId, voterId and suspectId are required");
@@ -270,9 +294,7 @@ export async function castVote(
 }
 
 /** End the game (host action or spy guessing location). */
-export async function endGame(
-  input: unknown,
-): Promise<
+export async function endGame(input: unknown): Promise<
   ActionResult<{
     ended: boolean;
     spyGuessedCorrectly?: boolean;
@@ -349,9 +371,7 @@ export async function endGame(
 }
 
 /** Return room to lobby for a new round (host only). */
-export async function restartGame(
-  input: unknown,
-): Promise<ActionResult<{ success: true }>> {
+export async function restartGame(input: unknown): Promise<ActionResult<{ success: true }>> {
   const parsed = restartGameInput.safeParse(input);
   if (!parsed.success) {
     return fail("gameId and playerId are required");
@@ -386,6 +406,86 @@ export async function restartGame(
   }
 }
 
+/** Get game state for a specific player (replaces GET /api/games/[id]). */
+export async function getGameState(
+  gameId: string,
+  playerId: string,
+): Promise<ActionResult<GameView>> {
+  if (!gameId || !playerId) {
+    return fail("gameId and playerId are required");
+  }
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: {
+        location: true,
+        assignments: true,
+        room: {
+          include: {
+            players: {
+              orderBy: { createdAt: "asc" },
+              select: { id: true, name: true, isHost: true, isOnline: true },
+            },
+          },
+        },
+        votes: true,
+      },
+    });
+
+    if (!game) return fail("Game not found");
+
+    const myAssignment = game.assignments.find((a) => a.playerId === playerId);
+    if (!myAssignment) return fail("Player not in this game");
+
+    const [combinedLocations, previousLocation] = await Promise.all([
+      fetchCombinedLocations(game.roomId),
+      game.room.prevLocationId
+        ? prisma.location.findUnique({
+            where: { id: game.room.prevLocationId },
+            select: { name: true },
+          })
+        : null,
+    ]);
+
+    const timeRemaining = calculateTimeRemaining(
+      game.timerRunning,
+      game.timerPausedAt,
+      game.startedAt,
+      game.room.timeLimit,
+    );
+
+    const isRevealPhase = REVEAL_STATES.has(game.state);
+
+    return ok({
+      gameId: game.id,
+      phase: game.state as GameView["phase"],
+      myRole: myAssignment.role,
+      isSpy: myAssignment.isSpy,
+      location: myAssignment.isSpy ? null : game.locationName,
+      allLocations: combinedLocations,
+      players: game.room.players,
+      timeRemaining,
+      timeLimit: game.room.timeLimit,
+      startedAt: game.startedAt.toISOString(),
+      timerRunning: game.timerRunning,
+      hideSpyCount: game.room.hideSpyCount,
+      spyCount: game.room.spyCount,
+      prevLocationName: previousLocation?.name ?? null,
+      votes: isRevealPhase
+        ? game.votes.map((v) => ({ voterId: v.voterId, suspectId: v.suspectId }))
+        : undefined,
+      spies: isRevealPhase
+        ? game.assignments.filter((a) => a.isSpy).map((a) => a.playerId)
+        : undefined,
+      revealedLocation: isRevealPhase ? game.locationName : undefined,
+    });
+  } catch (error) {
+    console.error("Failed to get game state:", error);
+    return fail("Failed to get game state");
+  }
+}
+
 /** Pause or resume the game timer (host only). */
 export async function toggleTimer(
   input: unknown,
@@ -416,9 +516,7 @@ export async function toggleTimer(
     } else if (action === "resume" && !game.timerRunning) {
       if (game.timerPausedAt) {
         const pausedDuration = Date.now() - game.timerPausedAt.getTime();
-        const newStartedAt = new Date(
-          game.startedAt.getTime() + pausedDuration,
-        );
+        const newStartedAt = new Date(game.startedAt.getTime() + pausedDuration);
         await prisma.game.update({
           where: { id: gameId },
           data: {

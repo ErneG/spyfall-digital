@@ -9,20 +9,15 @@ import {
   updateCustomLocationInput,
   deleteCustomLocationInput,
   type CustomLocationItem,
+  type LocationsResponse,
 } from "@/domains/location/schema";
 
 const codeField = z.object({ code: z.string().min(1) });
 
 const updateLocationsWithCode = updateLocationsInput.extend(codeField.shape);
-const createCustomLocationWithCode = createCustomLocationInput.extend(
-  codeField.shape,
-);
-const updateCustomLocationWithCode = updateCustomLocationInput.extend(
-  codeField.shape,
-);
-const deleteCustomLocationWithCode = deleteCustomLocationInput.extend(
-  codeField.shape,
-);
+const createCustomLocationWithCode = createCustomLocationInput.extend(codeField.shape);
+const updateCustomLocationWithCode = updateCustomLocationInput.extend(codeField.shape);
+const deleteCustomLocationWithCode = deleteCustomLocationInput.extend(codeField.shape);
 
 // ─── updateLocationSelections ──────────────────────────────────
 // Replaces PUT /api/rooms/[code]/locations
@@ -118,8 +113,15 @@ export async function updateCustomLocation(
     return fail("playerId and locationId required");
   }
 
-  const { code, playerId, locationId, name, roles, allSpies: isAllSpies, selected: isSelected } =
-    parsed.data;
+  const {
+    code,
+    playerId,
+    locationId,
+    name,
+    roles,
+    allSpies: isAllSpies,
+    selected: isSelected,
+  } = parsed.data;
 
   try {
     const room = await prisma.room.findUnique({
@@ -156,6 +158,51 @@ export async function updateCustomLocation(
   } catch (error) {
     console.error("updateCustomLocation failed:", error);
     return fail("Failed to update custom location");
+  }
+}
+
+// ─── getLocations ─────────────────────────────────────────────
+// Replaces GET /api/rooms/[code]/locations
+
+export async function getLocations(roomCode: string): Promise<ActionResult<LocationsResponse>> {
+  if (!roomCode) return fail("Room code is required");
+
+  try {
+    const room = await prisma.room.findUnique({
+      where: { code: roomCode.toUpperCase() },
+      include: {
+        selectedLocations: { select: { locationId: true } },
+        customLocations: {
+          include: { roles: { select: { id: true, name: true } } },
+        },
+      },
+    });
+
+    if (!room) return fail("Room not found");
+
+    const allLocations = await prisma.location.findMany({
+      select: { id: true, name: true, edition: true },
+      orderBy: { name: "asc" },
+    });
+
+    const selectedIds = new Set(room.selectedLocations.map((sl) => sl.locationId));
+
+    return ok({
+      locations: allLocations.map((loc) => ({
+        ...loc,
+        selected: selectedIds.has(loc.id),
+      })),
+      customLocations: room.customLocations.map((cl) => ({
+        id: cl.id,
+        name: cl.name,
+        allSpies: cl.allSpies,
+        selected: cl.selected,
+        roles: cl.roles,
+      })),
+    });
+  } catch (error) {
+    console.error("getLocations failed:", error);
+    return fail("Failed to get locations");
   }
 }
 

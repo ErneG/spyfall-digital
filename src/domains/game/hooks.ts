@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { gameViewSchema, type GameView } from "@/domains/game/schema";
+import { type GameView } from "@/domains/game/schema";
+import { getGameState } from "@/domains/game/actions";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 // ─── Query key factory ──────────────────────────────────────
 
@@ -17,13 +19,8 @@ export const gameKeys = {
 const POLL_INTERVAL = 5000;
 
 async function fetchGameState(gameId: string, playerId: string): Promise<GameView> {
-  const res = await fetch(`/api/games/${gameId}?playerId=${playerId}`);
-  if (!res.ok) {
-    const errorData = (await res.json()) as { error?: string };
-    throw new Error(errorData.error ?? "Failed to fetch game");
-  }
-  const json: unknown = await res.json();
-  return gameViewSchema.parse(json);
+  const result = await getGameState(gameId, playerId);
+  return unwrapAction(result);
 }
 
 export interface PeekRole {
@@ -34,12 +31,9 @@ export interface PeekRole {
 
 export async function fetchPlayerRole(gameId: string, playerId: string): Promise<PeekRole | null> {
   try {
-    const res = await fetch(`/api/games/${gameId}?playerId=${playerId}`);
-    if (!res.ok) return null;
-    const json: unknown = await res.json();
-    const parsed = gameViewSchema.safeParse(json);
-    if (!parsed.success) return null;
-    return { myRole: parsed.data.myRole, isSpy: parsed.data.isSpy, location: parsed.data.location };
+    const result = await getGameState(gameId, playerId);
+    if (!result.success) return null;
+    return { myRole: result.data.myRole, isSpy: result.data.isSpy, location: result.data.location };
   } catch {
     return null;
   }
@@ -48,7 +42,12 @@ export async function fetchPlayerRole(gameId: string, playerId: string): Promise
 // ─── Hooks ──────────────────────────────────────────────────
 
 export function useGameState(gameId: string | null, playerId: string | null) {
-  const { data: game = null, isLoading, error, refetch } = useQuery({
+  const {
+    data: game = null,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: gameKeys.state(gameId ?? "", playerId ?? ""),
     queryFn: () => fetchGameState(gameId!, playerId!),
     enabled: Boolean(gameId && playerId),

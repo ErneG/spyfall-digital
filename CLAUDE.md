@@ -15,6 +15,20 @@ A digital adaptation of the social deduction game Spyfall, built as a PWA with N
 - **Infra**: Docker Compose (PostgreSQL on port 5433)
 - **Design**: Stitch MCP + Nano Banana MCP
 
+## Stitch MCP Setup
+
+Stitch MCP (`mcp__stitch__*` tools) requires Google Cloud setup. If tools fail, run `stitch-doctor` first.
+
+**Prerequisites (one-time):**
+
+1. `~/.stitch-mcp/google-cloud-sdk/bin/gcloud auth login`
+2. `~/.stitch-mcp/google-cloud-sdk/bin/gcloud auth application-default login`
+3. `~/.stitch-mcp/google-cloud-sdk/bin/gcloud config set project gen-lang-client-0797685586`
+4. `~/.stitch-mcp/google-cloud-sdk/bin/gcloud auth application-default set-quota-project gen-lang-client-0797685586`
+5. `~/.stitch-mcp/google-cloud-sdk/bin/gcloud services enable stitch.googleapis.com`
+
+**If 403 recurs:** re-run steps 2–4, then restart Claude Code.
+
 ## Architecture — Domain-Driven Design
 
 ```
@@ -58,6 +72,7 @@ src/
 ```
 app/ → domains/ → shared/
 ```
+
 - **Never** import from `app/` into `domains/` or `shared/`
 - **Never** import between domains directly — use `shared/types/`
 - Components must not import Prisma — use Server Actions
@@ -94,15 +109,17 @@ Inspired by [adrianocola/spyfall](https://github.com/adrianocola/spyfall):
 ## Conventions
 
 ### Architecture (SOLID + Clean Architecture)
+
 - **Zod-first types** — all types inferred from Zod schemas via `z.infer<>`. NEVER hand-write interfaces for data crossing boundaries
-- **Server Actions for mutations** — all POST/PATCH/DELETE use Server Actions in `domains/*/actions.ts`
-- **GET stays as API routes** — SSE and polling endpoints remain in `app/api/`
+- **Server Actions for all logic** — all mutations AND queries use Server Actions in `domains/*/actions.ts`
+- **SSE stays as API route** — only `app/api/rooms/[code]/events/` remains as an API route (streaming requires it)
 - **Domain isolation** — domains don't import from each other. Use `shared/types/` for cross-domain types
 - **Pure game logic** — `domains/game/logic.ts` has no DB, no React, no Next.js imports
 - **ActionResult<T>** — all Server Actions return `{ success: true, data } | { success: false, error }`
 - **Validate at boundaries** — Zod `.safeParse()` at every Server Action entry point
 
 ### Code Quality
+
 - **No `any`** — use Zod validation or `unknown` with narrowing
 - **React.memo** on all leaf components receiving props
 - **useCallback** for every function passed as a prop
@@ -112,12 +129,14 @@ Inspired by [adrianocola/spyfall](https://github.com/adrianocola/spyfall):
 - **Commit often** — background hook auto-commits when 6+ files change
 
 ### Infrastructure
+
 - **Database** — `shared/lib/prisma.ts` singleton. Prisma v7 adapter pattern
 - **UI** — `shared/ui/` for shadcn components. Import from `@/shared/ui/`
 - **Constants** — `shared/lib/constants.ts` for game limits (MIN_PLAYERS, etc.)
 - **State transitions** use `prisma.$transaction` for atomicity
 
 ### Rules (see `.claude/rules/`)
+
 - `clean-architecture.md` — SOLID, dependency direction, domain structure
 - `zod-types.md` — schema conventions, naming, validation patterns
 - `server-actions.md` — Server Action patterns, error handling, auth
@@ -130,23 +149,27 @@ Inspired by [adrianocola/spyfall](https://github.com/adrianocola/spyfall):
 This project has a self-improving hook system adapted from the final-medusa project:
 
 ### Defense (PreToolUse)
+
 - `guard-env-files.sh` — Blocks .env edits
 - `guard-main-branch.sh` — Blocks edits on main/master
 - `guard-large-file-read.sh` — Blocks reading 400+ line files without limit/offset
 - `pre-push-check.sh` — Validates tsc + lint before git push
 
 ### Auto-Correction (PostToolUse)
+
 - `auto-format.sh` — Prettier after edits
 - `lint-on-edit.sh` — Per-file ESLint
 - `typecheck-on-edit.sh` — Periodic tsc (every 5th edit, 60s cooldown)
 - `commit-reminder.sh` — Auto-commits 6+ changed files (headless haiku)
 
 ### Error Learning (Self-Improving Loop)
+
 - `capture-errors.sh` — Logs all tool failures to `.claude/learnings/errors.log`
 - `compound-learnings.sh` — Analyzes errors at session end, proposes guardrails
 - `apply-proposals.sh` — Auto-applies pending hook proposals next session
 
 ### Quality Gates
+
 - `quality-sentinel.sh` — Blocks session stop if type errors exist in changed files
 
 ## Known Pitfalls
@@ -158,14 +181,28 @@ This project has a self-improving hook system adapted from the final-medusa proj
 
 ## API Routes
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/rooms` | Create room |
-| GET | `/api/rooms/[code]` | Get room state |
-| POST | `/api/rooms/[code]` | Join room |
-| GET | `/api/rooms/[code]/events` | SSE stream for room updates |
-| POST | `/api/games` | Start game (host only) |
-| GET | `/api/games/[id]?playerId=` | Get game state for player |
-| POST | `/api/games/[id]/vote` | Cast vote |
-| POST | `/api/games/[id]/end` | End game / spy guess |
-| POST | `/api/games/[id]/restart` | Return to lobby |
+| Method | Path                       | Description                 |
+| ------ | -------------------------- | --------------------------- |
+| GET    | `/api/rooms/[code]/events` | SSE stream for room updates |
+
+All other endpoints have been migrated to Server Actions in `domains/*/actions.ts`.
+
+## Server Actions
+
+| Domain   | Action                     | Description                        |
+| -------- | -------------------------- | ---------------------------------- |
+| room     | `createRoom`               | Create a new room                  |
+| room     | `joinRoom`                 | Join an existing room              |
+| room     | `updateRoomConfig`         | Update room settings (host only)   |
+| room     | `createPassAndPlayRoom`    | Create pass-and-play room          |
+| game     | `getGameState`             | Get game state for a player        |
+| game     | `startGame`                | Start a new game round (host only) |
+| game     | `castVote`                 | Cast a vote against a suspect      |
+| game     | `endGame`                  | End game / spy guess               |
+| game     | `restartGame`              | Return to lobby                    |
+| game     | `toggleTimer`              | Pause/resume timer (host only)     |
+| location | `getLocations`             | Get locations with selection state |
+| location | `updateLocationSelections` | Update location selections         |
+| location | `createCustomLocation`     | Create custom location             |
+| location | `updateCustomLocation`     | Update custom location             |
+| location | `deleteCustomLocation`     | Delete custom location             |
