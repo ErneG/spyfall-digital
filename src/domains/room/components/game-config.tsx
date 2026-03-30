@@ -2,10 +2,8 @@
 
 import { memo, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
-import { Badge } from "@/shared/ui/badge";
 import { TIMER_PRESETS, type RoomEvent } from "@/domains/room/schema";
 import { updateRoomConfig } from "@/domains/room/actions";
 import { roomKeys } from "@/domains/room/hooks";
@@ -40,42 +38,62 @@ interface ConfigPatch {
 /* -- Sub-components ----------------------------------------- */
 
 const GameConfigSummary = memo(function GameConfigSummary({
-  timeLimit, spyCount, selectedLocationCount, totalLocationCount, moderatorMode,
-}: Pick<GameConfigProps, "timeLimit" | "spyCount" | "selectedLocationCount" | "totalLocationCount" | "moderatorMode">) {
+  timeLimit,
+  spyCount,
+  selectedLocationCount,
+  totalLocationCount,
+  moderatorMode,
+}: Pick<
+  GameConfigProps,
+  "timeLimit" | "spyCount" | "selectedLocationCount" | "totalLocationCount" | "moderatorMode"
+>) {
   const { t } = useTranslation();
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Settings className="h-4 w-4" /> {t.config.gameSettings}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2 text-sm">
-          <Badge variant="secondary">
-            <Clock className="mr-1 h-3 w-3" />
-            {Math.floor(timeLimit / SECONDS_PER_MINUTE)}:{String(timeLimit % SECONDS_PER_MINUTE).padStart(2, "0")}
-          </Badge>
-          <Badge variant="secondary">{spyCount} {spyCount === 1 ? t.config.spy : t.config.spiesPlural}</Badge>
-          <Badge variant="secondary">{selectedLocationCount}/{totalLocationCount} {t.config.locationsSelected}</Badge>
-          {moderatorMode && <Badge variant="outline"><Shield className="mr-1 h-3 w-3" /> {t.config.moderatorMode}</Badge>}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-2xl bg-[#141414] p-4">
+      <p className="mb-3 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+        <Settings className="mr-1 inline h-3 w-3" /> {t.config.gameSettings}
+      </p>
+      <div className="flex flex-wrap gap-2 text-sm">
+        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+          <Clock className="mr-1 inline h-3 w-3" />
+          {Math.floor(timeLimit / SECONDS_PER_MINUTE)}:
+          {String(timeLimit % SECONDS_PER_MINUTE).padStart(2, "0")}
+        </span>
+        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+          {spyCount} {spyCount === 1 ? t.config.spy : t.config.spiesPlural}
+        </span>
+        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+          {selectedLocationCount}/{totalLocationCount} {t.config.locationsSelected}
+        </span>
+        {moderatorMode && (
+          <span className="rounded-lg bg-[#8B5CF6]/12 px-2.5 py-1 text-[13px] text-[#8B5CF6]">
+            <Shield className="mr-1 inline h-3 w-3" /> {t.config.moderatorMode}
+          </span>
+        )}
+      </div>
+    </div>
   );
 });
 
 const PresetButton = memo(function PresetButton({
-  label, value, isSelected, onClick,
+  label,
+  value,
+  isSelected,
+  onClick,
 }: {
-  label: string; value: number; isSelected: boolean; onClick: (value: number) => void;
+  label: string;
+  value: number;
+  isSelected: boolean;
+  onClick: (value: number) => void;
 }) {
-  const handleClick = useCallback(() => { onClick(value); }, [onClick, value]);
+  const handleClick = useCallback(() => {
+    onClick(value);
+  }, [onClick, value]);
   return (
     <button
       onClick={handleClick}
-      className={`flex-1 rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
-        isSelected ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-muted/80"
+      className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+        isSelected ? "bg-white text-black" : "bg-[#1C1C1E] text-[#8E8E93] hover:bg-[#2C2C2E]"
       }`}
     >
       {label}
@@ -84,31 +102,45 @@ const PresetButton = memo(function PresetButton({
 });
 
 const ConfigToggles = memo(function ConfigToggles({
-  autoStartTimer, hideSpyCount, moderatorMode,
-  onAutoStart, onHideSpy, onModerator,
+  autoStartTimer,
+  hideSpyCount,
+  moderatorMode,
+  onAutoStart,
+  onHideSpy,
+  onModerator,
 }: {
-  autoStartTimer: boolean; hideSpyCount: boolean; moderatorMode: boolean;
-  onAutoStart: (checked: boolean) => void; onHideSpy: (checked: boolean) => void; onModerator: (checked: boolean) => void;
+  autoStartTimer: boolean;
+  hideSpyCount: boolean;
+  moderatorMode: boolean;
+  onAutoStart: (checked: boolean) => void;
+  onHideSpy: (checked: boolean) => void;
+  onModerator: (checked: boolean) => void;
 }) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="auto-start" className="flex items-center gap-1.5 text-sm">
-          <Timer className="h-3 w-3" /> {t.config.autoStartTimer}
+    <div className="overflow-hidden rounded-2xl bg-[#141414]">
+      <div className="flex h-[56px] items-center justify-between px-4">
+        <Label htmlFor="auto-start" className="flex items-center gap-2 text-sm">
+          <Timer className="h-3.5 w-3.5 text-[#8E8E93]" /> {t.config.autoStartTimer}
         </Label>
         <Switch id="auto-start" checked={autoStartTimer} onCheckedChange={onAutoStart} />
       </div>
-      <div className="flex items-center justify-between">
-        <Label htmlFor="hide-spy" className="flex items-center gap-1.5 text-sm">
-          {hideSpyCount ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+      <div className="mx-4 h-px bg-white/5" />
+      <div className="flex h-[56px] items-center justify-between px-4">
+        <Label htmlFor="hide-spy" className="flex items-center gap-2 text-sm">
+          {hideSpyCount ? (
+            <EyeOff className="h-3.5 w-3.5 text-[#8E8E93]" />
+          ) : (
+            <Eye className="h-3.5 w-3.5 text-[#8E8E93]" />
+          )}
           {t.config.hideSpyCount}
         </Label>
         <Switch id="hide-spy" checked={hideSpyCount} onCheckedChange={onHideSpy} />
       </div>
-      <div className="flex items-center justify-between">
-        <Label htmlFor="moderator" className="flex items-center gap-1.5 text-sm">
-          <Shield className="h-3 w-3" /> {t.config.moderatorMode}
+      <div className="mx-4 h-px bg-white/5" />
+      <div className="flex h-[56px] items-center justify-between px-4">
+        <Label htmlFor="moderator" className="flex items-center gap-2 text-sm">
+          <Shield className="h-3.5 w-3.5 text-[#8E8E93]" /> {t.config.moderatorMode}
         </Label>
         <Switch id="moderator" checked={moderatorMode} onCheckedChange={onModerator} />
       </div>
@@ -119,15 +151,23 @@ const ConfigToggles = memo(function ConfigToggles({
 /* -- Main component ----------------------------------------- */
 
 export const GameConfig = memo(function GameConfig({
-  roomCode, playerId, isHost, timeLimit, spyCount, autoStartTimer,
-  hideSpyCount, moderatorMode, selectedLocationCount, totalLocationCount, onOpenLocations,
+  roomCode,
+  playerId,
+  isHost,
+  timeLimit,
+  spyCount,
+  autoStartTimer,
+  hideSpyCount,
+  moderatorMode,
+  selectedLocationCount,
+  totalLocationCount,
+  onOpenLocations,
 }: GameConfigProps) {
   const queryClient = useQueryClient();
   const cacheKey = roomKeys.events(roomCode);
 
   const configMutation = useMutation({
-    mutationFn: (patch: ConfigPatch) =>
-      updateRoomConfig({ roomCode, playerId, ...patch }),
+    mutationFn: (patch: ConfigPatch) => updateRoomConfig({ roomCode, playerId, ...patch }),
     onMutate: async (patch) => {
       await queryClient.cancelQueries({ queryKey: cacheKey });
       const previous = queryClient.getQueryData<RoomEvent>(cacheKey);
@@ -143,49 +183,108 @@ export const GameConfig = memo(function GameConfig({
     },
   });
 
-  const handleTimeSelect = useCallback((value: number) => { configMutation.mutate({ timeLimit: value }); }, [configMutation]);
-  const handleSpySelect = useCallback((count: number) => { configMutation.mutate({ spyCount: count }); }, [configMutation]);
-  const handleAutoStart = useCallback((checked: boolean) => { configMutation.mutate({ autoStartTimer: checked }); }, [configMutation]);
-  const handleHideSpy = useCallback((checked: boolean) => { configMutation.mutate({ hideSpyCount: checked }); }, [configMutation]);
-  const handleModerator = useCallback((checked: boolean) => { configMutation.mutate({ moderatorMode: checked }); }, [configMutation]);
+  const handleTimeSelect = useCallback(
+    (value: number) => {
+      configMutation.mutate({ timeLimit: value });
+    },
+    [configMutation],
+  );
+  const handleSpySelect = useCallback(
+    (count: number) => {
+      configMutation.mutate({ spyCount: count });
+    },
+    [configMutation],
+  );
+  const handleAutoStart = useCallback(
+    (checked: boolean) => {
+      configMutation.mutate({ autoStartTimer: checked });
+    },
+    [configMutation],
+  );
+  const handleHideSpy = useCallback(
+    (checked: boolean) => {
+      configMutation.mutate({ hideSpyCount: checked });
+    },
+    [configMutation],
+  );
+  const handleModerator = useCallback(
+    (checked: boolean) => {
+      configMutation.mutate({ moderatorMode: checked });
+    },
+    [configMutation],
+  );
 
   const { t } = useTranslation();
 
   if (!isHost) {
-    return <GameConfigSummary timeLimit={timeLimit} spyCount={spyCount} selectedLocationCount={selectedLocationCount} totalLocationCount={totalLocationCount} moderatorMode={moderatorMode} />;
+    return (
+      <GameConfigSummary
+        timeLimit={timeLimit}
+        spyCount={spyCount}
+        selectedLocationCount={selectedLocationCount}
+        totalLocationCount={totalLocationCount}
+        moderatorMode={moderatorMode}
+      />
+    );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base"><Settings className="h-4 w-4" /> {t.config.gameSettings}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div className="space-y-2">
-          <Label className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="h-3 w-3" /> {t.config.timer}</Label>
-          <div className="flex gap-1.5">
-            {TIMER_PRESETS.map((preset) => (
-              <PresetButton key={preset.value} label={preset.label} value={preset.value} isSelected={timeLimit === preset.value} onClick={handleTimeSelect} />
-            ))}
-          </div>
+    <div className="space-y-5">
+      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+        <Settings className="mr-1 inline h-3 w-3" /> {t.config.gameSettings}
+      </p>
+      <div className="space-y-2">
+        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+          <Clock className="mr-1 inline h-3 w-3" /> {t.config.timer}
+        </p>
+        <div className="flex gap-1.5">
+          {TIMER_PRESETS.map((preset) => (
+            <PresetButton
+              key={preset.value}
+              label={preset.label}
+              value={preset.value}
+              isSelected={timeLimit === preset.value}
+              onClick={handleTimeSelect}
+            />
+          ))}
         </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">{t.config.spies}</Label>
-          <div className="flex gap-1.5">
-            {SPY_OPTIONS.map((count) => (
-              <PresetButton key={count} label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`} value={count} isSelected={spyCount === count} onClick={handleSpySelect} />
-            ))}
-          </div>
+      </div>
+      <div className="space-y-2">
+        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.config.spies}</p>
+        <div className="flex gap-1.5">
+          {SPY_OPTIONS.map((count) => (
+            <PresetButton
+              key={count}
+              label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`}
+              value={count}
+              isSelected={spyCount === count}
+              onClick={handleSpySelect}
+            />
+          ))}
         </div>
-        <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">{t.config.locations}</Label>
-          <button onClick={onOpenLocations} className="w-full rounded-md bg-muted px-3 py-2 text-left text-sm hover:bg-muted/80 transition-colors">
+      </div>
+      <div className="space-y-2">
+        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+          {t.config.locations}
+        </p>
+        <button
+          onClick={onOpenLocations}
+          className="flex h-[56px] w-full items-center justify-between rounded-2xl bg-[#141414] px-4 text-sm transition-colors hover:bg-[#1C1C1E]"
+        >
+          <span>
             {selectedLocationCount} / {totalLocationCount} {t.config.locationsSelected}
-            <span className="float-right text-muted-foreground">{t.config.edit} &rarr;</span>
-          </button>
-        </div>
-        <ConfigToggles autoStartTimer={autoStartTimer} hideSpyCount={hideSpyCount} moderatorMode={moderatorMode} onAutoStart={handleAutoStart} onHideSpy={handleHideSpy} onModerator={handleModerator} />
-      </CardContent>
-    </Card>
+          </span>
+          <span className="text-[#48484A]">{t.config.edit} &rarr;</span>
+        </button>
+      </div>
+      <ConfigToggles
+        autoStartTimer={autoStartTimer}
+        hideSpyCount={hideSpyCount}
+        moderatorMode={moderatorMode}
+        onAutoStart={handleAutoStart}
+        onHideSpy={handleHideSpy}
+        onModerator={handleModerator}
+      />
+    </div>
   );
 });

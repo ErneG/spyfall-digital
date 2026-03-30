@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from "eslint-plugin-storybook";
+
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
@@ -6,6 +9,7 @@ import tsParser from "@typescript-eslint/parser";
 import sonarjs from "eslint-plugin-sonarjs";
 import unicorn from "eslint-plugin-unicorn";
 import promise from "eslint-plugin-promise";
+import importX from "eslint-plugin-import-x";
 // eslint-plugin-jsx-a11y loaded by eslint-config-next (no explicit import needed)
 import reactPerf from "eslint-plugin-react-perf";
 import queryPlugin from "@tanstack/eslint-plugin-query";
@@ -13,6 +17,7 @@ import queryPlugin from "@tanstack/eslint-plugin-query";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  ...storybook.configs["flat/recommended"],
 
   globalIgnores([
     ".next/**",
@@ -64,6 +69,18 @@ const eslintConfig = defineConfig([
         { checksVoidReturn: { attributes: false } },
       ],
 
+      // ── Strict boolean expressions — no implicit coercion in conditions ──
+      "@typescript-eslint/strict-boolean-expressions": [
+        "warn",
+        {
+          allowString: true,
+          allowNumber: false,
+          allowNullableObject: true,
+          allowNullableBoolean: true,
+          allowNullableString: true,
+        },
+      ],
+
       // ── Exhaustive switch — forces handling all enum/union cases ──
       "@typescript-eslint/switch-exhaustiveness-check": "error",
 
@@ -80,7 +97,7 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/consistent-type-exports": "error",
 
       // ── No non-null assertion (use proper narrowing) ──
-      "@typescript-eslint/no-non-null-assertion": "warn",
+      "@typescript-eslint/no-non-null-assertion": "error",
 
       // ── Require await in async functions ──
       "@typescript-eslint/require-await": "warn",
@@ -144,6 +161,12 @@ const eslintConfig = defineConfig([
 
       // ── No prototype builtins (prototype pollution) ──
       "no-prototype-builtins": "error",
+
+      // ── No debugger statements ──
+      "no-debugger": "error",
+
+      // ── No alert/confirm/prompt ──
+      "no-alert": "error",
     },
   },
 
@@ -184,32 +207,31 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.ts", "src/**/*.tsx"],
     plugins: { sonarjs },
     rules: {
-      // ── Cognitive complexity (more nuanced than cyclomatic) ──
-      // Measures how hard code is to UNDERSTAND, not just branch count
+      // ── Cognitive complexity ──
       "sonarjs/cognitive-complexity": ["warn", 15],
 
-      // ── No identical functions (DRY — extract shared logic) ──
+      // ── No identical functions (DRY) ──
       "sonarjs/no-identical-functions": "warn",
 
-      // ── No duplicated string literals (extract constants) ──
+      // ── No duplicated string literals ──
       "sonarjs/no-duplicate-string": ["warn", { threshold: 3 }],
 
-      // ── No collapsible if statements (combine conditions) ──
+      // ── No collapsible if statements ──
       "sonarjs/no-collapsible-if": "warn",
 
       // ── No redundant boolean ──
       "sonarjs/no-redundant-boolean": "error",
 
-      // ── No inverted boolean check (prefer positive conditions) ──
+      // ── No inverted boolean check ──
       "sonarjs/no-inverted-boolean-check": "warn",
 
       // ── No identical conditions in if/else chains ──
       "sonarjs/no-all-duplicated-branches": "error",
 
-      // ── No gratuitous expressions (always true/false) ──
+      // ── No gratuitous expressions ──
       "sonarjs/no-gratuitous-expressions": "warn",
 
-      // ── Prefer immediate return (no temp var before return) ──
+      // ── Prefer immediate return ──
       "sonarjs/prefer-immediate-return": "warn",
 
       // ── Prefer single boolean return ──
@@ -224,55 +246,25 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.ts", "src/**/*.tsx"],
     plugins: { unicorn },
     rules: {
-      // ── Prefer Array.isArray() over instanceof ──
       "unicorn/no-instanceof-array": "error",
-
-      // ── Prefer .at() for last element (arr.at(-1) vs arr[arr.length-1]) ──
       "unicorn/prefer-at": "warn",
-
-      // ── Prefer String.startsWith/endsWith over regex ──
       "unicorn/prefer-string-starts-ends-with": "error",
-
-      // ── Prefer String.includes over indexOf !== -1 ──
       "unicorn/prefer-includes": "error",
-
-      // ── Prefer Number.isNaN over global isNaN ──
       "unicorn/prefer-number-properties": "error",
-
-      // ── Prefer structuredClone over JSON.parse(JSON.stringify()) ──
       "unicorn/prefer-structured-clone": "warn",
-
-      // ── Prefer Array.from over spread for iterables ──
       "unicorn/prefer-spread": "warn",
-
-      // ── No unnecessary await in return ──
       "unicorn/no-useless-promise-resolve-reject": "error",
-
-      // ── No empty catch blocks without comment ──
       "unicorn/no-useless-undefined": "warn",
-
-      // ── Prefer ternary over simple if/else assignment ──
       "unicorn/prefer-ternary": ["warn", "only-single-line"],
-
-      // ── Throw Error objects, not strings ──
       "unicorn/throw-new-error": "error",
-
-      // ── Prefer using Set.has for multiple comparisons ──
       "unicorn/prefer-set-has": "warn",
-
-      // ── No nested ternary (more nuanced version) ──
       "unicorn/no-nested-ternary": "error",
-
-      // ── Prefer modern DOM APIs ──
       "unicorn/prefer-dom-node-text-content": "warn",
       "unicorn/prefer-dom-node-append": "warn",
-
-      // ── Abbreviation expander (no confusing shortnames) ──
       "unicorn/prevent-abbreviations": [
         "warn",
         {
           replacements: {
-            // Allow common React/Next.js abbreviations
             props: false,
             ref: false,
             params: false,
@@ -285,7 +277,6 @@ const eslintConfig = defineConfig([
             db: false,
             id: false,
             fn: false,
-            // But flag confusing ones
             e: { event: true, error: true },
             cb: { callback: true },
             btn: { button: true },
@@ -300,27 +291,17 @@ const eslintConfig = defineConfig([
             ret: { result: true },
           },
           allowList: {
-            // Allow common Next.js patterns
             searchParams: true,
             ProcessEnv: true,
-            // Allow common loop/utility names
             i: true,
             j: true,
             utils: true,
           },
         },
       ],
-
-      // ── Prefer RegExp named groups ──
       "unicorn/prefer-regexp-test": "warn",
-
-      // ── Enforce error message in new Error() ──
       "unicorn/error-message": "error",
-
-      // ── No process.exit in library code ──
       "unicorn/no-process-exit": "warn",
-
-      // ── Prefer switch over long if/else chains ──
       "unicorn/prefer-switch": ["warn", { minimumCases: 4 }],
     },
   },
@@ -332,20 +313,9 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.tsx"],
     plugins: { "react-perf": reactPerf },
     rules: {
-      // ── No JSX literal objects as props (creates new ref each render) ──
-      // e.g. <Comp style={{ color: 'red' }} /> — extract to const or useMemo
       "react-perf/jsx-no-new-object-as-prop": "warn",
-
-      // ── No JSX literal arrays as props ──
-      // e.g. <Comp items={[1,2,3]} /> — extract to const or useMemo
       "react-perf/jsx-no-new-array-as-prop": "warn",
-
-      // ── No inline arrow functions as JSX props ──
-      // e.g. <Comp onClick={() => doThing()} /> — use useCallback
       "react-perf/jsx-no-new-function-as-prop": "warn",
-
-      // ── No JSX spread of new objects ──
-      // e.g. <Comp {...{ a: 1 }} /> — use named variable
       "react-perf/jsx-no-jsx-as-prop": "warn",
     },
   },
@@ -364,154 +334,171 @@ const eslintConfig = defineConfig([
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 6. ACCESSIBILITY — WCAG COMPLIANCE
+  // 6. IMPORT ORGANIZATION — ORDER & HYGIENE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
-    files: ["src/**/*.tsx"],
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    plugins: { "import-x": importX },
+    settings: {
+      "import-x/resolver": {
+        typescript: {
+          project: "./tsconfig.json",
+        },
+      },
+    },
     rules: {
-      // ── Clickable elements must be focusable ──
-      "jsx-a11y/click-events-have-key-events": "warn",
-      "jsx-a11y/no-static-element-interactions": "warn",
+      // ── Import order with groups ──
+      "import-x/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "type",
+          ],
+          pathGroups: [
+            {
+              pattern: "@/**",
+              group: "internal",
+              position: "before",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["type"],
+          "newlines-between": "always",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+        },
+      ],
 
-      // ── Images need alt text ──
-      "jsx-a11y/alt-text": "error",
+      // ── No duplicate imports from the same module ──
+      "import-x/no-duplicates": "error",
 
-      // ── Anchors must have content ──
-      "jsx-a11y/anchor-has-content": "error",
-      "jsx-a11y/anchor-is-valid": "warn",
+      // ── No cycle dependencies (warn — can be slow on large codebases) ──
+      "import-x/no-cycle": ["warn", { maxDepth: 4 }],
 
-      // ── Labels associated with controls ──
-      "jsx-a11y/label-has-associated-control": "warn",
+      // ── No self-imports ──
+      "import-x/no-self-import": "error",
 
-      // ── No autofocus (disorienting for screen readers) ──
-      "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
+      // ── No useless path segments ──
+      "import-x/no-useless-path-segments": "error",
 
-      // ── Heading order (no skipping h1 → h3) ──
-      "jsx-a11y/heading-has-content": "error",
+      // ── Ensure imports resolve (off — TypeScript handles this) ──
+      "import-x/no-unresolved": "off",
 
-      // ── ARIA roles must be valid ──
-      "jsx-a11y/aria-role": "error",
-      "jsx-a11y/aria-props": "error",
+      // ── No mutable exports ──
+      "import-x/no-mutable-exports": "error",
 
-      // ── tabIndex only on interactive elements ──
-      "jsx-a11y/no-noninteractive-tabindex": "warn",
+      // ── Prefer named exports ──
+      "import-x/no-anonymous-default-export": "warn",
     },
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 7. REACT — PERFORMANCE & CORRECTNESS
+  // 7. ACCESSIBILITY — WCAG COMPLIANCE (jsx-a11y)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     files: ["src/**/*.tsx"],
     rules: {
-      // ── Key in iterators ──
+      "jsx-a11y/click-events-have-key-events": "warn",
+      "jsx-a11y/no-static-element-interactions": "warn",
+      "jsx-a11y/alt-text": "error",
+      "jsx-a11y/anchor-has-content": "error",
+      "jsx-a11y/anchor-is-valid": "warn",
+      "jsx-a11y/label-has-associated-control": "warn",
+      "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
+      "jsx-a11y/heading-has-content": "error",
+      "jsx-a11y/aria-role": "error",
+      "jsx-a11y/aria-props": "error",
+      "jsx-a11y/aria-proptypes": "error",
+      "jsx-a11y/aria-unsupported-elements": "error",
+      "jsx-a11y/no-noninteractive-tabindex": "warn",
+      "jsx-a11y/interactive-supports-focus": "warn",
+      "jsx-a11y/no-redundant-roles": "warn",
+      "jsx-a11y/role-has-required-aria-props": "error",
+      "jsx-a11y/scope": "error",
+      "jsx-a11y/media-has-caption": "warn",
+    },
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 8. REACT — PERFORMANCE & CORRECTNESS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    files: ["src/**/*.tsx"],
+    rules: {
       "react/jsx-key": ["error", { checkFragmentShorthand: true }],
-
-      // ── No array index as key ──
       "react/no-array-index-key": "warn",
-
-      // ── Self-closing tags ──
       "react/self-closing-comp": "error",
-
-      // ── No unstable nested components (causes remounts) ──
       "react/no-unstable-nested-components": "error",
-
-      // ── No children as prop ──
       "react/no-children-prop": "error",
-
-      // ── No danger (dangerouslySetInnerHTML) without justification ──
       "react/no-danger": "warn",
-
-      // ── No deprecated lifecycle methods ──
       "react/no-deprecated": "error",
-
-      // ── Boolean props: prefer shorthand <Comp disabled /> ──
       "react/jsx-boolean-value": ["warn", "never"],
-
-      // ── Curly brace consistency ──
       "react/jsx-curly-brace-presence": [
         "warn",
         { props: "never", children: "never" },
       ],
-
-      // ── No useless fragments ──
       "react/jsx-no-useless-fragment": "warn",
-
-      // ── No string refs (use useRef) ──
       "react/no-string-refs": "error",
-
-      // ── No find-dom-node ──
       "react/no-find-dom-node": "error",
 
-      // ── React hooks rules (applies to ALL components, not just hooks/) ──
+      // ── React hooks rules — STRICT (error, not warn) ──
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/exhaustive-deps": "error",
+
+      "react/no-direct-mutation-state": "error",
+      "react/no-unknown-property": "error",
+      "react/display-name": "warn",
     },
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 8. GENERAL CODE QUALITY — CLEAN CODE PRINCIPLES
+  // 9. GENERAL CODE QUALITY — CLEAN CODE PRINCIPLES
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
     rules: {
-      // ── Prefer const ──
       "prefer-const": "error",
       "no-var": "error",
-
-      // ── No console in components (use proper logging) ──
       "no-console": ["warn", { allow: ["warn", "error"] }],
 
-      // ── Complexity guard ──
-      complexity: ["warn", 15],
+      // ── Curly braces required for all blocks ──
+      curly: ["error", "all"],
 
-      // ── Max lines per function (SRP) ──
+      complexity: ["warn", 15],
       "max-lines-per-function": [
         "warn",
         { max: 100, skipBlankLines: true, skipComments: true },
       ],
-
-      // ── Max function params ──
       "max-params": ["warn", 4],
-
-      // ── Max depth of nesting ──
       "max-depth": ["warn", 4],
-
-      // ── Max lines per file (encourage splitting) ──
       "max-lines": [
         "warn",
         { max: 300, skipBlankLines: true, skipComments: true },
       ],
 
-      // ── No nested ternaries ──
       "no-nested-ternary": "error",
-
-      // ── No duplicate imports ──
       "no-duplicate-imports": "error",
-
-      // ── Prefer template literals ──
       "prefer-template": "error",
-
-      // ── Early return pattern ──
       "no-else-return": "error",
-
-      // ── Arrow function bodies ──
       "arrow-body-style": ["warn", "as-needed"],
-
-      // ── Object shorthand ──
       "object-shorthand": "error",
-
-      // ── Prefer destructuring ──
       "prefer-destructuring": ["warn", { object: true, array: false }],
-
-      // ── Strict equality ──
       eqeqeq: ["error", "always"],
 
-      // ── No magic numbers ──
       "no-magic-numbers": [
         "warn",
         {
-          ignore: [-1, 0, 1, 2, 3, 5, 10, 12, 60, 100, 200, 300, 360, 400, 403, 404, 420, 480, 500, 540, 600, 1000, 1500, 2000, 3000, 5000],
+          ignore: [
+            -1, 0, 1, 2, 3, 5, 10, 12, 60, 100, 200, 300, 360, 400, 403, 404,
+            420, 480, 500, 540, 600, 1000, 1500, 2000, 3000, 5000,
+          ],
           ignoreArrayIndexes: true,
           enforceConst: true,
         },
@@ -525,53 +512,162 @@ const eslintConfig = defineConfig([
       "no-useless-rename": "error",
       "no-useless-computed-key": "error",
 
-      // ── No shadow variables (confusing scope) ──
-      "no-shadow": "off", // use TS version
+      // ── No shadow variables ──
+      "no-shadow": "off",
       "@typescript-eslint/no-shadow": "warn",
 
-      // ── Prefer spread over Object.assign ──
       "prefer-spread": "warn",
-
-      // ── Prefer rest params over arguments ──
       "prefer-rest-params": "error",
 
-      // ── No param reassignment (pure function principle) ──
-      "no-param-reassign": ["warn", { props: false }],
+      // ── No param reassignment (strict — error) ──
+      "no-param-reassign": ["error", { props: false }],
 
-      // ── Require default case in switch ──
+      // ── Handled by @typescript-eslint/return-await ──
+      "no-return-await": "off",
+
       "default-case": "warn",
-
-      // ── Default case last ──
       "default-case-last": "error",
-
-      // ── Grouped variable declarations ──
       "one-var": ["error", "never"],
-
-      // ── No lonely if in else ──
       "no-lonely-if": "error",
-
-      // ── Prefer exponentiation operator ──
       "prefer-exponentiation-operator": "warn",
-
-      // ── No unneeded escape ──
       "no-useless-escape": "error",
-
-      // ── No label that is same as variable ──
       "no-label-var": "error",
-
-      // ── Guard for-in (prototype chain) ──
       "guard-for-in": "warn",
-
-      // ── No continue (encourage restructuring) ──
       "no-continue": "warn",
+      "no-with": "error",
+      "no-sequences": "error",
+      "no-throw-literal": "error",
+      "use-isnan": "error",
+      "valid-typeof": "error",
+      "no-empty-character-class": "error",
+      "no-cond-assign": "error",
+      "no-constant-condition": "warn",
+      "no-empty-pattern": "error",
+      "symbol-description": "error",
+      yoda: "error",
     },
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 9. DOMAIN ARCHITECTURE BOUNDARIES
+  // 10. ARCHITECTURE BOUNDARY ENFORCEMENT
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  // Domain logic files — pure functions (no framework, no DB)
+  // ── shared/ must NOT import from app/ or domains/ ──
+  {
+    files: ["src/shared/**/*.ts", "src/shared/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/app/**"],
+              message:
+                "shared/ must not import from app/ — dependency flows app/ -> domains/ -> shared/",
+            },
+            {
+              group: ["@/domains/*", "@/domains/**"],
+              message:
+                "shared/ must not import from domains/ — dependency flows app/ -> domains/ -> shared/",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── domains/ must NOT import from app/ ──
+  {
+    files: ["src/domains/**/*.ts", "src/domains/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/app/**"],
+              message:
+                "domains/ must not import from app/ — dependency flows app/ -> domains/ -> shared/",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── Cross-domain boundary: room/ must not import from other domains ──
+  {
+    files: ["src/domains/room/**/*.ts", "src/domains/room/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/domains/game/*",
+                "@/domains/game/**",
+                "@/domains/location/*",
+                "@/domains/location/**",
+              ],
+              message:
+                "Domains must not import from other domains. Use shared types.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── Cross-domain boundary: game/ must not import from other domains ──
+  {
+    files: ["src/domains/game/**/*.ts", "src/domains/game/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/domains/room/*",
+                "@/domains/room/**",
+                "@/domains/location/*",
+                "@/domains/location/**",
+              ],
+              message:
+                "Domains must not import from other domains. Use shared types.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── Cross-domain boundary: location/ must not import from other domains ──
+  {
+    files: ["src/domains/location/**/*.ts", "src/domains/location/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/domains/room/*",
+                "@/domains/room/**",
+                "@/domains/game/*",
+                "@/domains/game/**",
+              ],
+              message:
+                "Domains must not import from other domains. Use shared types.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ── Domain logic files — pure functions (no framework, no DB) ──
   {
     files: ["src/domains/**/logic.ts", "src/lib/game-logic.ts"],
     rules: {
@@ -579,53 +675,78 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
-            { group: ["next/*", "react", "react-dom"], message: "Logic must be framework-agnostic" },
-            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Logic must not depend on database" },
+            {
+              group: ["next/*", "react", "react-dom"],
+              message: "Logic must be framework-agnostic",
+            },
+            {
+              group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"],
+              message: "Logic must not depend on database",
+            },
           ],
         },
       ],
-      "max-lines-per-function": ["warn", { max: 50, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": [
+        "warn",
+        { max: 50, skipBlankLines: true, skipComments: true },
+      ],
     },
   },
 
-  // Domain schemas — Zod only, no framework deps
+  // ── Domain schemas — Zod only, no framework deps ──
   {
     files: ["src/domains/**/schema.ts", "src/shared/types/**/*.ts"],
     rules: {
       "no-magic-numbers": "off",
-      "@typescript-eslint/naming-convention": "off", // Zod field names match DB schema
+      "@typescript-eslint/naming-convention": "off",
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["react", "react-dom", "next/*"], message: "Schema files must be framework-agnostic" },
-            { group: ["@/generated/*", "@prisma/*"], message: "Schemas must not depend on Prisma types directly" },
+            {
+              group: ["react", "react-dom", "next/*"],
+              message: "Schema files must be framework-agnostic",
+            },
+            {
+              group: ["@/generated/*", "@prisma/*"],
+              message: "Schemas must not depend on Prisma types directly",
+            },
           ],
         },
       ],
     },
   },
 
-  // Domain hooks — React hooks, max 60 lines
+  // ── Domain hooks — React hooks, max 60 lines ──
   {
-    files: ["src/domains/**/hooks.ts", "src/hooks/**/*.ts"],
+    files: [
+      "src/domains/**/hooks.ts",
+      "src/hooks/**/*.ts",
+      "src/shared/hooks/**/*.ts",
+    ],
     rules: {
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "max-lines-per-function": ["warn", { max: 60, skipBlankLines: true, skipComments: true }],
-      // Hooks must not access DB directly
+      "react-hooks/exhaustive-deps": "error",
+      "max-lines-per-function": [
+        "warn",
+        { max: 60, skipBlankLines: true, skipComments: true },
+      ],
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Hooks must not import database modules. Use server actions." },
+            {
+              group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"],
+              message:
+                "Hooks must not import database modules. Use server actions.",
+            },
           ],
         },
       ],
     },
   },
 
-  // Server Actions — relaxed for DB operations, no client imports
+  // ── Server Actions — relaxed for DB, no client imports, no default exports ──
   {
     files: ["src/domains/**/actions.ts"],
     rules: {
@@ -634,25 +755,30 @@ const eslintConfig = defineConfig([
       "max-lines-per-function": "off",
       "max-lines": "off",
       "no-magic-numbers": "off",
-      "complexity": "off",
+      complexity: "off",
       "sonarjs/no-duplicate-string": "off",
       "sonarjs/cognitive-complexity": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
+      // No default exports in action files
+      "import-x/no-default-export": "error",
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            { group: ["@/domains/*/components/*", "@/domains/*/hooks*"], message: "Server actions must not import client-side code" },
+            {
+              group: ["@/domains/*/components/*", "@/domains/*/hooks*"],
+              message: "Server actions must not import client-side code",
+            },
           ],
         },
       ],
     },
   },
 
-  // Domain components — no direct DB access, no direct fetch
+  // ── Domain components — no direct DB access, no direct fetch ──
   {
     files: ["src/domains/**/components/**/*.tsx"],
     rules: {
@@ -660,47 +786,31 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
-            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Components must not import database modules. Use server actions or hooks." },
+            {
+              group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"],
+              message:
+                "Components must not import database modules. Use server actions or hooks.",
+            },
           ],
         },
       ],
       "no-restricted-globals": [
         "error",
-        { name: "fetch", message: "Use TanStack Query (useQuery/useMutation) or a query function from hooks.ts instead of direct fetch()." },
-        { name: "setInterval", message: "Use useQuery with refetchInterval instead of setInterval for polling." },
-      ],
-    },
-  },
-
-  // Cross-domain boundary — domains must not import from each other
-  {
-    files: ["src/domains/room/**/*.ts", "src/domains/room/**/*.tsx"],
-    rules: {
-      "no-restricted-imports": [
-        "warn",
         {
-          patterns: [
-            { group: ["@/domains/game/*", "@/domains/player/*", "@/domains/location/*"], message: "Domains should not import directly from other domains. Use shared types." },
-          ],
+          name: "fetch",
+          message:
+            "Use TanStack Query or a query function from hooks.ts instead of direct fetch().",
         },
-      ],
-    },
-  },
-  {
-    files: ["src/domains/game/**/*.ts", "src/domains/game/**/*.tsx"],
-    rules: {
-      "no-restricted-imports": [
-        "warn",
         {
-          patterns: [
-            { group: ["@/domains/room/*", "@/domains/player/*", "@/domains/location/*"], message: "Domains should not import directly from other domains. Use shared types." },
-          ],
+          name: "setInterval",
+          message:
+            "Use useQuery with refetchInterval instead of setInterval for polling.",
         },
       ],
     },
   },
 
-  // App pages — thin layer, import from domains only, no direct fetch
+  // ── App pages — thin layer, no direct DB or fetch ──
   {
     files: ["src/app/**/*.tsx"],
     rules: {
@@ -708,28 +818,47 @@ const eslintConfig = defineConfig([
         "warn",
         {
           patterns: [
-            { group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"], message: "Pages should not access DB directly. Use server actions or domain hooks." },
+            {
+              group: ["@/generated/*", "@prisma/*", "@/shared/lib/prisma"],
+              message:
+                "Pages should not access DB directly. Use server actions or domain hooks.",
+            },
           ],
         },
       ],
       "no-restricted-globals": [
         "error",
-        { name: "fetch", message: "Use TanStack Query (useQuery/useMutation) or a query function from hooks.ts instead of direct fetch()." },
-        { name: "setInterval", message: "Use useQuery with refetchInterval instead of setInterval for polling." },
+        {
+          name: "fetch",
+          message:
+            "Use TanStack Query or a query function from hooks.ts instead of direct fetch().",
+        },
+        {
+          name: "setInterval",
+          message:
+            "Use useQuery with refetchInterval instead of setInterval for polling.",
+        },
       ],
     },
   },
 
-  // API routes (GET only after migration) — relaxed for DB access
+  // ── API routes — relaxed for DB access ──
   {
     files: ["src/app/api/**/*.ts"],
     rules: {
       "no-console": "off",
       "no-throw-literal": "error",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "no-magic-numbers": "off",
+      "max-lines-per-function": "off",
     },
   },
 
-  // Legacy compatibility (keep until migration complete)
+  // ── Legacy compatibility ──
   {
     files: ["src/components/**/*.tsx"],
     rules: {
@@ -737,14 +866,18 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
-            { group: ["@/lib/prisma", "@prisma/*", "@/generated/*"], message: "Components must not import server-only modules. Use server actions." },
+            {
+              group: ["@/lib/prisma", "@prisma/*", "@/generated/*"],
+              message:
+                "Components must not import server-only modules. Use server actions.",
+            },
           ],
         },
       ],
     },
   },
 
-  // shadcn/ui — generated code, heavily relaxed
+  // ── shadcn/ui — generated code, heavily relaxed ──
   {
     files: ["src/components/ui/**/*.tsx", "src/shared/ui/**/*.tsx"],
     rules: {
@@ -762,24 +895,12 @@ const eslintConfig = defineConfig([
       "max-lines-per-function": "off",
       "max-lines": "off",
       "no-magic-numbers": "off",
+      "react/display-name": "off",
+      "import-x/no-default-export": "off",
     },
   },
 
-  // API routes — relaxed type safety for dynamic DB results
-  {
-    files: ["src/app/api/**/*.ts"],
-    rules: {
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-unsafe-return": "off",
-      "@typescript-eslint/no-unsafe-call": "off",
-      "no-magic-numbers": "off",
-      "max-lines-per-function": "off",
-    },
-  },
-
-  // Data/seed files — relaxed rules
+  // ── Data/seed files — relaxed ──
   {
     files: ["src/data/**/*.ts", "src/domains/**/data.ts", "prisma/**/*.ts"],
     rules: {
@@ -787,6 +908,49 @@ const eslintConfig = defineConfig([
       "max-lines": "off",
       "max-lines-per-function": "off",
       "sonarjs/no-duplicate-string": "off",
+    },
+  },
+
+  // ── Next.js pages/layouts — allow default exports (required by framework) ──
+  {
+    files: [
+      "src/app/**/page.tsx",
+      "src/app/**/layout.tsx",
+      "src/app/**/loading.tsx",
+      "src/app/**/error.tsx",
+      "src/app/**/not-found.tsx",
+      "src/app/**/template.tsx",
+      "src/app/**/default.tsx",
+      "src/app/manifest.ts",
+      "src/app/sitemap.ts",
+      "src/app/robots.ts",
+    ],
+    rules: {
+      "import-x/no-default-export": "off",
+      "import-x/no-anonymous-default-export": "off",
+    },
+  },
+
+  // ── Config files at root — relaxed ──
+  {
+    files: ["*.mjs", "*.js", "*.ts"],
+    rules: {
+      "import-x/no-default-export": "off",
+      "import-x/no-anonymous-default-export": "off",
+    },
+  },
+
+  // ── Storybook stories — relaxed ──
+  {
+    files: ["src/stories/**/*.ts", "src/stories/**/*.tsx"],
+    rules: {
+      "import-x/no-default-export": "off",
+      "no-magic-numbers": "off",
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "react-perf/jsx-no-new-function-as-prop": "off",
+      "react-perf/jsx-no-new-object-as-prop": "off",
+      "react-perf/jsx-no-new-array-as-prop": "off",
     },
   },
 ]);
