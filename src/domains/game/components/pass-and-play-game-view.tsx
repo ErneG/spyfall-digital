@@ -1,32 +1,11 @@
 "use client";
 
-import { AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useCallback, useMemo } from "react";
-
-import { castVote } from "@/domains/game/actions";
-import {
-  TimerSection,
-  useExpiryBeep,
-  useGameActions,
-} from "@/domains/game/components/game-view-parts";
-import { LocationGrid } from "@/domains/game/components/location-grid";
-import {
-  PeekPlayerPicker,
-  VoteHandoff,
-  VotePicker,
-} from "@/domains/game/components/pass-and-play-parts";
+import { SpyGuessPhase, VotingPhase } from "@/domains/game/components/pass-and-play-phases";
+import { PlayingPhase } from "@/domains/game/components/pass-and-play-playing";
 import { RevealScreen } from "@/domains/game/components/reveal-screen";
 import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
-import { useGameState, useTimer, fetchPlayerRole } from "@/domains/game/hooks";
-import { useSession } from "@/shared/hooks/use-session";
+import { usePassAndPlay } from "@/domains/game/components/use-pass-and-play";
 import { useTranslation } from "@/shared/i18n/context";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Separator } from "@/shared/ui/separator";
-
-const REVEAL_PHASES = new Set(["REVEAL", "FINISHED"]);
 
 interface PassAndPlayGameViewProps {
   gameId: string;
@@ -40,175 +19,19 @@ interface PassAndPlayGameViewProps {
   isTimerRunning: boolean;
 }
 
-export function PassAndPlayGameView({
-  gameId,
-  hostPlayerId,
-  allPlayers,
-  roomCode: _roomCode,
-  timeLimit,
-  gameStartedAt,
-  hideSpyCount,
-  spyCount,
-  isTimerRunning: initialTimerRunning,
-}: PassAndPlayGameViewProps) {
+export function PassAndPlayGameView(props: PassAndPlayGameViewProps) {
+  const { gameId, hostPlayerId, allPlayers, hideSpyCount, spyCount } = props;
   const { t } = useTranslation();
-  const router = useRouter();
-  const { clearSession } = useSession();
-  const { game, isLoading } = useGameState(gameId, hostPlayerId);
-  const isTimerRunning = game?.timerRunning ?? initialTimerRunning;
-  const startedAt = game?.startedAt ?? gameStartedAt;
-  const effectiveTimeLimit = game?.timeLimit ?? timeLimit;
-  const { display, isExpired } = useTimer(startedAt, effectiveTimeLimit, isTimerRunning);
-  const { timerMutation, endMutation, restartMutation } = useGameActions(gameId, hostPlayerId);
+  const state = usePassAndPlay({
+    gameId,
+    hostPlayerId,
+    allPlayers,
+    timeLimit: props.timeLimit,
+    gameStartedAt: props.gameStartedAt,
+    isTimerRunning: props.isTimerRunning,
+  });
 
-  useExpiryBeep(isExpired);
-
-  const [phase, setPhase] = useState<"role-reveal" | "playing" | "voting" | "spy-guess">(
-    "role-reveal",
-  );
-
-  // Voting state
-  const [voteIndex, setVoteIndex] = useState(0);
-  const [voteStep, setVoteStep] = useState<"handoff" | "pick">("handoff");
-  const [isVoting, setIsVoting] = useState(false);
-
-  // Spy guess state
-  const [spyGuessPlayer, setSpyGuessPlayer] = useState<{ id: string; name: string } | null>(null);
-  const [isVerifiedSpy, setIsVerifiedSpy] = useState(false);
-  const [spyVerifyError, setSpyVerifyError] = useState<string | null>(null);
-
-  // Server phase takes priority over client phase (except during role-reveal)
-  const isServerInReveal = game ? REVEAL_PHASES.has(game.phase) : false;
-  const shouldShowReveal = isServerInReveal && phase !== "role-reveal";
-
-  const handleRoleRevealComplete = useCallback(() => {
-    timerMutation.mutate(false);
-    setPhase("playing");
-  }, [timerMutation]);
-
-  const onTimerToggle = useCallback(() => {
-    timerMutation.mutate(isTimerRunning);
-  }, [timerMutation, isTimerRunning]);
-
-  const handleStartVoting = useCallback(() => {
-    setVoteIndex(0);
-    setVoteStep("handoff");
-    setPhase("voting");
-  }, []);
-
-  const onEndGameClick = useCallback(() => {
-    endMutation.mutate();
-  }, [endMutation]);
-
-  const handleLeave = useCallback(() => {
-    clearSession();
-    router.push("/");
-  }, [clearSession, router]);
-
-  // ─── Spy guess handlers ──────────────────────────────────
-
-  const handleStartSpyGuess = useCallback(() => {
-    setSpyGuessPlayer(null);
-    setIsVerifiedSpy(false);
-    setSpyVerifyError(null);
-    setPhase("spy-guess");
-  }, []);
-
-  const verifySpy = useCallback(
-    async (player: { id: string; name: string }) => {
-      setSpyGuessPlayer(player);
-      setSpyVerifyError(null);
-      setIsVerifiedSpy(false);
-      const role = await fetchPlayerRole(gameId, player.id);
-      if (role?.isSpy) {
-        setIsVerifiedSpy(true);
-      } else {
-        setSpyVerifyError("Incorrect guess. Try again.");
-        setSpyGuessPlayer(null);
-      }
-    },
-    [gameId],
-  );
-
-  const handleSelectSpyPlayer = useCallback(
-    (player: { id: string; name: string }) => {
-      void verifySpy(player);
-    },
-    [verifySpy],
-  );
-
-  const handleSpyGuessBack = useCallback(() => {
-    setSpyGuessPlayer(null);
-    setIsVerifiedSpy(false);
-    setSpyVerifyError(null);
-    setPhase("playing");
-  }, []);
-
-  const currentVoter = allPlayers[voteIndex];
-
-  const voteCandidates = useMemo(
-    () => allPlayers.filter((p) => p.id !== currentVoter.id),
-    [allPlayers, currentVoter.id],
-  );
-
-  const handleVoteReady = useCallback(() => {
-    setVoteStep("pick");
-  }, []);
-
-  const handleCancelVoting = useCallback(() => {
-    setVoteIndex(0);
-    setVoteStep("handoff");
-    setPhase("playing");
-  }, []);
-
-  const submitVote = useCallback(
-    async (suspectId: string) => {
-      setIsVoting(true);
-      await castVote({ gameId, voterId: currentVoter.id, suspectId });
-      if (voteIndex < allPlayers.length - 1) {
-        setVoteIndex((previous) => previous + 1);
-        setVoteStep("handoff");
-      } else {
-        setPhase("playing");
-      }
-      setIsVoting(false);
-    },
-    [gameId, currentVoter.id, voteIndex, allPlayers.length],
-  );
-
-  const handleCastVoteClick = useCallback(
-    (suspectId: string) => {
-      void submitVote(suspectId);
-    },
-    [submitVote],
-  );
-
-  const handlePlayAgain = useCallback(() => {
-    // Reset all client state for new round
-    setPhase("role-reveal");
-    setVoteIndex(0);
-    setVoteStep("handoff");
-    setIsVoting(false);
-    setSpyGuessPlayer(null);
-    setIsVerifiedSpy(false);
-    setSpyVerifyError(null);
-    restartMutation.mutate();
-  }, [restartMutation]);
-
-  const spyCountLabel = useMemo(
-    () =>
-      hideSpyCount ? null : (
-        <p className="text-muted-foreground text-center text-xs">
-          <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
-          {spyCount === 1 ? "1 spy among you" : `${spyCount} spies among you`}
-        </p>
-      ),
-    [hideSpyCount, spyCount],
-  );
-
-  // (isRevealPhase replaced by shouldShowReveal computed above)
-
-  if (!game && !isLoading && phase !== "role-reveal") {
+  if (!state.game && !state.isLoading && state.phase !== "role-reveal") {
     return (
       <main className="flex flex-1 items-center justify-center p-4">
         <p className="text-destructive">Failed to load game</p>
@@ -216,12 +39,48 @@ export function PassAndPlayGameView({
     );
   }
 
+  return (
+    <PhaseRouter
+      state={state}
+      gameId={gameId}
+      hostPlayerId={hostPlayerId}
+      allPlayers={allPlayers}
+      hideSpyCount={hideSpyCount}
+      spyCount={spyCount}
+      t={t}
+    />
+  );
+}
+
+// ─── Phase router ──────────────────────────────────────────
+
+interface PhaseRouterProps {
+  state: ReturnType<typeof usePassAndPlay>;
+  gameId: string;
+  hostPlayerId: string;
+  allPlayers: Array<{ id: string; name: string }>;
+  hideSpyCount: boolean;
+  spyCount: number;
+  t: ReturnType<typeof useTranslation>["t"];
+}
+
+function PhaseRouter({
+  state,
+  gameId,
+  hostPlayerId,
+  allPlayers,
+  hideSpyCount,
+  spyCount,
+  t,
+}: PhaseRouterProps) {
+  const { game, phase, shouldShowReveal } = state;
+
   if (phase === "role-reveal") {
     return (
       <RoleRevealCarousel
         gameId={gameId}
         players={allPlayers}
-        onComplete={handleRoleRevealComplete}
+        onComplete={state.handleRoleRevealComplete}
       />
     );
   }
@@ -232,143 +91,35 @@ export function PassAndPlayGameView({
         game={game}
         playerId={hostPlayerId}
         isHost
-        onRestart={handlePlayAgain}
-        onLeave={handleLeave}
+        onRestart={state.handlePlayAgain}
+        onLeave={state.handleLeave}
       />
     );
   }
 
   if (phase === "spy-guess") {
-    const isShowingGrid = spyGuessPlayer && isVerifiedSpy && game;
     return (
-      <main className="flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-4">
-          {isShowingGrid ? (
-            <div className="space-y-4">
-              <div className="text-center">
-                <p className="text-muted-foreground text-sm">
-                  {spyGuessPlayer.name}, {t.passAndPlay.spyTapToGuess}
-                </p>
-              </div>
-              <LocationGrid
-                locations={game.allLocations}
-                revealedLocation={null}
-                prevLocationName={game.prevLocationName}
-                gameId={gameId}
-                playerId={spyGuessPlayer.id}
-              />
-              <Button variant="ghost" className="w-full" onClick={handleSpyGuessBack}>
-                {t.common.cancel}
-              </Button>
-            </div>
-          ) : (
-            <PeekPlayerPicker
-              players={allPlayers}
-              onSelectPlayer={handleSelectSpyPlayer}
-              onBack={handleSpyGuessBack}
-              title={t.passAndPlay.spyGuessTitle}
-              subtitle={t.passAndPlay.spyGuessSubtitle}
-              error={spyVerifyError}
-            />
-          )}
-        </div>
-      </main>
+      <SpyGuessPhase
+        spyGuess={state.spyGuess}
+        game={game}
+        allPlayers={allPlayers}
+        gameId={gameId}
+        t={t}
+      />
     );
   }
 
   if (phase === "voting") {
-    return (
-      <main className="flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-4">
-          <div className="text-muted-foreground text-center text-sm">
-            {t.passAndPlay.voteNofM} {voteIndex + 1} of {allPlayers.length}
-          </div>
-          {voteStep === "handoff" ? (
-            <VoteHandoff
-              playerName={currentVoter.name}
-              onReady={handleVoteReady}
-              onCancel={handleCancelVoting}
-            />
-          ) : (
-            <VotePicker
-              voterName={currentVoter.name}
-              candidates={voteCandidates}
-              isVoting={isVoting}
-              onVote={handleCastVoteClick}
-            />
-          )}
-        </div>
-      </main>
-    );
+    return <VotingPhase voting={state.voting} allPlayers={allPlayers} t={t} />;
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center p-4 pb-24">
-      <div className="w-full max-w-md space-y-4">
-        <TimerSection
-          display={display}
-          isExpired={isExpired}
-          isTimerRunning={isTimerRunning}
-          isHost
-          onToggle={onTimerToggle}
-        />
-        {spyCountLabel}
-
-        <Card>
-          <CardContent className="pt-4 pb-3">
-            <p className="text-muted-foreground mb-2 text-xs">
-              {t.players.title} ({allPlayers.length})
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {allPlayers.map((p) => (
-                <Badge key={p.id} variant="secondary">
-                  {p.name}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {game && (
-          <LocationGrid
-            locations={game.allLocations}
-            revealedLocation={game.location}
-            prevLocationName={game.prevLocationName}
-          />
-        )}
-
-        <Separator />
-
-        <Button
-          variant="outline"
-          className="border-destructive/50 text-destructive h-12 w-full gap-2"
-          onClick={handleStartSpyGuess}
-        >
-          <Crosshair className="h-4 w-4" /> {t.passAndPlay.spyGuessLocation}
-        </Button>
-
-        <div className="flex gap-2">
-          <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={onEndGameClick}
-            disabled={endMutation.isPending}
-          >
-            {endMutation.isPending ? t.game.ending : t.game.endGame}
-          </Button>
-          <Button variant="outline" className="flex-1 gap-2" onClick={handleStartVoting}>
-            <Hand className="h-4 w-4" /> {t.game.vote}
-          </Button>
-        </div>
-
-        <Button
-          variant="ghost"
-          className="text-muted-foreground w-full gap-2"
-          onClick={handleLeave}
-        >
-          <LogOut className="h-4 w-4" /> {t.game.leaveGame}
-        </Button>
-      </div>
-    </main>
+    <PlayingPhase
+      state={state}
+      allPlayers={allPlayers}
+      hideSpyCount={hideSpyCount}
+      spyCount={spyCount}
+      t={t}
+    />
   );
 }
