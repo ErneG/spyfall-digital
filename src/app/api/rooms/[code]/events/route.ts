@@ -3,25 +3,40 @@ import { prisma } from "@/shared/lib/prisma";
 const SSE_CONTENT_TYPE = "text/event-stream";
 
 // GET /api/rooms/[code]/events — SSE stream for room state updates
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ code: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
 
   const encoder = new TextEncoder();
   let isClosed = false;
+  let heartbeat: ReturnType<typeof setInterval> | null = null;
 
   const stream = new ReadableStream({
     start(controller) {
       const send = (data: unknown) => {
-        if (isClosed) {return;}
+        if (isClosed) {
+          return;
+        }
         try {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         } catch {
           isClosed = true;
         }
       };
+
+      // Send SSE comment as keepalive every 15s to prevent proxy/browser timeouts
+      const hb = setInterval(() => {
+        if (isClosed) {
+          clearInterval(hb);
+          return;
+        }
+        try {
+          controller.enqueue(encoder.encode(": heartbeat\n\n"));
+        } catch {
+          isClosed = true;
+          clearInterval(hb);
+        }
+      }, 15_000);
+      heartbeat = hb;
 
       const poll = async () => {
         while (!isClosed) {
@@ -31,7 +46,13 @@ export async function GET(
               include: {
                 players: {
                   orderBy: { createdAt: "asc" },
-                  select: { id: true, name: true, isHost: true, isOnline: true, moderatorRole: true },
+                  select: {
+                    id: true,
+                    name: true,
+                    isHost: true,
+                    isOnline: true,
+                    moderatorRole: true,
+                  },
                 },
                 games: {
                   orderBy: { startedAt: "desc" },
@@ -55,7 +76,11 @@ export async function GET(
 
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- games[0] can be undefined at runtime
             const gameFields = latestGame
-              ? { currentGameId: latestGame.id, gameStartedAt: latestGame.startedAt, timerRunning: latestGame.timerRunning }
+              ? {
+                  currentGameId: latestGame.id,
+                  gameStartedAt: latestGame.startedAt,
+                  timerRunning: latestGame.timerRunning,
+                }
               : { currentGameId: null, gameStartedAt: null, timerRunning: true };
 
             send({
@@ -83,6 +108,9 @@ export async function GET(
     },
     cancel() {
       isClosed = true;
+      if (heartbeat) {
+        clearInterval(heartbeat);
+      }
     },
   });
 

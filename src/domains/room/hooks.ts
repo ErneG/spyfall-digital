@@ -18,6 +18,7 @@ export const roomKeys = {
 // ─── SSE hook — writes to query cache ───────────────────────
 
 const RECONNECT_DELAY = 3000;
+const STALE_TIMEOUT = 10_000; // force reconnect if no message in 10s
 
 /** SSE hook for real-time room state updates. Feeds data into TanStack Query cache. */
 export function useRoomEvents(code: string | null) {
@@ -25,6 +26,7 @@ export function useRoomEvents(code: string | null) {
   const [isConnected, setIsConnected] = useState(false);
   const esRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const staleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectRef = useRef<() => void>(null);
 
   const connect = useCallback(() => {
@@ -36,14 +38,34 @@ export function useRoomEvents(code: string | null) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
+    if (staleTimerRef.current) {
+      clearTimeout(staleTimerRef.current);
+      staleTimerRef.current = null;
+    }
 
     esRef.current?.close();
     const es = new EventSource(`/api/rooms/${code}/events`);
     esRef.current = es;
 
-    es.onopen = () => setIsConnected(true);
+    const resetStaleTimer = () => {
+      if (staleTimerRef.current) {
+        clearTimeout(staleTimerRef.current);
+      }
+      staleTimerRef.current = setTimeout(() => {
+        // No message received in 10s — connection is likely dead
+        es.close();
+        setIsConnected(false);
+        connectRef.current?.();
+      }, STALE_TIMEOUT);
+    };
+
+    es.onopen = () => {
+      setIsConnected(true);
+      resetStaleTimer();
+    };
 
     es.onmessage = (event: MessageEvent<string>) => {
+      resetStaleTimer();
       try {
         const raw: unknown = JSON.parse(event.data);
         const result = roomEventSchema.safeParse(raw);
@@ -69,6 +91,9 @@ export function useRoomEvents(code: string | null) {
     es.onerror = () => {
       setIsConnected(false);
       es.close();
+      if (staleTimerRef.current) {
+        clearTimeout(staleTimerRef.current);
+      }
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
@@ -86,6 +111,9 @@ export function useRoomEvents(code: string | null) {
       esRef.current?.close();
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (staleTimerRef.current) {
+        clearTimeout(staleTimerRef.current);
       }
       setIsConnected(false);
     };
