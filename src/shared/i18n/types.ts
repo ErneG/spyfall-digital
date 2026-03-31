@@ -67,6 +67,8 @@ export interface Translations {
     youWereSpy: string;
     yourRoleWas: string;
     playAgain: string;
+    gameInProgress: string;
+    waitingForRound: string;
     waitingForNewRound: string;
     leaveRoom: string;
     leaveGame: string;

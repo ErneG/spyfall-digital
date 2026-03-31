@@ -20,7 +20,8 @@ export const lv = {
     starting: "S\u0101k...",
     addPlayer: "Pievienot sp\u0113l\u0113t\u0101ju",
     playerN: "Sp\u0113l\u0113t\u0101js",
-    footer: "3-12 sp\u0113l\u0113t\u0101ji \u00B7 8 min\u016B\u0161u raundi \u00B7 54 lok\u0101cijas",
+    footer:
+      "3-12 sp\u0113l\u0113t\u0101ji \u00B7 8 min\u016B\u0161u raundi \u00B7 54 lok\u0101cijas",
     footerInspired: "Iedvesmots no galda sp\u0113les Spyfall",
   },
   room: {
@@ -67,6 +68,8 @@ export const lv = {
     youWereSpy: "Tu biji spiegs!",
     yourRoleWas: "Tava loma bija:",
     playAgain: "Sp\u0113l\u0113t v\u0113lreiz",
+    gameInProgress: "Sp\u0113le notiek",
+    waitingForRound: "Tu pievienosies n\u0101kamaj\u0101 raund\u0101. Pagaidi!",
     waitingForNewRound: "Gaida, kad saimnieks s\u0101ks jaunu raundu...",
     leaveRoom: "Pamest istabu",
     leaveGame: "Pamest sp\u0113li",
@@ -93,7 +96,8 @@ export const lv = {
     tapToReveal: "Pieskaries, lai redz\u0113tu savu lomu",
     revealMyRole: "Atkl\u0101t manu lomu",
     retry: "M\u0113\u0123in\u0101t v\u0113lreiz",
-    fetchError: "Neizdev\u0101s iel\u0101d\u0113t lomu. Pieskaries, lai m\u0113\u0123in\u0101tu v\u0113lreiz.",
+    fetchError:
+      "Neizdev\u0101s iel\u0101d\u0113t lomu. Pieskaries, lai m\u0113\u0123in\u0101tu v\u0113lreiz.",
     gotIt: "Sapratu",
     gotItNext: "Sapratu, padod t\u0101l\u0101k",
     everyonesReady: "Visi gatavi!",
@@ -125,7 +129,8 @@ export const lv = {
     allNamesRequired: "Visi sp\u0113l\u0113t\u0101ju v\u0101rdi ir nepiecie\u0161ami",
     uniqueNames: "Sp\u0113l\u0113t\u0101ju v\u0101rdiem j\u0101b\u016Bt unik\u0101liem",
     somethingWentWrong: "Kaut kas nog\u0101ja greizi",
-    unexpectedError: "Rad\u0101s neparedz\u0113ta k\u013C\u016Bda. L\u016Bdzu, m\u0113\u0123ini v\u0113lreiz.",
+    unexpectedError:
+      "Rad\u0101s neparedz\u0113ta k\u013C\u016Bda. L\u016Bdzu, m\u0113\u0123ini v\u0113lreiz.",
     tryAgain: "M\u0113\u0123in\u0101t v\u0113lreiz",
     failedToLoadGame: "Neizdev\u0101s iel\u0101d\u0113t sp\u0113li",
     loadingGame: "Iel\u0101d\u0113 sp\u0113li...",

@@ -67,6 +67,8 @@ export const en = {
     youWereSpy: "You were the spy!",
     yourRoleWas: "Your role was:",
     playAgain: "Play Again",
+    gameInProgress: "Game in progress",
+    waitingForRound: "You'll join the next round. Hang tight!",
     waitingForNewRound: "Waiting for the host to start a new round...",
     leaveRoom: "Leave Room",
     leaveGame: "Leave Game",

@@ -19,9 +19,7 @@ import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms
 
-export async function createRoom(
-  input: CreateRoomInput,
-): Promise<ActionResult<CreateRoomOutput>> {
+export async function createRoom(input: CreateRoomInput): Promise<ActionResult<CreateRoomOutput>> {
   const parsed = createRoomInput.safeParse(input);
   if (!parsed.success) {
     return fail(parsed.error.issues[0]?.message ?? "Invalid input");
@@ -84,9 +82,7 @@ export async function createRoom(
 // ─── joinRoom ──────────────────────────────────────────────
 // Replaces POST /api/rooms/[code]
 
-export async function joinRoom(
-  input: JoinRoomInput,
-): Promise<ActionResult<JoinRoomOutput>> {
+export async function joinRoom(input: JoinRoomInput): Promise<ActionResult<JoinRoomOutput>> {
   const parsed = joinRoomInput.safeParse(input);
   if (!parsed.success) {
     return fail(parsed.error.issues[0]?.message ?? "Invalid input");
@@ -104,8 +100,8 @@ export async function joinRoom(
       return fail("Room not found");
     }
 
-    if (room.state !== "LOBBY") {
-      return fail("Game already in progress");
+    if (room.state === "FINISHED") {
+      return fail("This room has ended");
     }
 
     if (room.players.length >= MAX_PLAYERS) {
@@ -180,12 +176,9 @@ export async function updateRoomConfig(
     const updateData: Record<string, unknown> = {};
     if (config.timeLimit !== undefined) updateData.timeLimit = config.timeLimit;
     if (config.spyCount !== undefined) updateData.spyCount = config.spyCount;
-    if (config.autoStartTimer !== undefined)
-      updateData.autoStartTimer = config.autoStartTimer;
-    if (config.hideSpyCount !== undefined)
-      updateData.hideSpyCount = config.hideSpyCount;
-    if (config.moderatorMode !== undefined)
-      updateData.moderatorMode = config.moderatorMode;
+    if (config.autoStartTimer !== undefined) updateData.autoStartTimer = config.autoStartTimer;
+    if (config.hideSpyCount !== undefined) updateData.hideSpyCount = config.hideSpyCount;
+    if (config.moderatorMode !== undefined) updateData.moderatorMode = config.moderatorMode;
     if (config.moderatorLocationId !== undefined)
       updateData.moderatorLocationId = config.moderatorLocationId ?? null;
 

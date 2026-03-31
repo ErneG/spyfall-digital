@@ -8,7 +8,9 @@ import { useGameState, useTimer } from "@/domains/game/hooks";
 import { useSession } from "@/shared/hooks/use-session";
 import { LocationGrid } from "@/domains/game/components/location-grid";
 import { RevealScreen } from "@/domains/game/components/reveal-screen";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Clock } from "lucide-react";
+import { Button } from "@/shared/ui/button";
+import { useTranslation } from "@/shared/i18n/context";
 import {
   RoleCard,
   PlayerList,
@@ -30,12 +32,22 @@ interface GameViewProps {
   hideSpyCount: boolean;
   spyCount: number;
   isTimerRunning: boolean;
+  players?: Array<{ id: string; name: string; isHost: boolean; isOnline: boolean }>;
 }
 
 export function GameView({
-  gameId, playerId, isHost, roomCode: _roomCode, timeLimit, gameStartedAt,
-  hideSpyCount, spyCount, isTimerRunning: initialTimerRunning,
+  gameId,
+  playerId,
+  isHost,
+  roomCode: _roomCode,
+  timeLimit,
+  gameStartedAt,
+  hideSpyCount,
+  spyCount,
+  isTimerRunning: initialTimerRunning,
+  players: roomPlayers,
 }: GameViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const { clearSession } = useSession();
   const { game, isLoading } = useGameState(gameId, playerId);
@@ -48,28 +60,76 @@ export function GameView({
 
   useExpiryBeep(isExpired);
 
-  const onTimerToggle = useCallback(() => { timerMutation.mutate(isTimerRunning); }, [timerMutation, isTimerRunning]);
-  const onEndGameClick = useCallback(() => { endMutation.mutate(); }, [endMutation]);
-  const onRestart = useCallback(() => { restartMutation.mutate(); }, [restartMutation]);
-  const handleLeave = useCallback(() => { clearSession(); router.push("/"); }, [clearSession, router]);
-  const toggleRole = useCallback(() => { setIsRoleRevealed((previous) => !previous); }, []);
+  const onTimerToggle = useCallback(() => {
+    timerMutation.mutate(isTimerRunning);
+  }, [timerMutation, isTimerRunning]);
+  const onEndGameClick = useCallback(() => {
+    endMutation.mutate();
+  }, [endMutation]);
+  const onRestart = useCallback(() => {
+    restartMutation.mutate();
+  }, [restartMutation]);
+  const handleLeave = useCallback(() => {
+    clearSession();
+    router.push("/");
+  }, [clearSession, router]);
+  const toggleRole = useCallback(() => {
+    setIsRoleRevealed((previous) => !previous);
+  }, []);
 
   const spyBadges = useMemo(
-    () => hideSpyCount ? null : Array.from({ length: spyCount }, (_, i) => (
-      <Badge key={i} variant="destructive" className="text-xs"><AlertTriangle className="mr-1 h-3 w-3" /> Spy</Badge>
-    )),
+    () =>
+      hideSpyCount
+        ? null
+        : Array.from({ length: spyCount }, (_, i) => (
+            <Badge key={i} variant="destructive" className="text-xs">
+              <AlertTriangle className="mr-1 h-3 w-3" /> Spy
+            </Badge>
+          )),
     [hideSpyCount, spyCount],
   );
 
   if (!game) {
-    const message = isLoading ? "Loading game..." : "Failed to load game";
-    const className = isLoading ? "text-muted-foreground" : "text-destructive";
-    return <main className="flex flex-1 items-center justify-center p-4"><p className={className}>{message}</p></main>;
+    if (isLoading) {
+      return (
+        <main className="flex flex-1 items-center justify-center p-4">
+          <p className="text-muted-foreground">{t.common.loading}</p>
+        </main>
+      );
+    }
+    // Player joined mid-game — they're in the room but not in this round
+    return (
+      <main className="flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-4 text-center">
+          <Clock className="text-muted-foreground mx-auto h-10 w-10" />
+          <p className="text-lg font-medium">{t.game.gameInProgress}</p>
+          <p className="text-muted-foreground text-sm">{t.game.waitingForRound}</p>
+          {roomPlayers && (
+            <PlayerList
+              players={roomPlayers.map((p) => ({ ...p, isOnline: true }))}
+              currentPlayerId={playerId}
+            />
+          )}
+          <Separator />
+          <Button variant="ghost" className="text-muted-foreground w-full" onClick={handleLeave}>
+            {t.room.leaveRoom}
+          </Button>
+        </div>
+      </main>
+    );
   }
 
   const isRevealPhase = REVEAL_PHASES.has(game.phase);
   if (isRevealPhase) {
-    return <RevealScreen game={game} playerId={playerId} isHost={isHost} onRestart={onRestart} onLeave={handleLeave} />;
+    return (
+      <RevealScreen
+        game={game}
+        playerId={playerId}
+        isHost={isHost}
+        onRestart={onRestart}
+        onLeave={handleLeave}
+      />
+    );
   }
 
   const revealedLocation = game.isSpy ? null : game.location;
@@ -79,9 +139,21 @@ export function GameView({
   return (
     <main className="flex flex-1 flex-col items-center p-4 pb-24">
       <div className="w-full max-w-md space-y-4">
-        <TimerSection display={display} isExpired={isExpired} isTimerRunning={isTimerRunning} isHost={isHost} onToggle={onTimerToggle} />
+        <TimerSection
+          display={display}
+          isExpired={isExpired}
+          isTimerRunning={isTimerRunning}
+          isHost={isHost}
+          onToggle={onTimerToggle}
+        />
         {spyBadges && <div className="flex justify-center gap-1">{spyBadges}</div>}
-        <RoleCard isSpy={game.isSpy} isRoleRevealed={isRoleRevealed} location={game.location} myRole={game.myRole} onToggle={toggleRole} />
+        <RoleCard
+          isSpy={game.isSpy}
+          isRoleRevealed={isRoleRevealed}
+          location={game.location}
+          myRole={game.myRole}
+          onToggle={toggleRole}
+        />
         <PlayerList players={game.players} currentPlayerId={playerId} />
         <LocationGrid
           locations={game.allLocations}
@@ -91,7 +163,14 @@ export function GameView({
           playerId={spyPlayerId}
         />
         <Separator />
-        <GameActions isHost={isHost} isEnding={endMutation.isPending} onEndGame={onEndGameClick} game={game} playerId={playerId} gameId={gameId} />
+        <GameActions
+          isHost={isHost}
+          isEnding={endMutation.isPending}
+          onEndGame={onEndGameClick}
+          game={game}
+          playerId={playerId}
+          gameId={gameId}
+        />
       </div>
     </main>
   );

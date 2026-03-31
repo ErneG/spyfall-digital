@@ -47,7 +47,11 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     autoStartRef.current = true;
     startGameMutation.mutate(
       { roomId: session.roomId, playerId: session.playerId },
-      { onSettled: () => { autoStartRef.current = false; } },
+      {
+        onSettled: () => {
+          autoStartRef.current = false;
+        },
+      },
     );
   }, [session, room, startGameMutation]);
 
@@ -58,7 +62,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     copyTimeoutRef.current = setTimeout(() => setIsCopied(false), 2000);
   }, [code]);
 
-  const handleLeave = useCallback(() => { clearSession(); router.push("/"); }, [clearSession, router]);
+  const handleLeave = useCallback(() => {
+    clearSession();
+    router.push("/");
+  }, [clearSession, router]);
   const handleOpenLocations = useCallback(() => setIsLocationsOpen(true), []);
   const handleStartClick = useCallback(() => {
     if (!session) return;
@@ -68,22 +75,47 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   if (!isLoaded || !session) return null;
 
+  // Pass-and-play: show loading spinner while waiting for SSE to deliver game state
+  // (game was already started from home page before navigating here)
+  if (session.passAndPlay && session.allPlayers && (!room || !room.currentGameId)) {
+    return (
+      <main className="flex flex-1 items-center justify-center p-4">
+        <div className="space-y-3 text-center">
+          <div className="border-muted border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-4" />
+          <p className="text-muted-foreground">{t.common.loading}</p>
+        </div>
+      </main>
+    );
+  }
+
   if (room && room.state !== "LOBBY" && room.currentGameId) {
     if (session.passAndPlay && session.allPlayers) {
       return (
         <PassAndPlayGameView
-          gameId={room.currentGameId} hostPlayerId={session.playerId}
-          allPlayers={session.allPlayers} roomCode={code}
-          timeLimit={room.timeLimit} gameStartedAt={room.gameStartedAt}
-          hideSpyCount={room.hideSpyCount} spyCount={room.spyCount} isTimerRunning={room.timerRunning}
+          gameId={room.currentGameId}
+          hostPlayerId={session.playerId}
+          allPlayers={session.allPlayers}
+          roomCode={code}
+          timeLimit={room.timeLimit}
+          gameStartedAt={room.gameStartedAt}
+          hideSpyCount={room.hideSpyCount}
+          spyCount={room.spyCount}
+          isTimerRunning={room.timerRunning}
         />
       );
     }
     return (
       <GameView
-        gameId={room.currentGameId} playerId={session.playerId} isHost={session.isHost}
-        roomCode={code} timeLimit={room.timeLimit} gameStartedAt={room.gameStartedAt}
-        hideSpyCount={room.hideSpyCount} spyCount={room.spyCount} isTimerRunning={room.timerRunning}
+        gameId={room.currentGameId}
+        playerId={session.playerId}
+        isHost={session.isHost}
+        roomCode={code}
+        timeLimit={room.timeLimit}
+        gameStartedAt={room.gameStartedAt}
+        hideSpyCount={room.hideSpyCount}
+        spyCount={room.spyCount}
+        isTimerRunning={room.timerRunning}
+        players={room.players}
       />
     );
   }
@@ -93,21 +125,45 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4">
-        <RoomCodeHeader code={code} isCopied={isCopied} isConnected={isConnected} onCopy={handleCopy} />
+        <RoomCodeHeader
+          code={code}
+          isCopied={isCopied}
+          isConnected={isConnected}
+          onCopy={handleCopy}
+        />
         {room && (
           <GameConfig
-            roomCode={code} playerId={session.playerId} isHost={session.isHost}
-            timeLimit={room.timeLimit} spyCount={room.spyCount} autoStartTimer={room.autoStartTimer}
-            hideSpyCount={room.hideSpyCount} moderatorMode={room.moderatorMode}
-            selectedLocationCount={room.selectedLocationCount} totalLocationCount={room.totalLocationCount}
+            roomCode={code}
+            playerId={session.playerId}
+            isHost={session.isHost}
+            timeLimit={room.timeLimit}
+            spyCount={room.spyCount}
+            autoStartTimer={room.autoStartTimer}
+            hideSpyCount={room.hideSpyCount}
+            moderatorMode={room.moderatorMode}
+            selectedLocationCount={room.selectedLocationCount}
+            totalLocationCount={room.totalLocationCount}
             onOpenLocations={handleOpenLocations}
           />
         )}
-        <LocationSettings open={isLocationsOpen} onOpenChange={setIsLocationsOpen} roomCode={code} playerId={session.playerId} />
+        <LocationSettings
+          open={isLocationsOpen}
+          onOpenChange={setIsLocationsOpen}
+          roomCode={code}
+          playerId={session.playerId}
+        />
         <PlayerList players={players} currentPlayerId={session.playerId} />
-        <StartSection isHost={session.isHost} isStarting={startGameMutation.isPending} playerCount={players.length} error={error} onStart={handleStartClick} />
+        <StartSection
+          isHost={session.isHost}
+          isStarting={startGameMutation.isPending}
+          playerCount={players.length}
+          error={error}
+          onStart={handleStartClick}
+        />
         <Separator />
-        <Button variant="ghost" className="w-full text-muted-foreground" onClick={handleLeave}>{t.room.leaveRoom}</Button>
+        <Button variant="ghost" className="text-muted-foreground w-full" onClick={handleLeave}>
+          {t.room.leaveRoom}
+        </Button>
       </div>
     </main>
   );
