@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -50,17 +49,17 @@ const LocationButton = memo(function LocationButton({
     }
   }, [isSpy, onSpyClick, onCrossClick, location]);
 
-  let className = "text-left text-xs py-1.5 px-2 rounded transition-colors cursor-pointer ";
+  let className = "text-left text-xs py-2 px-3 rounded-xl transition-colors cursor-pointer ";
   if (isRevealed) {
-    className += "bg-primary/10 text-primary font-bold";
+    className += "bg-[#8B5CF6]/12 text-[#8B5CF6] font-bold";
   } else if (isPrevious) {
-    className += "bg-muted/30 text-muted-foreground line-through opacity-50";
+    className += "bg-[#1C1C1E] text-[#48484A] line-through opacity-50";
   } else if (isCrossed) {
-    className += "bg-muted/30 text-muted-foreground line-through";
+    className += "bg-[#1C1C1E] text-[#48484A] line-through";
   } else if (isSpy) {
-    className += "bg-muted/50 hover:bg-muted";
+    className += "bg-[#1C1C1E] text-[#8E8E93] hover:bg-[#2C2C2E]";
   } else {
-    className += "bg-muted/50 hover:bg-muted/70";
+    className += "bg-[#1C1C1E] text-[#8E8E93] hover:bg-[#2C2C2E]";
   }
 
   return (
@@ -90,7 +89,8 @@ const GuessDialog = memo(function GuessDialog({
         <DialogHeader>
           <DialogTitle>{t.locationGrid.guessTitle}</DialogTitle>
           <DialogDescription>
-            Are you sure the location is <strong>{guessTarget ? translateLocation(guessTarget.name) : ""}</strong>?
+            Are you sure the location is{" "}
+            <strong>{guessTarget ? translateLocation(guessTarget.name) : ""}</strong>?
             {t.locationGrid.guessConfirm}
           </DialogDescription>
         </DialogHeader>
@@ -172,18 +172,14 @@ export const LocationGrid = memo(function LocationGrid({
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {t.locationGrid.title} ({locations.length})
-            {isSpy && <span className="text-destructive ml-1">{t.locationGrid.tapToGuess}</span>}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-1.5">{locationButtons}</div>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl bg-[#141414] p-4">
+        <p className="mb-3 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+          <MapPin className="mr-1 inline h-3 w-3" />
+          {t.locationGrid.title} ({locations.length})
+          {isSpy && <span className="ml-1 text-[#EF4444]">{t.locationGrid.tapToGuess}</span>}
+        </p>
+        <div className="grid grid-cols-2 gap-1.5">{locationButtons}</div>
+      </div>
 
       <GuessDialog
         guessTarget={guessTarget}

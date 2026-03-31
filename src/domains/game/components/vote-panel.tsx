@@ -39,14 +39,16 @@ const VotePlayerButton = memo(function VotePlayerButton({
   }, [onVote, player.id]);
 
   return (
-    <Button
-      variant="outline"
-      className="w-full justify-start"
+    <button
+      className="flex h-[56px] w-full items-center gap-3 rounded-2xl bg-[#141414] px-4 text-left transition-colors hover:bg-[#1C1C1E] disabled:opacity-50"
       onClick={handleClick}
       disabled={isVoting}
     >
-      {player.name}
-    </Button>
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8 text-sm font-semibold text-[#8E8E93]">
+        {player.name.charAt(0).toUpperCase()}
+      </div>
+      <span className="font-medium">{player.name}</span>
+    </button>
   );
 });
 
@@ -67,7 +69,9 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
   });
 
   const onVote = useCallback(
-    (suspectId: string) => { voteMutation.mutate(suspectId); },
+    (suspectId: string) => {
+      voteMutation.mutate(suspectId);
+    },
     [voteMutation],
   );
 
@@ -76,20 +80,17 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
   }, []);
 
   const triggerElement = useMemo(
-    () => <Button variant="outline" className="flex-1 gap-2" />,
+    () => (
+      <Button className="h-[52px] flex-1 gap-2 rounded-2xl bg-white font-semibold text-black hover:bg-white/90" />
+    ),
     [],
   );
 
-  const otherPlayers = useMemo(
-    () => players.filter((p) => p.id !== playerId),
-    [players, playerId],
-  );
+  const otherPlayers = useMemo(() => players.filter((p) => p.id !== playerId), [players, playerId]);
 
   if (hasVoted) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-2 flex-1">
-        {t.voting.voteSubmitted}
-      </p>
+      <p className="flex-1 py-2 text-center text-[13px] text-[#34D399]">{t.voting.voteSubmitted}</p>
     );
   }
 
@@ -106,11 +107,16 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
         </DialogHeader>
         <div className="space-y-2">
           {otherPlayers.map((p) => (
-            <VotePlayerButton key={p.id} player={p} isVoting={voteMutation.isPending} onVote={onVote} />
+            <VotePlayerButton
+              key={p.id}
+              player={p}
+              isVoting={voteMutation.isPending}
+              onVote={onVote}
+            />
           ))}
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={handleCancel}>
+          <Button variant="ghost" onClick={handleCancel} className="text-[#8E8E93]">
             {t.voting.cancel}
           </Button>
         </DialogFooter>

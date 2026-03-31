@@ -22,27 +22,23 @@ export const StartSection = React.memo(function StartSection({
   const { t } = useTranslation();
   return (
     <>
-      {error && <p className="text-sm text-destructive text-center">{error}</p>}
+      {error && <p className="text-center text-[13px] text-[#EF4444]">{error}</p>}
 
       {isHost ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Button
-            className="w-full h-12 text-lg"
+            className="h-[52px] w-full rounded-2xl bg-white text-lg font-semibold text-black hover:bg-white/90"
             onClick={onStart}
             disabled={isStarting || playerCount < 3}
           >
             {isStarting ? t.home.starting : t.home.startGame}
           </Button>
           {playerCount < 3 && (
-            <p className="text-xs text-muted-foreground text-center">
-              {t.players.needMinPlayers}
-            </p>
+            <p className="text-center text-xs text-[#48484A]">{t.players.needMinPlayers}</p>
           )}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground text-center">
-          {t.players.waitingForHost}
-        </p>
+        <p className="text-center text-sm text-[#8E8E93]">{t.players.waitingForHost}</p>
       )}
     </>
   );

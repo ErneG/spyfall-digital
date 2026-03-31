@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import "./globals.css";
 
@@ -17,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Spyfall Digital",
-  description: "A digital social deduction game — find the spy before they figure out the location!",
+  description:
+    "A digital social deduction game — find the spy before they figure out the location!",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -42,14 +42,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col bg-black">
         <Providers>
           <header className="flex justify-end gap-1 p-2">
             <LanguageToggle />
-            <ThemeToggle />
           </header>
           {children}
         </Providers>

@@ -2,8 +2,6 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/shared/ui/badge";
-import { Separator } from "@/shared/ui/separator";
 import { useGameState, useTimer } from "@/domains/game/hooks";
 import { useSession } from "@/shared/hooks/use-session";
 import { LocationGrid } from "@/domains/game/components/location-grid";
@@ -82,9 +80,12 @@ export function GameView({
       hideSpyCount
         ? null
         : Array.from({ length: spyCount }, (_, i) => (
-            <Badge key={i} variant="destructive" className="text-xs">
+            <span
+              key={i}
+              className="inline-flex items-center rounded-full bg-[#EF4444]/12 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"
+            >
               <AlertTriangle className="mr-1 h-3 w-3" /> Spy
-            </Badge>
+            </span>
           )),
     [hideSpyCount, spyCount],
   );
@@ -93,7 +94,7 @@ export function GameView({
     if (isLoading) {
       return (
         <main className="flex flex-1 items-center justify-center p-4">
-          <p className="text-muted-foreground">{t.common.loading}</p>
+          <p className="text-[#8E8E93]">{t.common.loading}</p>
         </main>
       );
     }
@@ -101,17 +102,17 @@ export function GameView({
     return (
       <main className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4 text-center">
-          <Clock className="text-muted-foreground mx-auto h-10 w-10" />
+          <Clock className="mx-auto h-10 w-10 text-[#8E8E93]" />
           <p className="text-lg font-medium">{t.game.gameInProgress}</p>
-          <p className="text-muted-foreground text-sm">{t.game.waitingForRound}</p>
+          <p className="text-sm text-[#8E8E93]">{t.game.waitingForRound}</p>
           {roomPlayers && (
             <PlayerList
               players={roomPlayers.map((p) => ({ ...p, isOnline: true }))}
               currentPlayerId={playerId}
             />
           )}
-          <Separator />
-          <Button variant="ghost" className="text-muted-foreground w-full" onClick={handleLeave}>
+          <div className="h-px bg-white/5" />
+          <Button variant="ghost" className="w-full text-[#8E8E93]" onClick={handleLeave}>
             {t.room.leaveRoom}
           </Button>
         </div>
@@ -137,8 +138,8 @@ export function GameView({
   const spyPlayerId = game.isSpy ? playerId : undefined;
 
   return (
-    <main className="flex flex-1 flex-col items-center p-4 pb-24">
-      <div className="w-full max-w-md space-y-4">
+    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-24">
+      <div className="w-full max-w-md space-y-5">
         <TimerSection
           display={display}
           isExpired={isExpired}
@@ -162,7 +163,7 @@ export function GameView({
           gameId={spyGameId}
           playerId={spyPlayerId}
         />
-        <Separator />
+        <div className="h-px bg-white/5" />
         <GameActions
           isHost={isHost}
           isEnding={endMutation.isPending}
