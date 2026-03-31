@@ -44,7 +44,9 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   // Auto-start new game for pass-and-play when room returns to LOBBY (after "Play Again")
   useEffect(() => {
-    if (!session?.passAndPlay || !room || room.state !== "LOBBY" || autoStartRef.current) {return;}
+    if (!session?.passAndPlay || !room || room.state !== "LOBBY" || autoStartRef.current) {
+      return;
+    }
     autoStartRef.current = true;
     startGameMutation.mutate(
       { roomId: session.roomId, playerId: session.playerId },
@@ -59,7 +61,9 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const handleCopy = useCallback(() => {
     void navigator.clipboard.writeText(code.toUpperCase());
     setIsCopied(true);
-    if (copyTimeoutRef.current) {clearTimeout(copyTimeoutRef.current);}
+    if (copyTimeoutRef.current) {
+      clearTimeout(copyTimeoutRef.current);
+    }
     copyTimeoutRef.current = setTimeout(() => setIsCopied(false), 2000);
   }, [code]);
 
@@ -69,16 +73,20 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }, [clearSession, router]);
   const handleOpenLocations = useCallback(() => setIsLocationsOpen(true), []);
   const handleStartClick = useCallback(() => {
-    if (!session) {return;}
+    if (!session) {
+      return;
+    }
     setError("");
     startGameMutation.mutate({ roomId: session.roomId, playerId: session.playerId });
   }, [session, startGameMutation]);
 
-  if (!isLoaded || !session) {return null;}
+  if (!isLoaded || !session) {
+    return null;
+  }
 
-  // Pass-and-play: show loading spinner while waiting for SSE to deliver game state
-  // (game was already started from home page before navigating here)
-  if (session.passAndPlay && session.allPlayers && (!room || !room.currentGameId)) {
+  // Pass-and-play: show spinner only while SSE hasn't connected yet (room is null).
+  // Once SSE delivers data, fall through to game view or auto-start.
+  if (session.passAndPlay && session.allPlayers && !room) {
     return (
       <main className="flex flex-1 items-center justify-center p-4">
         <div className="space-y-3 text-center">
