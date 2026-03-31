@@ -1,17 +1,14 @@
 "use client";
 
-import { Eye, EyeOff, Plus, X, Clock } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import React, { useCallback } from "react";
 
-import { TIMER_PRESETS } from "@/domains/room/schema";
 import { useTranslation } from "@/shared/i18n/context";
 import { MIN_PLAYERS, MAX_PLAYERS } from "@/shared/lib/constants";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import { Switch } from "@/shared/ui/switch";
 
-const SPY_OPTIONS = [1, 2] as const;
+import { GameConfigSection } from "./game-config-section";
 
 /* ── Private subcomponents ───────────────────────────── */
 
@@ -57,27 +54,47 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   );
 });
 
-const PnPPresetButton = React.memo(function PnPPresetButton({
-  label,
-  value,
-  isSelected,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  isSelected: boolean;
-  onClick: (value: number) => void;
-}) {
-  const handleClick = useCallback(() => onClick(value), [onClick, value]);
+/* ── Player list section ─────────────────────────────── */
+
+interface PlayerListSectionProps {
+  playerNames: string[];
+  onPlayerNameChange: (index: number, value: string) => void;
+  onAddPlayer: () => void;
+  onRemovePlayer: (index: number) => void;
+}
+
+const PlayerListSection = React.memo(function PlayerListSection({
+  playerNames,
+  onPlayerNameChange,
+  onAddPlayer,
+  onRemovePlayer,
+}: PlayerListSectionProps) {
+  const { t } = useTranslation();
   return (
-    <button
-      onClick={handleClick}
-      className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-        isSelected ? "bg-white text-black" : "bg-[#141414] text-[#8E8E93] hover:bg-[#1C1C1E]"
-      }`}
-    >
-      {label}
-    </button>
+    <>
+      <div className="space-y-2">
+        {playerNames.map((name, index) => (
+          <PlayerNameRow
+            key={`player-${String(index)}`}
+            index={index}
+            name={name}
+            canRemove={playerNames.length > MIN_PLAYERS}
+            onNameChange={onPlayerNameChange}
+            onRemove={onRemovePlayer}
+          />
+        ))}
+      </div>
+      {playerNames.length < MAX_PLAYERS && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full gap-1 text-[#8E8E93]"
+          onClick={onAddPlayer}
+        >
+          <Plus className="h-4 w-4" /> {t.home.addPlayer}
+        </Button>
+      )}
+    </>
   );
 });
 
@@ -124,75 +141,21 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
         <p className="text-[13px] text-[#8E8E93]">{t.home.passAndPlayDesc}</p>
       </div>
       <div className="space-y-4">
-        <div className="space-y-2">
-          {playerNames.map((name, index) => (
-            <PlayerNameRow
-              key={index}
-              index={index}
-              name={name}
-              canRemove={playerNames.length > MIN_PLAYERS}
-              onNameChange={onPlayerNameChange}
-              onRemove={onRemovePlayer}
-            />
-          ))}
-        </div>
-        {playerNames.length < MAX_PLAYERS && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full gap-1 text-[#8E8E93]"
-            onClick={onAddPlayer}
-          >
-            <Plus className="h-4 w-4" /> {t.home.addPlayer}
-          </Button>
-        )}
-
+        <PlayerListSection
+          playerNames={playerNames}
+          onPlayerNameChange={onPlayerNameChange}
+          onAddPlayer={onAddPlayer}
+          onRemovePlayer={onRemovePlayer}
+        />
         <div className="h-px bg-white/5" />
-
-        <div className="space-y-2">
-          <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
-            <Clock className="mr-1 inline h-3 w-3" /> {t.config.timer}
-          </p>
-          <div className="flex gap-1.5">
-            {TIMER_PRESETS.map((preset) => (
-              <PnPPresetButton
-                key={preset.value}
-                label={preset.label}
-                value={preset.value}
-                isSelected={timeLimit === preset.value}
-                onClick={onTimeLimitChange}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.config.spies}</p>
-          <div className="flex gap-1.5">
-            {SPY_OPTIONS.map((count) => (
-              <PnPPresetButton
-                key={count}
-                label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`}
-                value={count}
-                isSelected={spyCount === count}
-                onClick={onSpyCountChange}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="flex h-[56px] items-center justify-between rounded-2xl bg-[#141414] px-4">
-          <Label htmlFor="pnp-hide-spy" className="flex items-center gap-1.5 text-sm">
-            {hideSpyCount ? (
-              <EyeOff className="h-3.5 w-3.5 text-[#8E8E93]" />
-            ) : (
-              <Eye className="h-3.5 w-3.5 text-[#8E8E93]" />
-            )}
-            {t.config.hideSpyCount}
-          </Label>
-          <Switch id="pnp-hide-spy" checked={hideSpyCount} onCheckedChange={onHideSpyCountChange} />
-        </div>
-
+        <GameConfigSection
+          timeLimit={timeLimit}
+          spyCount={spyCount}
+          hideSpyCount={hideSpyCount}
+          onTimeLimitChange={onTimeLimitChange}
+          onSpyCountChange={onSpyCountChange}
+          onHideSpyCountChange={onHideSpyCountChange}
+        />
         {error && (
           <p className="text-[13px] text-[#EF4444]">
             {t.errors[error as keyof typeof t.errors] ?? error}
