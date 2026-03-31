@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import { startGame } from "@/domains/game/actions";
 import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
@@ -443,9 +443,16 @@ export const FooterInfo = React.memo(function FooterInfo() {
 
 export function useHomeState() {
   const router = useRouter();
-  const { setSession } = useSession();
+  const { session, setSession } = useSession();
   const [mode, setMode] = useState<"idle" | "create" | "join" | "pass-and-play">("idle");
   const [name, setName] = useState("");
+
+  // Auto-redirect to active room if session exists (tab reopen, back navigation, etc.)
+  useEffect(() => {
+    if (session?.roomCode) {
+      router.replace(`/room/${session.roomCode}`);
+    }
+  }, [session, router]);
   const [joinCode, setJoinCode] = useState("");
   const [playerNames, setPlayerNames] = useState<string[]>(["", "", ""]);
   const [pnpTimeLimit, setPnpTimeLimit] = useState(DEFAULT_TIME_LIMIT);
@@ -561,13 +568,17 @@ export function useHomeState() {
   );
   const handleCreateKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {handleCreateClick();}
+      if (event.key === "Enter") {
+        handleCreateClick();
+      }
     },
     [handleCreateClick],
   );
   const handleJoinKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {handleJoinClick();}
+      if (event.key === "Enter") {
+        handleJoinClick();
+      }
     },
     [handleJoinClick],
   );

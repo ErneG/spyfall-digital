@@ -28,7 +28,9 @@ export function useRoomEvents(code: string | null) {
   const connectRef = useRef<() => void>(null);
 
   const connect = useCallback(() => {
-    if (!code) {return;}
+    if (!code) {
+      return;
+    }
 
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -67,7 +69,9 @@ export function useRoomEvents(code: string | null) {
     es.onerror = () => {
       setIsConnected(false);
       es.close();
-      if (reconnectTimeoutRef.current) {clearTimeout(reconnectTimeoutRef.current);}
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
       reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), RECONNECT_DELAY);
     };
   }, [code, queryClient]);
@@ -80,10 +84,23 @@ export function useRoomEvents(code: string | null) {
     connect();
     return () => {
       esRef.current?.close();
-      if (reconnectTimeoutRef.current) {clearTimeout(reconnectTimeoutRef.current);}
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
       setIsConnected(false);
     };
   }, [connect]);
+
+  // Reconnect SSE when tab regains focus (handles tab close/reopen, phone lock, etc.)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible" && code) {
+        connect();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [code, connect]);
 
   // Read data from query cache (SSE is the writer, no HTTP fetching)
   const { data = null } = useQuery<RoomEvent | null>({
