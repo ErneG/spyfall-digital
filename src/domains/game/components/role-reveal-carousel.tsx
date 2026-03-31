@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, AlertTriangle, Shield, MapPin, ChevronRight, Check } from "lucide-react";
+import { Eye, Shield, MapPin, ChevronRight, Check } from "lucide-react";
 import { useState, useCallback, memo } from "react";
 
 import { fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
@@ -11,19 +11,25 @@ import { Card, CardContent } from "@/shared/ui/card";
 type RevealStep = "handoff" | "ready" | "revealed";
 
 const HandoffScreen = memo(function HandoffScreen({
-  playerName, isFirst, onReady,
-}: { playerName: string; isFirst: boolean; onReady: () => void }) {
+  playerName,
+  isFirst,
+  onReady,
+}: {
+  playerName: string;
+  isFirst: boolean;
+  onReady: () => void;
+}) {
   const { t } = useTranslation();
   return (
     <Card>
-      <CardContent className="pt-8 pb-8 text-center space-y-6">
+      <CardContent className="space-y-6 pt-8 pb-8 text-center">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {isFirst ? t.passAndPlay.startingWith : t.passAndPlay.handDeviceTo}
           </p>
           <p className="text-3xl font-bold">{playerName}</p>
         </div>
-        <Button size="lg" className="w-full h-14 text-lg gap-2" onClick={onReady}>
+        <Button size="lg" className="h-14 w-full gap-2 text-lg" onClick={onReady}>
           {t.passAndPlay.imReady} {playerName} <ChevronRight className="h-5 w-5" />
         </Button>
       </CardContent>
@@ -32,24 +38,30 @@ const HandoffScreen = memo(function HandoffScreen({
 });
 
 const ReadyScreen = memo(function ReadyScreen({
-  playerName, isLoading, hasError, onReveal,
-}: { playerName: string; isLoading: boolean; hasError: boolean; onReveal: () => void }) {
+  playerName,
+  isLoading,
+  hasError,
+  onReveal,
+}: {
+  playerName: string;
+  isLoading: boolean;
+  hasError: boolean;
+  onReveal: () => void;
+}) {
   const { t } = useTranslation();
   return (
     <Card>
-      <CardContent className="pt-8 pb-8 text-center space-y-6">
-        <Eye className="h-12 w-12 mx-auto text-muted-foreground" />
+      <CardContent className="space-y-6 pt-8 pb-8 text-center">
+        <Eye className="text-muted-foreground mx-auto h-12 w-12" />
         <div className="space-y-2">
           <p className="text-lg font-semibold">{playerName}</p>
           <p className="text-muted-foreground">{t.passAndPlay.tapToReveal}</p>
         </div>
-        {hasError && (
-          <p className="text-sm text-destructive">{t.passAndPlay.fetchError}</p>
-        )}
+        {hasError && <p className="text-destructive text-sm">{t.passAndPlay.fetchError}</p>}
         <Button
           size="lg"
           variant="outline"
-          className="w-full h-14 text-lg"
+          className="h-14 w-full text-lg"
           onClick={onReveal}
           disabled={isLoading}
         >
@@ -63,37 +75,50 @@ const ReadyScreen = memo(function ReadyScreen({
 });
 
 const RevealedScreen = memo(function RevealedScreen({
-  role, isLast, onNext,
-}: { role: PeekRole; isLast: boolean; onNext: () => void }) {
+  role,
+  isLast,
+  onNext,
+}: {
+  role: PeekRole;
+  isLast: boolean;
+  onNext: () => void;
+}) {
   const { t, translateLocation, translateRole } = useTranslation();
   return (
-    <Card className={role.isSpy ? "border-destructive/50 bg-destructive/5" : ""}>
-      <CardContent className="pt-8 pb-8 text-center space-y-6">
+    <Card>
+      <CardContent className="space-y-6 pt-8 pb-8 text-center">
         {role.isSpy ? (
           <div className="space-y-3">
-            <AlertTriangle className="h-12 w-12 mx-auto text-destructive" />
-            <p className="text-2xl font-bold text-destructive">{t.game.youAreTheSpy}</p>
-            <p className="text-sm text-muted-foreground">
-              {t.game.spyHint}
-            </p>
+            <Shield className="text-primary mx-auto h-12 w-12" />
+            <p className="text-2xl font-bold">{t.game.youAreTheSpy}</p>
+            <p className="text-muted-foreground text-sm">{t.game.spyHint}</p>
           </div>
         ) : (
           <div className="space-y-3">
-            <Shield className="h-12 w-12 mx-auto text-primary" />
+            <Shield className="text-primary mx-auto h-12 w-12" />
             <div className="flex items-center justify-center gap-2">
-              <MapPin className="h-5 w-5 text-muted-foreground" />
-              <p className="text-2xl font-bold">{role.location ? translateLocation(role.location) : role.location}</p>
+              <MapPin className="text-muted-foreground h-5 w-5" />
+              <p className="text-2xl font-bold">
+                {role.location ? translateLocation(role.location) : role.location}
+              </p>
             </div>
             <p className="text-muted-foreground">
-              {t.game.yourRole} <span className="font-semibold text-foreground">{role.myRole ? translateRole(role.myRole) : role.myRole}</span>
+              {t.game.yourRole}{" "}
+              <span className="text-foreground font-semibold">
+                {role.myRole ? translateRole(role.myRole) : role.myRole}
+              </span>
             </p>
           </div>
         )}
-        <Button size="lg" className="w-full h-14 text-lg gap-2" onClick={onNext}>
+        <Button size="lg" className="h-14 w-full gap-2 text-lg" onClick={onNext}>
           {isLast ? (
-            <>{t.passAndPlay.gotIt} <Check className="h-5 w-5" /></>
+            <>
+              {t.passAndPlay.gotIt} <Check className="h-5 w-5" />
+            </>
           ) : (
-            <>{t.passAndPlay.gotItNext} <ChevronRight className="h-5 w-5" /></>
+            <>
+              {t.passAndPlay.gotItNext} <ChevronRight className="h-5 w-5" />
+            </>
           )}
         </Button>
       </CardContent>
@@ -105,13 +130,13 @@ const AllReadyScreen = memo(function AllReadyScreen({ onStart }: { onStart: () =
   const { t } = useTranslation();
   return (
     <Card>
-      <CardContent className="pt-8 pb-8 text-center space-y-6">
-        <Check className="h-12 w-12 mx-auto text-primary" />
+      <CardContent className="space-y-6 pt-8 pb-8 text-center">
+        <Check className="text-primary mx-auto h-12 w-12" />
         <div className="space-y-2">
           <p className="text-2xl font-bold">{t.passAndPlay.everyonesReady}</p>
           <p className="text-muted-foreground">{t.passAndPlay.allPlayersReady}</p>
         </div>
-        <Button size="lg" className="w-full h-14 text-lg" onClick={onStart}>
+        <Button size="lg" className="h-14 w-full text-lg" onClick={onStart}>
           {t.passAndPlay.startPlaying}
         </Button>
       </CardContent>
@@ -119,7 +144,15 @@ const AllReadyScreen = memo(function AllReadyScreen({ onStart }: { onStart: () =
   );
 });
 
-export function RoleRevealCarousel({ gameId, players, onComplete }: { gameId: string; players: Array<{ id: string; name: string }>; onComplete: () => void }) {
+export function RoleRevealCarousel({
+  gameId,
+  players,
+  onComplete,
+}: {
+  gameId: string;
+  players: Array<{ id: string; name: string }>;
+  onComplete: () => void;
+}) {
   const { t } = useTranslation();
   const [playerIndex, setPlayerIndex] = useState(0);
   const [step, setStep] = useState<RevealStep>("handoff");
@@ -148,7 +181,9 @@ export function RoleRevealCarousel({ gameId, players, onComplete }: { gameId: st
     setIsLoading(false);
   }, [gameId, currentPlayer.id]);
 
-  const handleRevealClick = useCallback(() => { void revealRole(); }, [revealRole]);
+  const handleRevealClick = useCallback(() => {
+    void revealRole();
+  }, [revealRole]);
 
   const handleNext = useCallback(() => {
     if (isLast) {
@@ -173,16 +208,25 @@ export function RoleRevealCarousel({ gameId, players, onComplete }: { gameId: st
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4">
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-center text-sm">
           {t.passAndPlay.playerNofM} {playerIndex + 1} of {players.length}
         </div>
 
         {step === "handoff" && (
-          <HandoffScreen playerName={currentPlayer.name} isFirst={playerIndex === 0} onReady={handleReady} />
+          <HandoffScreen
+            playerName={currentPlayer.name}
+            isFirst={playerIndex === 0}
+            onReady={handleReady}
+          />
         )}
 
         {step === "ready" && (
-          <ReadyScreen playerName={currentPlayer.name} isLoading={isLoading} hasError={hasFetchError} onReveal={handleRevealClick} />
+          <ReadyScreen
+            playerName={currentPlayer.name}
+            isLoading={isLoading}
+            hasError={hasFetchError}
+            onReveal={handleRevealClick}
+          />
         )}
 
         {step === "revealed" && role && (

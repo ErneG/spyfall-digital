@@ -76,18 +76,14 @@ export function GameView({
     setIsRoleRevealed((previous) => !previous);
   }, []);
 
-  const spyBadges = useMemo(
+  const spyCountLabel = useMemo(
     () =>
-      hideSpyCount
-        ? null
-        : Array.from({ length: spyCount }, (_, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center rounded-full bg-[#EF4444]/12 px-2.5 py-1 text-xs font-semibold text-[#EF4444]"
-            >
-              <AlertTriangle className="mr-1 h-3 w-3" /> Spy
-            </span>
-          )),
+      hideSpyCount ? null : (
+        <p className="text-center text-xs text-[#8E8E93]">
+          <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
+          {spyCount === 1 ? "1 spy among you" : `${spyCount} spies among you`}
+        </p>
+      ),
     [hideSpyCount, spyCount],
   );
 
@@ -148,7 +144,7 @@ export function GameView({
           isHost={isHost}
           onToggle={onTimerToggle}
         />
-        {spyBadges && <div className="flex justify-center gap-1">{spyBadges}</div>}
+        {spyCountLabel}
         <RoleCard
           isSpy={game.isSpy}
           isRoleRevealed={isRoleRevealed}
@@ -160,7 +156,7 @@ export function GameView({
         <LocationGrid
           locations={game.allLocations}
           revealedLocation={revealedLocation}
-          prevLocationName={game.prevLocationName}
+          prevLocationName={game.isSpy ? null : game.prevLocationName}
           gameId={spyGameId}
           playerId={spyPlayerId}
         />

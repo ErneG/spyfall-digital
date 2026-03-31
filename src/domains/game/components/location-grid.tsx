@@ -17,7 +17,6 @@ import {
 
 import type { LocationInfo } from "@/domains/game/schema";
 
-
 interface LocationGridProps {
   locations: LocationInfo[];
   revealedLocation: string | null;
@@ -138,7 +137,9 @@ export const LocationGrid = memo(function LocationGrid({
   }, []);
 
   const handleGuess = useCallback(async () => {
-    if (!gameId || !playerId || !guessTarget) {return;}
+    if (!gameId || !playerId || !guessTarget) {
+      return;
+    }
     setIsGuessing(true);
     try {
       await endGame({ gameId, playerId, spyGuessLocationId: guessTarget.id });
@@ -179,7 +180,6 @@ export const LocationGrid = memo(function LocationGrid({
         <p className="mb-3 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
           <MapPin className="mr-1 inline h-3 w-3" />
           {t.locationGrid.title} ({locations.length})
-          {isSpy && <span className="ml-1 text-[#EF4444]">{t.locationGrid.tapToGuess}</span>}
         </p>
         <div className="grid grid-cols-2 gap-1.5">{locationButtons}</div>
       </div>

@@ -38,7 +38,9 @@ export const RoleCard = memo(function RoleCard({
 }) {
   const { t, translateLocation, translateRole } = useTranslation();
   return (
-    <div className={`rounded-2xl p-6 text-center ${isSpy ? "bg-[#EF4444]/12" : "bg-[#141414]"}`}>
+    <div
+      className={`rounded-2xl p-6 text-center ${isRoleRevealed && isSpy ? "bg-[#EF4444]/12" : "bg-[#141414]"}`}
+    >
       <button onClick={onToggle} className="w-full cursor-pointer space-y-3">
         {isRoleRevealed ? (
           <>

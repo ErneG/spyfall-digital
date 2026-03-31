@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
+import { AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useCallback, useMemo } from "react";
 
@@ -13,13 +13,12 @@ import {
 import { LocationGrid } from "@/domains/game/components/location-grid";
 import {
   PeekPlayerPicker,
-  PeekRevealCard,
   VoteHandoff,
   VotePicker,
 } from "@/domains/game/components/pass-and-play-parts";
 import { RevealScreen } from "@/domains/game/components/reveal-screen";
 import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
-import { useGameState, useTimer, fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
+import { useGameState, useTimer, fetchPlayerRole } from "@/domains/game/hooks";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
 import { Badge } from "@/shared/ui/badge";
@@ -64,16 +63,9 @@ export function PassAndPlayGameView({
 
   useExpiryBeep(isExpired);
 
-  const [phase, setPhase] = useState<"role-reveal" | "playing" | "peek" | "voting" | "spy-guess">(
+  const [phase, setPhase] = useState<"role-reveal" | "playing" | "voting" | "spy-guess">(
     "role-reveal",
   );
-
-  // Peek state
-  const [peekPlayer, setPeekPlayer] = useState<{ id: string; name: string } | null>(null);
-  const [peekRole, setPeekRole] = useState<PeekRole | null>(null);
-  const [isPeekRevealed, setIsPeekRevealed] = useState(false);
-  const [isPeekLoading, setIsPeekLoading] = useState(false);
-  const [hasPeekFetchError, setPeekFetchError] = useState(false);
 
   // Voting state
   const [voteIndex, setVoteIndex] = useState(0);
@@ -108,57 +100,10 @@ export function PassAndPlayGameView({
     endMutation.mutate();
   }, [endMutation]);
 
-  const handlePeek = useCallback(() => {
-    setPeekPlayer(null);
-    setPeekRole(null);
-    setIsPeekRevealed(false);
-    setPhase("peek");
-  }, []);
-
   const handleLeave = useCallback(() => {
     clearSession();
     router.push("/");
   }, [clearSession, router]);
-
-  const handleSelectPeekPlayer = useCallback((player: { id: string; name: string }) => {
-    setPeekPlayer(player);
-    setPeekRole(null);
-    setIsPeekRevealed(false);
-    setPeekFetchError(false);
-  }, []);
-
-  const peekReveal = useCallback(async () => {
-    if (!peekPlayer) {
-      return;
-    }
-    setIsPeekLoading(true);
-    setPeekFetchError(false);
-    const role = await fetchPlayerRole(gameId, peekPlayer.id);
-    if (role) {
-      setPeekRole(role);
-      setIsPeekRevealed(true);
-    } else {
-      setPeekFetchError(true);
-    }
-    setIsPeekLoading(false);
-  }, [gameId, peekPlayer]);
-
-  const handlePeekRevealClick = useCallback(() => {
-    void peekReveal();
-  }, [peekReveal]);
-
-  const handlePeekHide = useCallback(() => {
-    setIsPeekRevealed(false);
-    setPeekRole(null);
-    setPeekPlayer(null);
-  }, []);
-
-  const handlePeekBack = useCallback(() => {
-    setPeekPlayer(null);
-    setPeekRole(null);
-    setIsPeekRevealed(false);
-    setPhase("playing");
-  }, []);
 
   // ─── Spy guess handlers ──────────────────────────────────
 
@@ -178,7 +123,7 @@ export function PassAndPlayGameView({
       if (role?.isSpy) {
         setIsVerifiedSpy(true);
       } else {
-        setSpyVerifyError(`${player.name} is not the spy.`);
+        setSpyVerifyError("Incorrect guess. Try again.");
         setSpyGuessPlayer(null);
       }
     },
@@ -241,11 +186,6 @@ export function PassAndPlayGameView({
   const handlePlayAgain = useCallback(() => {
     // Reset all client state for new round
     setPhase("role-reveal");
-    setPeekPlayer(null);
-    setPeekRole(null);
-    setIsPeekRevealed(false);
-    setIsPeekLoading(false);
-    setPeekFetchError(false);
     setVoteIndex(0);
     setVoteStep("handoff");
     setIsVoting(false);
@@ -255,15 +195,14 @@ export function PassAndPlayGameView({
     restartMutation.mutate();
   }, [restartMutation]);
 
-  const spyBadges = useMemo(
+  const spyCountLabel = useMemo(
     () =>
-      hideSpyCount
-        ? null
-        : Array.from({ length: spyCount }, (_, i) => (
-            <Badge key={i} variant="destructive" className="text-xs">
-              <AlertTriangle className="mr-1 h-3 w-3" /> Spy
-            </Badge>
-          )),
+      hideSpyCount ? null : (
+        <p className="text-muted-foreground text-center text-xs">
+          <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
+          {spyCount === 1 ? "1 spy among you" : `${spyCount} spies among you`}
+        </p>
+      ),
     [hideSpyCount, spyCount],
   );
 
@@ -296,33 +235,6 @@ export function PassAndPlayGameView({
         onRestart={handlePlayAgain}
         onLeave={handleLeave}
       />
-    );
-  }
-
-  if (phase === "peek") {
-    return (
-      <main className="flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {!peekPlayer ? (
-            <PeekPlayerPicker
-              players={allPlayers}
-              onSelectPlayer={handleSelectPeekPlayer}
-              onBack={handlePeekBack}
-            />
-          ) : (
-            <PeekRevealCard
-              playerName={peekPlayer.name}
-              role={peekRole}
-              isRevealed={isPeekRevealed}
-              isLoading={isPeekLoading}
-              hasError={hasPeekFetchError}
-              onReveal={handlePeekRevealClick}
-              onHide={handlePeekHide}
-              onBack={handlePeekBack}
-            />
-          )}
-        </div>
-      </main>
     );
   }
 
@@ -400,7 +312,7 @@ export function PassAndPlayGameView({
           isHost
           onToggle={onTimerToggle}
         />
-        {spyBadges && <div className="flex justify-center gap-1">{spyBadges}</div>}
+        {spyCountLabel}
 
         <Card>
           <CardContent className="pt-4 pb-3">
@@ -416,10 +328,6 @@ export function PassAndPlayGameView({
             </div>
           </CardContent>
         </Card>
-
-        <Button variant="outline" className="h-12 w-full gap-2" onClick={handlePeek}>
-          <Eye className="h-4 w-4" /> {t.passAndPlay.peekAtRole}
-        </Button>
 
         {game && (
           <LocationGrid
