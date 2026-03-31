@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import { shuffle, assignRoles, type RoleAssignment } from "./logic";
+import { describe, it, expect } from "vitest";
+
+import { shuffle, assignRoles } from "./logic";
 
 // ─── shuffle ───────────────────────────────────────────────────
 
@@ -97,9 +98,7 @@ describe("assignRoles", () => {
 
   describe("with moderator pre-assignments", () => {
     it("respects pre-assigned spy role", () => {
-      const result = assignRoles(playerIds, roles, 1, [
-        { playerId: "p3", role: "SPY" },
-      ]);
+      const result = assignRoles(playerIds, roles, 1, [{ playerId: "p3", role: "SPY" }]);
       const p3 = result.find((r) => r.playerId === "p3");
       expect(p3?.isSpy).toBe(true);
       expect(p3?.role).toBe("SPY");
@@ -108,18 +107,14 @@ describe("assignRoles", () => {
     });
 
     it("respects pre-assigned non-spy role", () => {
-      const result = assignRoles(playerIds, roles, 1, [
-        { playerId: "p2", role: "Doctor" },
-      ]);
+      const result = assignRoles(playerIds, roles, 1, [{ playerId: "p2", role: "Doctor" }]);
       const p2 = result.find((r) => r.playerId === "p2");
       expect(p2?.role).toBe("Doctor");
       expect(p2?.isSpy).toBe(false);
     });
 
     it("reduces remaining spy slots when spy is pre-assigned", () => {
-      const result = assignRoles(playerIds, roles, 2, [
-        { playerId: "p1", role: "SPY" },
-      ]);
+      const result = assignRoles(playerIds, roles, 2, [{ playerId: "p1", role: "SPY" }]);
       const spies = result.filter((r) => r.isSpy);
       expect(spies).toHaveLength(2);
       expect(spies.some((s) => s.playerId === "p1")).toBe(true);

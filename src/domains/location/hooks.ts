@@ -1,7 +1,8 @@
 "use client";
 
-import type { LocationsResponse } from "@/domains/location/schema";
 import { getLocations } from "@/domains/location/actions";
+
+import type { LocationsResponse } from "@/domains/location/schema";
 
 export const locationKeys = {
   all: ["locations"] as const,
@@ -10,6 +11,6 @@ export const locationKeys = {
 
 export async function fetchLocations(roomCode: string): Promise<LocationsResponse | null> {
   const result = await getLocations(roomCode);
-  if (!result.success) return null;
+  if (!result.success) {return null;}
   return result.data;
 }

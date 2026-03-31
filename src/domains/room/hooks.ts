@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState, useCallback } from "react";
+
 import { roomEventSchema, type RoomEvent } from "@/domains/room/schema";
 
 // Re-export useSession from shared for backward compatibility
@@ -27,7 +28,7 @@ export function useRoomEvents(code: string | null) {
   const connectRef = useRef<() => void>(null);
 
   const connect = useCallback(() => {
-    if (!code) return;
+    if (!code) {return;}
 
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -66,7 +67,7 @@ export function useRoomEvents(code: string | null) {
     es.onerror = () => {
       setIsConnected(false);
       es.close();
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) {clearTimeout(reconnectTimeoutRef.current);}
       reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), RECONNECT_DELAY);
     };
   }, [code, queryClient]);
@@ -79,7 +80,7 @@ export function useRoomEvents(code: string | null) {
     connect();
     return () => {
       esRef.current?.close();
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) {clearTimeout(reconnectTimeoutRef.current);}
       setIsConnected(false);
     };
   }, [connect]);

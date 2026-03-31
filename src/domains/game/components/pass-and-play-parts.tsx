@@ -1,14 +1,17 @@
 "use client";
 
-import { memo, useCallback } from "react";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
 import {
   Eye, EyeOff, AlertTriangle, Shield, MapPin,
   Hand, ChevronRight,
 } from "lucide-react";
-import type { PeekRole } from "@/domains/game/hooks";
+import { memo, useCallback } from "react";
+
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+
+import type { PeekRole } from "@/domains/game/hooks";
+
 
 export type { PeekRole };
 

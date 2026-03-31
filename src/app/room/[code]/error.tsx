@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+
+import { Button } from "@/shared/ui/button";
+
 
 export default function RoomError({
   error,

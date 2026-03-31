@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
 import { Crown } from "lucide-react";
-import type { PlayerInfo } from "@/domains/room/schema";
+import React from "react";
+
 import { useTranslation } from "@/shared/i18n/context";
+
+import type { PlayerInfo } from "@/domains/room/schema";
+
 
 interface PlayerListProps {
   players: PlayerInfo[];

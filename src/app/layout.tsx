@@ -1,7 +1,9 @@
-import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "@/components/providers";
+
 import { LanguageToggle } from "@/components/language-toggle";
+import { Providers } from "@/components/providers";
+
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const geistSans = Geist({

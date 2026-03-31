@@ -1,6 +1,10 @@
 "use client";
 
+import { MapPin } from "lucide-react";
 import { memo, useState, useCallback, useMemo } from "react";
+
+import { endGame } from "@/domains/game/actions";
+import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -10,10 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { MapPin } from "lucide-react";
+
 import type { LocationInfo } from "@/domains/game/schema";
-import { endGame } from "@/domains/game/actions";
-import { useTranslation } from "@/shared/i18n/context";
+
 
 interface LocationGridProps {
   locations: LocationInfo[];
@@ -135,7 +138,7 @@ export const LocationGrid = memo(function LocationGrid({
   }, []);
 
   const handleGuess = useCallback(async () => {
-    if (!gameId || !playerId || !guessTarget) return;
+    if (!gameId || !playerId || !guessTarget) {return;}
     setIsGuessing(true);
     try {
       await endGame({ gameId, playerId, spyGuessLocationId: guessTarget.id });

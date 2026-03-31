@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback } from "react";
-import { Button } from "@/shared/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { useCallback } from "react";
+
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
 
 export default function Error({
   error,

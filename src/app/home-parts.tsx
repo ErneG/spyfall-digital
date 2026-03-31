@@ -1,18 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { useSession } from "@/shared/hooks/use-session";
-import { Label } from "@/shared/ui/label";
-import { Switch } from "@/shared/ui/switch";
-import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
-import { startGame } from "@/domains/game/actions";
-import { unwrapAction } from "@/shared/lib/unwrap-action";
-import { TIMER_PRESETS } from "@/domains/room/schema";
-import { MIN_PLAYERS, MAX_PLAYERS, DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import {
   Eye,
   EyeOff,
@@ -24,7 +12,20 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState, useCallback } from "react";
+
+import { startGame } from "@/domains/game/actions";
+import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
+import { TIMER_PRESETS } from "@/domains/room/schema";
+import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
+import { MIN_PLAYERS, MAX_PLAYERS, DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Switch } from "@/shared/ui/switch";
 
 const SPY_OPTIONS = [1, 2] as const;
 
@@ -560,13 +561,13 @@ export function useHomeState() {
   );
   const handleCreateKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") handleCreateClick();
+      if (event.key === "Enter") {handleCreateClick();}
     },
     [handleCreateClick],
   );
   const handleJoinKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") handleJoinClick();
+      if (event.key === "Enter") {handleJoinClick();}
     },
     [handleJoinClick],
   );

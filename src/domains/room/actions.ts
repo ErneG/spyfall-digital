@@ -1,7 +1,5 @@
 "use server";
 
-import { prisma } from "@/shared/lib/prisma";
-import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 import {
   createRoomInput,
   joinRoomInput,
@@ -13,8 +11,10 @@ import {
   type JoinRoomOutput,
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
-import { generateRoomCode } from "@/shared/lib/room-code";
 import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
+import { prisma } from "@/shared/lib/prisma";
+import { generateRoomCode } from "@/shared/lib/room-code";
+import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms
@@ -33,7 +33,7 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
     for (let attempt = 0; attempt < 10; attempt++) {
       code = generateRoomCode();
       const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) break;
+      if (!existing) {break;}
       if (attempt === 9) {
         return fail("Failed to generate unique room code");
       }
@@ -174,13 +174,13 @@ export async function updateRoomConfig(
 
     // Build update object from allowed fields
     const updateData: Record<string, unknown> = {};
-    if (config.timeLimit !== undefined) updateData.timeLimit = config.timeLimit;
-    if (config.spyCount !== undefined) updateData.spyCount = config.spyCount;
-    if (config.autoStartTimer !== undefined) updateData.autoStartTimer = config.autoStartTimer;
-    if (config.hideSpyCount !== undefined) updateData.hideSpyCount = config.hideSpyCount;
-    if (config.moderatorMode !== undefined) updateData.moderatorMode = config.moderatorMode;
+    if (config.timeLimit !== undefined) {updateData.timeLimit = config.timeLimit;}
+    if (config.spyCount !== undefined) {updateData.spyCount = config.spyCount;}
+    if (config.autoStartTimer !== undefined) {updateData.autoStartTimer = config.autoStartTimer;}
+    if (config.hideSpyCount !== undefined) {updateData.hideSpyCount = config.hideSpyCount;}
+    if (config.moderatorMode !== undefined) {updateData.moderatorMode = config.moderatorMode;}
     if (config.moderatorLocationId !== undefined)
-      updateData.moderatorLocationId = config.moderatorLocationId ?? null;
+      {updateData.moderatorLocationId = config.moderatorLocationId ?? null;}
 
     const updated = await prisma.room.update({
       where: { id: room.id },
@@ -221,8 +221,8 @@ export async function createPassAndPlayRoom(
     for (let attempt = 0; attempt < 10; attempt++) {
       code = generateRoomCode();
       const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) break;
-      if (attempt === 9) return fail("Failed to generate unique room code");
+      if (!existing) {break;}
+      if (attempt === 9) {return fail("Failed to generate unique room code");}
     }
 
     // Fetch all locations to auto-select them

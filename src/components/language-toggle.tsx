@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback } from "react";
-import { Button } from "@/shared/ui/button";
+
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
 
 export function LanguageToggle() {
   const { locale, setLocale } = useTranslation();

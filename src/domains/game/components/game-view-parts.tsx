@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, memo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/shared/ui/button";
+import { Eye, EyeOff, MapPin, Shield, AlertTriangle, Pause, Play } from "lucide-react";
+import { useEffect, useRef, memo } from "react";
+
+import { toggleTimer, endGame, restartGame } from "@/domains/game/actions";
 import { Timer } from "@/domains/game/components/timer";
 import { VotePanel } from "@/domains/game/components/vote-panel";
-import { Eye, EyeOff, MapPin, Shield, AlertTriangle, Pause, Play } from "lucide-react";
+import { gameKeys } from "@/domains/game/hooks";
+import { useTranslation } from "@/shared/i18n/context";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
+import { Button } from "@/shared/ui/button";
+
 import type { GameView as GameViewData } from "@/domains/game/schema";
 import type { PlayerInfo } from "@/shared/types/common";
-import { toggleTimer, endGame, restartGame } from "@/domains/game/actions";
-import { gameKeys } from "@/domains/game/hooks";
-import { unwrapAction } from "@/shared/lib/unwrap-action";
-import { useTranslation } from "@/shared/i18n/context";
 
 const BEEP_FREQUENCY = 800;
 const BEEP_VOLUME = 0.3;

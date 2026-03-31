@@ -1,5 +1,6 @@
-import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+
+import { PrismaClient } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -14,8 +15,8 @@ function createPrismaClient() {
 }
 
 export const prisma = new Proxy({} as PrismaClient, {
-  get(_target, prop) {
+  get(_target, property) {
     globalForPrisma.prisma ??= createPrismaClient();
-    return globalForPrisma.prisma[prop as keyof PrismaClient];
+    return globalForPrisma.prisma[property as keyof PrismaClient];
   },
 });

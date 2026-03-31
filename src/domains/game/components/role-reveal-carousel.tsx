@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback, memo } from "react";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
 import { Eye, AlertTriangle, Shield, MapPin, ChevronRight, Check } from "lucide-react";
+import { useState, useCallback, memo } from "react";
+
 import { fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
 
 type RevealStep = "handoff" | "ready" | "revealed";
 

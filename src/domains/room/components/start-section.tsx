@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/shared/ui/button";
+
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
 
 interface StartSectionProps {
   isHost: boolean;

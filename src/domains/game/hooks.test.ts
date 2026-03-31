@@ -1,15 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // We need to test useTimer which is a pure timer hook.
 // useGameState depends on react-query and server actions, so we skip it here.
 
-// Re-implement computeRemaining for test assertions (mirrors the logic in hooks.ts)
-function computeRemaining(startedAt: string | null, timeLimit: number): number {
-  if (!startedAt) return timeLimit;
-  const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
-  return Math.max(0, timeLimit - elapsed);
-}
+// computeRemaining reference removed — tests use useTimer hook directly
 
 // We need to mock the module imports to isolate useTimer
 vi.mock("@tanstack/react-query", () => ({

@@ -1,7 +1,14 @@
 "use client";
 
-import { memo, useState, useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Hand } from "lucide-react";
+import { memo, useState, useCallback, useMemo } from "react";
+
+
+import { castVote } from "@/domains/game/actions";
+import { gameKeys } from "@/domains/game/hooks";
+import { useTranslation } from "@/shared/i18n/context";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
@@ -12,12 +19,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/ui/dialog";
-import { Hand } from "lucide-react";
+
 import type { PlayerInfo } from "@/shared/types/common";
-import { castVote } from "@/domains/game/actions";
-import { gameKeys } from "@/domains/game/hooks";
-import { unwrapAction } from "@/shared/lib/unwrap-action";
-import { useTranslation } from "@/shared/i18n/context";
 
 interface VotePanelProps {
   players: PlayerInfo[];

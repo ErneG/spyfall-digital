@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
 import { Copy, Check, Wifi, WifiOff } from "lucide-react";
+import React from "react";
+
 import { useTranslation } from "@/shared/i18n/context";
 
 interface RoomCodeHeaderProps {

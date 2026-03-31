@@ -1,14 +1,15 @@
 "use client";
 
-import { memo, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Label } from "@/shared/ui/label";
-import { Switch } from "@/shared/ui/switch";
-import { TIMER_PRESETS, type RoomEvent } from "@/domains/room/schema";
+import { Settings, Clock, Eye, EyeOff, Shield, Timer } from "lucide-react";
+import { memo, useCallback } from "react";
+
 import { updateRoomConfig } from "@/domains/room/actions";
 import { roomKeys } from "@/domains/room/hooks";
-import { Settings, Clock, Eye, EyeOff, Shield, Timer } from "lucide-react";
+import { TIMER_PRESETS, type RoomEvent } from "@/domains/room/schema";
 import { useTranslation } from "@/shared/i18n/context";
+import { Label } from "@/shared/ui/label";
+import { Switch } from "@/shared/ui/switch";
 
 const SECONDS_PER_MINUTE = 60;
 const SPY_OPTIONS = [1, 2] as const;

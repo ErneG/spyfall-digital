@@ -1,14 +1,9 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { useGameState, useTimer } from "@/domains/game/hooks";
-import { useSession } from "@/shared/hooks/use-session";
-import { LocationGrid } from "@/domains/game/components/location-grid";
-import { RevealScreen } from "@/domains/game/components/reveal-screen";
 import { AlertTriangle, Clock } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { useTranslation } from "@/shared/i18n/context";
+import { useRouter } from "next/navigation";
+import { useState, useCallback, useMemo } from "react";
+
 import {
   RoleCard,
   PlayerList,
@@ -17,6 +12,12 @@ import {
   useExpiryBeep,
   useGameActions,
 } from "@/domains/game/components/game-view-parts";
+import { LocationGrid } from "@/domains/game/components/location-grid";
+import { RevealScreen } from "@/domains/game/components/reveal-screen";
+import { useGameState, useTimer } from "@/domains/game/hooks";
+import { useSession } from "@/shared/hooks/use-session";
+import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
 
 const REVEAL_PHASES = new Set(["REVEAL", "FINISHED"]);
 

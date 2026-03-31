@@ -1,11 +1,13 @@
 "use client";
 
+import { MapPin, Search, X, Plus, Trash2, Check } from "lucide-react";
 import { memo, useState, useEffect, useCallback, useMemo } from "react";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
+
+import { updateLocationSelections, createCustomLocation, updateCustomLocation, deleteCustomLocation } from "@/domains/location/actions";
+import { fetchLocations } from "@/domains/location/hooks";
+import { useTranslation } from "@/shared/i18n/context";
 import { Badge } from "@/shared/ui/badge";
-import { Separator } from "@/shared/ui/separator";
-import { Switch } from "@/shared/ui/switch";
+import { Button } from "@/shared/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,11 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
-import { MapPin, Search, X, Plus, Trash2, Check } from "lucide-react";
-import { updateLocationSelections, createCustomLocation, updateCustomLocation, deleteCustomLocation } from "@/domains/location/actions";
-import { fetchLocations } from "@/domains/location/hooks";
+import { Input } from "@/shared/ui/input";
+import { Separator } from "@/shared/ui/separator";
+import { Switch } from "@/shared/ui/switch";
+
 import type { LocationItem, CustomLocationItem } from "@/domains/location/schema";
-import { useTranslation } from "@/shared/i18n/context";
+
 
 interface LocationSettingsProps {
   open: boolean;

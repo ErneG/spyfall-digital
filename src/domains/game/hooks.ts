@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { type GameView } from "@/domains/game/schema";
+import { useEffect, useState, useCallback, useMemo } from "react";
+
 import { getGameState } from "@/domains/game/actions";
+import { type GameView } from "@/domains/game/schema";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 // ─── Query key factory ──────────────────────────────────────
@@ -32,7 +33,9 @@ export interface PeekRole {
 export async function fetchPlayerRole(gameId: string, playerId: string): Promise<PeekRole | null> {
   try {
     const result = await getGameState(gameId, playerId);
-    if (!result.success) return null;
+    if (!result.success) {
+      return null;
+    }
     return { myRole: result.data.myRole, isSpy: result.data.isSpy, location: result.data.location };
   } catch {
     return null;
@@ -49,6 +52,7 @@ export function useGameState(gameId: string | null, playerId: string | null) {
     refetch,
   } = useQuery({
     queryKey: gameKeys.state(gameId ?? "", playerId ?? ""),
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- guarded by enabled
     queryFn: () => fetchGameState(gameId!, playerId!),
     enabled: Boolean(gameId && playerId),
     refetchInterval: POLL_INTERVAL,
@@ -58,7 +62,9 @@ export function useGameState(gameId: string | null, playerId: string | null) {
 }
 
 function computeRemaining(startedAt: string | null, timeLimit: number): number {
-  if (!startedAt) return timeLimit;
+  if (!startedAt) {
+    return timeLimit;
+  }
   const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
   return Math.max(0, timeLimit - elapsed);
 }
@@ -68,14 +74,20 @@ export function useTimer(startedAt: string | null, timeLimit: number, running: b
   const [isExpired, setIsExpired] = useState(() => computeRemaining(startedAt, timeLimit) === 0);
 
   const tick = useCallback(() => {
-    if (!startedAt || !running) return;
+    if (!startedAt || !running) {
+      return;
+    }
     const left = computeRemaining(startedAt, timeLimit);
     setRemaining(left);
-    if (left === 0) setIsExpired(true);
+    if (left === 0) {
+      setIsExpired(true);
+    }
   }, [startedAt, timeLimit, running]);
 
   useEffect(() => {
-    if (!running) return;
+    if (!running) {
+      return;
+    }
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [tick, running]);

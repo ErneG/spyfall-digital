@@ -49,7 +49,7 @@ export function assignRoles(
   let remainingSpySlots = spyCount;
   for (const ma of moderatorAssignments) {
     const isSpy = ma.role === "SPY";
-    if (isSpy) remainingSpySlots--;
+    if (isSpy) {remainingSpySlots--;}
     result.push({ playerId: ma.playerId, role: ma.role, isSpy });
   }
 

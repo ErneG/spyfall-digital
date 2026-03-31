@@ -1,30 +1,31 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { Eye, AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Badge } from "@/shared/ui/badge";
-import { Separator } from "@/shared/ui/separator";
-import { useGameState, useTimer, fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
-import { useSession } from "@/shared/hooks/use-session";
-import { LocationGrid } from "@/domains/game/components/location-grid";
-import { RevealScreen } from "@/domains/game/components/reveal-screen";
-import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
+import { useState, useCallback, useMemo } from "react";
+
+import { castVote } from "@/domains/game/actions";
 import {
   TimerSection,
   useExpiryBeep,
   useGameActions,
 } from "@/domains/game/components/game-view-parts";
-import { castVote } from "@/domains/game/actions";
+import { LocationGrid } from "@/domains/game/components/location-grid";
 import {
   PeekPlayerPicker,
   PeekRevealCard,
   VoteHandoff,
   VotePicker,
 } from "@/domains/game/components/pass-and-play-parts";
-import { Eye, AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
+import { RevealScreen } from "@/domains/game/components/reveal-screen";
+import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
+import { useGameState, useTimer, fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
+import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Separator } from "@/shared/ui/separator";
 
 const REVEAL_PHASES = new Set(["REVEAL", "FINISHED"]);
 
@@ -41,8 +42,15 @@ interface PassAndPlayGameViewProps {
 }
 
 export function PassAndPlayGameView({
-  gameId, hostPlayerId, allPlayers, roomCode: _roomCode, timeLimit,
-  gameStartedAt, hideSpyCount, spyCount, isTimerRunning: initialTimerRunning,
+  gameId,
+  hostPlayerId,
+  allPlayers,
+  roomCode: _roomCode,
+  timeLimit,
+  gameStartedAt,
+  hideSpyCount,
+  spyCount,
+  isTimerRunning: initialTimerRunning,
 }: PassAndPlayGameViewProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -56,7 +64,9 @@ export function PassAndPlayGameView({
 
   useExpiryBeep(isExpired);
 
-  const [phase, setPhase] = useState<"role-reveal" | "playing" | "peek" | "voting" | "spy-guess">("role-reveal");
+  const [phase, setPhase] = useState<"role-reveal" | "playing" | "peek" | "voting" | "spy-guess">(
+    "role-reveal",
+  );
 
   // Peek state
   const [peekPlayer, setPeekPlayer] = useState<{ id: string; name: string } | null>(null);
@@ -94,7 +104,9 @@ export function PassAndPlayGameView({
     setPhase("voting");
   }, []);
 
-  const onEndGameClick = useCallback(() => { endMutation.mutate(); }, [endMutation]);
+  const onEndGameClick = useCallback(() => {
+    endMutation.mutate();
+  }, [endMutation]);
 
   const handlePeek = useCallback(() => {
     setPeekPlayer(null);
@@ -116,7 +128,9 @@ export function PassAndPlayGameView({
   }, []);
 
   const peekReveal = useCallback(async () => {
-    if (!peekPlayer) return;
+    if (!peekPlayer) {
+      return;
+    }
     setIsPeekLoading(true);
     setPeekFetchError(false);
     const role = await fetchPlayerRole(gameId, peekPlayer.id);
@@ -129,7 +143,9 @@ export function PassAndPlayGameView({
     setIsPeekLoading(false);
   }, [gameId, peekPlayer]);
 
-  const handlePeekRevealClick = useCallback(() => { void peekReveal(); }, [peekReveal]);
+  const handlePeekRevealClick = useCallback(() => {
+    void peekReveal();
+  }, [peekReveal]);
 
   const handlePeekHide = useCallback(() => {
     setIsPeekRevealed(false);
@@ -153,22 +169,28 @@ export function PassAndPlayGameView({
     setPhase("spy-guess");
   }, []);
 
-  const verifySpy = useCallback(async (player: { id: string; name: string }) => {
-    setSpyGuessPlayer(player);
-    setSpyVerifyError(null);
-    setIsVerifiedSpy(false);
-    const role = await fetchPlayerRole(gameId, player.id);
-    if (role?.isSpy) {
-      setIsVerifiedSpy(true);
-    } else {
-      setSpyVerifyError(`${player.name} is not the spy.`);
-      setSpyGuessPlayer(null);
-    }
-  }, [gameId]);
+  const verifySpy = useCallback(
+    async (player: { id: string; name: string }) => {
+      setSpyGuessPlayer(player);
+      setSpyVerifyError(null);
+      setIsVerifiedSpy(false);
+      const role = await fetchPlayerRole(gameId, player.id);
+      if (role?.isSpy) {
+        setIsVerifiedSpy(true);
+      } else {
+        setSpyVerifyError(`${player.name} is not the spy.`);
+        setSpyGuessPlayer(null);
+      }
+    },
+    [gameId],
+  );
 
-  const handleSelectSpyPlayer = useCallback((player: { id: string; name: string }) => {
-    void verifySpy(player);
-  }, [verifySpy]);
+  const handleSelectSpyPlayer = useCallback(
+    (player: { id: string; name: string }) => {
+      void verifySpy(player);
+    },
+    [verifySpy],
+  );
 
   const handleSpyGuessBack = useCallback(() => {
     setSpyGuessPlayer(null);
@@ -194,21 +216,27 @@ export function PassAndPlayGameView({
     setPhase("playing");
   }, []);
 
-  const submitVote = useCallback(async (suspectId: string) => {
-    setIsVoting(true);
-    await castVote({ gameId, voterId: currentVoter.id, suspectId });
-    if (voteIndex < allPlayers.length - 1) {
-      setVoteIndex((previous) => previous + 1);
-      setVoteStep("handoff");
-    } else {
-      setPhase("playing");
-    }
-    setIsVoting(false);
-  }, [gameId, currentVoter.id, voteIndex, allPlayers.length]);
+  const submitVote = useCallback(
+    async (suspectId: string) => {
+      setIsVoting(true);
+      await castVote({ gameId, voterId: currentVoter.id, suspectId });
+      if (voteIndex < allPlayers.length - 1) {
+        setVoteIndex((previous) => previous + 1);
+        setVoteStep("handoff");
+      } else {
+        setPhase("playing");
+      }
+      setIsVoting(false);
+    },
+    [gameId, currentVoter.id, voteIndex, allPlayers.length],
+  );
 
-  const handleCastVoteClick = useCallback((suspectId: string) => {
-    void submitVote(suspectId);
-  }, [submitVote]);
+  const handleCastVoteClick = useCallback(
+    (suspectId: string) => {
+      void submitVote(suspectId);
+    },
+    [submitVote],
+  );
 
   const handlePlayAgain = useCallback(() => {
     // Reset all client state for new round
@@ -228,9 +256,14 @@ export function PassAndPlayGameView({
   }, [restartMutation]);
 
   const spyBadges = useMemo(
-    () => hideSpyCount ? null : Array.from({ length: spyCount }, (_, i) => (
-      <Badge key={i} variant="destructive" className="text-xs"><AlertTriangle className="mr-1 h-3 w-3" /> Spy</Badge>
-    )),
+    () =>
+      hideSpyCount
+        ? null
+        : Array.from({ length: spyCount }, (_, i) => (
+            <Badge key={i} variant="destructive" className="text-xs">
+              <AlertTriangle className="mr-1 h-3 w-3" /> Spy
+            </Badge>
+          )),
     [hideSpyCount, spyCount],
   );
 
@@ -245,11 +278,25 @@ export function PassAndPlayGameView({
   }
 
   if (phase === "role-reveal") {
-    return <RoleRevealCarousel gameId={gameId} players={allPlayers} onComplete={handleRoleRevealComplete} />;
+    return (
+      <RoleRevealCarousel
+        gameId={gameId}
+        players={allPlayers}
+        onComplete={handleRoleRevealComplete}
+      />
+    );
   }
 
   if (shouldShowReveal && game) {
-    return <RevealScreen game={game} playerId={hostPlayerId} isHost onRestart={handlePlayAgain} onLeave={handleLeave} />;
+    return (
+      <RevealScreen
+        game={game}
+        playerId={hostPlayerId}
+        isHost
+        onRestart={handlePlayAgain}
+        onLeave={handleLeave}
+      />
+    );
   }
 
   if (phase === "peek") {
@@ -257,12 +304,21 @@ export function PassAndPlayGameView({
       <main className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-md">
           {!peekPlayer ? (
-            <PeekPlayerPicker players={allPlayers} onSelectPlayer={handleSelectPeekPlayer} onBack={handlePeekBack} />
+            <PeekPlayerPicker
+              players={allPlayers}
+              onSelectPlayer={handleSelectPeekPlayer}
+              onBack={handlePeekBack}
+            />
           ) : (
             <PeekRevealCard
-              playerName={peekPlayer.name} role={peekRole} isRevealed={isPeekRevealed}
-              isLoading={isPeekLoading} hasError={hasPeekFetchError}
-              onReveal={handlePeekRevealClick} onHide={handlePeekHide} onBack={handlePeekBack}
+              playerName={peekPlayer.name}
+              role={peekRole}
+              isRevealed={isPeekRevealed}
+              isLoading={isPeekLoading}
+              hasError={hasPeekFetchError}
+              onReveal={handlePeekRevealClick}
+              onHide={handlePeekHide}
+              onBack={handlePeekBack}
             />
           )}
         </div>
@@ -278,7 +334,9 @@ export function PassAndPlayGameView({
           {isShowingGrid ? (
             <div className="space-y-4">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground">{spyGuessPlayer.name}, {t.passAndPlay.spyTapToGuess}</p>
+                <p className="text-muted-foreground text-sm">
+                  {spyGuessPlayer.name}, {t.passAndPlay.spyTapToGuess}
+                </p>
               </div>
               <LocationGrid
                 locations={game.allLocations}
@@ -287,7 +345,9 @@ export function PassAndPlayGameView({
                 gameId={gameId}
                 playerId={spyGuessPlayer.id}
               />
-              <Button variant="ghost" className="w-full" onClick={handleSpyGuessBack}>{t.common.cancel}</Button>
+              <Button variant="ghost" className="w-full" onClick={handleSpyGuessBack}>
+                {t.common.cancel}
+              </Button>
             </div>
           ) : (
             <PeekPlayerPicker
@@ -308,13 +368,22 @@ export function PassAndPlayGameView({
     return (
       <main className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-md space-y-4">
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-center text-sm">
             {t.passAndPlay.voteNofM} {voteIndex + 1} of {allPlayers.length}
           </div>
           {voteStep === "handoff" ? (
-            <VoteHandoff playerName={currentVoter.name} onReady={handleVoteReady} onCancel={handleCancelVoting} />
+            <VoteHandoff
+              playerName={currentVoter.name}
+              onReady={handleVoteReady}
+              onCancel={handleCancelVoting}
+            />
           ) : (
-            <VotePicker voterName={currentVoter.name} candidates={voteCandidates} isVoting={isVoting} onVote={handleCastVoteClick} />
+            <VotePicker
+              voterName={currentVoter.name}
+              candidates={voteCandidates}
+              isVoting={isVoting}
+              onVote={handleCastVoteClick}
+            />
           )}
         </div>
       </main>
@@ -324,21 +393,31 @@ export function PassAndPlayGameView({
   return (
     <main className="flex flex-1 flex-col items-center p-4 pb-24">
       <div className="w-full max-w-md space-y-4">
-        <TimerSection display={display} isExpired={isExpired} isTimerRunning={isTimerRunning} isHost onToggle={onTimerToggle} />
+        <TimerSection
+          display={display}
+          isExpired={isExpired}
+          isTimerRunning={isTimerRunning}
+          isHost
+          onToggle={onTimerToggle}
+        />
         {spyBadges && <div className="flex justify-center gap-1">{spyBadges}</div>}
 
         <Card>
           <CardContent className="pt-4 pb-3">
-            <p className="text-xs text-muted-foreground mb-2">{t.players.title} ({allPlayers.length})</p>
+            <p className="text-muted-foreground mb-2 text-xs">
+              {t.players.title} ({allPlayers.length})
+            </p>
             <div className="flex flex-wrap gap-1.5">
               {allPlayers.map((p) => (
-                <Badge key={p.id} variant="secondary">{p.name}</Badge>
+                <Badge key={p.id} variant="secondary">
+                  {p.name}
+                </Badge>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <Button variant="outline" className="w-full h-12 gap-2" onClick={handlePeek}>
+        <Button variant="outline" className="h-12 w-full gap-2" onClick={handlePeek}>
           <Eye className="h-4 w-4" /> {t.passAndPlay.peekAtRole}
         </Button>
 
@@ -352,12 +431,21 @@ export function PassAndPlayGameView({
 
         <Separator />
 
-        <Button variant="outline" className="w-full h-12 gap-2 border-destructive/50 text-destructive" onClick={handleStartSpyGuess}>
+        <Button
+          variant="outline"
+          className="border-destructive/50 text-destructive h-12 w-full gap-2"
+          onClick={handleStartSpyGuess}
+        >
           <Crosshair className="h-4 w-4" /> {t.passAndPlay.spyGuessLocation}
         </Button>
 
         <div className="flex gap-2">
-          <Button variant="destructive" className="flex-1" onClick={onEndGameClick} disabled={endMutation.isPending}>
+          <Button
+            variant="destructive"
+            className="flex-1"
+            onClick={onEndGameClick}
+            disabled={endMutation.isPending}
+          >
             {endMutation.isPending ? t.game.ending : t.game.endGame}
           </Button>
           <Button variant="outline" className="flex-1 gap-2" onClick={handleStartVoting}>
@@ -365,7 +453,11 @@ export function PassAndPlayGameView({
           </Button>
         </div>
 
-        <Button variant="ghost" className="w-full text-muted-foreground gap-2" onClick={handleLeave}>
+        <Button
+          variant="ghost"
+          className="text-muted-foreground w-full gap-2"
+          onClick={handleLeave}
+        >
           <LogOut className="h-4 w-4" /> {t.game.leaveGame}
         </Button>
       </div>

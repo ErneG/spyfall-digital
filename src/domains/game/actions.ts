@@ -1,5 +1,6 @@
 "use server";
 
+import { assignRoles, MIN_PLAYERS, shuffle } from "@/domains/game/logic";
 import {
   startGameInput,
   castVoteInput,
@@ -9,9 +10,8 @@ import {
   type StartGameOutput,
   type GameView,
 } from "@/domains/game/schema";
-import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 import { prisma } from "@/shared/lib/prisma";
-import { assignRoles, MIN_PLAYERS, shuffle } from "@/domains/game/logic";
+import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -135,8 +135,8 @@ export async function startGame(input: unknown): Promise<ActionResult<StartGameO
       },
     });
 
-    if (!room) return fail("Room not found");
-    if (room.hostId !== playerId) return fail("Only the host can start");
+    if (!room) {return fail("Room not found");}
+    if (room.hostId !== playerId) {return fail("Only the host can start");}
     if (room.players.length < MIN_PLAYERS) {
       return fail(`Need at least ${MIN_PLAYERS} players`);
     }
@@ -238,7 +238,7 @@ export async function castVote(
       },
     });
 
-    if (!game) return fail("Game not found");
+    if (!game) {return fail("Game not found");}
 
     if (game.state !== "PLAYING" && game.state !== "VOTING") {
       return fail("Voting is not allowed in this phase");
@@ -317,14 +317,14 @@ export async function endGame(input: unknown): Promise<
       },
     });
 
-    if (!game) return fail("Game not found");
+    if (!game) {return fail("Game not found");}
 
     if (game.state !== "PLAYING" && game.state !== "VOTING") {
       return fail("Game is not active");
     }
 
     const assignment = game.assignments.find((a) => a.playerId === playerId);
-    if (!assignment) return fail("Player not in this game");
+    if (!assignment) {return fail("Player not in this game");}
 
     // Spy guessing location
     if (spyGuessLocationId && assignment.isSpy) {
@@ -385,8 +385,8 @@ export async function restartGame(input: unknown): Promise<ActionResult<{ succes
       include: { room: true },
     });
 
-    if (!game) return fail("Game not found");
-    if (game.room.hostId !== playerId) return fail("Only the host can restart");
+    if (!game) {return fail("Game not found");}
+    if (game.room.hostId !== playerId) {return fail("Only the host can restart");}
 
     await prisma.$transaction([
       prisma.game.update({
@@ -433,10 +433,10 @@ export async function getGameState(
       },
     });
 
-    if (!game) return fail("Game not found");
+    if (!game) {return fail("Game not found");}
 
     const myAssignment = game.assignments.find((a) => a.playerId === playerId);
-    if (!myAssignment) return fail("Player not in this game");
+    if (!myAssignment) {return fail("Player not in this game");}
 
     const [combinedLocations, previousLocation] = await Promise.all([
       fetchCombinedLocations(game.roomId),
@@ -503,7 +503,7 @@ export async function toggleTimer(
       include: { room: true },
     });
 
-    if (!game) return fail("Game not found");
+    if (!game) {return fail("Game not found");}
     if (game.room.hostId !== playerId) {
       return fail("Only the host can control the timer");
     }

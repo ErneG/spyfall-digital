@@ -1,8 +1,7 @@
 "use server";
 
 import { z } from "zod/v4";
-import { prisma } from "@/shared/lib/prisma";
-import { ok, fail, type ActionResult } from "@/shared/types/action-result";
+
 import {
   updateLocationsInput,
   createCustomLocationInput,
@@ -11,6 +10,8 @@ import {
   type CustomLocationItem,
   type LocationsResponse,
 } from "@/domains/location/schema";
+import { prisma } from "@/shared/lib/prisma";
+import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 
 const codeField = z.object({ code: z.string().min(1) });
 
@@ -36,9 +37,9 @@ export async function updateLocationSelections(
     const room = await prisma.room.findUnique({
       where: { code: code.toUpperCase() },
     });
-    if (!room) return fail("Room not found");
-    if (room.hostId !== playerId) return fail("Host only");
-    if (room.state !== "LOBBY") return fail("Game in progress");
+    if (!room) {return fail("Room not found");}
+    if (room.hostId !== playerId) {return fail("Host only");}
+    if (room.state !== "LOBBY") {return fail("Game in progress");}
 
     await prisma.$transaction([
       prisma.roomLocation.deleteMany({ where: { roomId: room.id } }),
@@ -74,8 +75,8 @@ export async function createCustomLocation(
     const room = await prisma.room.findUnique({
       where: { code: code.toUpperCase() },
     });
-    if (!room) return fail("Room not found");
-    if (room.hostId !== playerId) return fail("Host only");
+    if (!room) {return fail("Room not found");}
+    if (room.hostId !== playerId) {return fail("Host only");}
 
     const customLocation = await prisma.customLocation.create({
       data: {
@@ -127,13 +128,13 @@ export async function updateCustomLocation(
     const room = await prisma.room.findUnique({
       where: { code: code.toUpperCase() },
     });
-    if (!room) return fail("Room not found");
-    if (room.hostId !== playerId) return fail("Host only");
+    if (!room) {return fail("Room not found");}
+    if (room.hostId !== playerId) {return fail("Host only");}
 
     const updateData: Record<string, unknown> = {};
-    if (name !== undefined) updateData.name = name;
-    if (isAllSpies !== undefined) updateData.allSpies = isAllSpies;
-    if (isSelected !== undefined) updateData.selected = isSelected;
+    if (name !== undefined) {updateData.name = name;}
+    if (isAllSpies !== undefined) {updateData.allSpies = isAllSpies;}
+    if (isSelected !== undefined) {updateData.selected = isSelected;}
 
     await prisma.$transaction(async (tx) => {
       await tx.customLocation.update({
@@ -165,7 +166,7 @@ export async function updateCustomLocation(
 // Replaces GET /api/rooms/[code]/locations
 
 export async function getLocations(roomCode: string): Promise<ActionResult<LocationsResponse>> {
-  if (!roomCode) return fail("Room code is required");
+  if (!roomCode) {return fail("Room code is required");}
 
   try {
     const room = await prisma.room.findUnique({
@@ -178,7 +179,7 @@ export async function getLocations(roomCode: string): Promise<ActionResult<Locat
       },
     });
 
-    if (!room) return fail("Room not found");
+    if (!room) {return fail("Room not found");}
 
     const allLocations = await prisma.location.findMany({
       select: { id: true, name: true, edition: true },
@@ -223,8 +224,8 @@ export async function deleteCustomLocation(
     const room = await prisma.room.findUnique({
       where: { code: code.toUpperCase() },
     });
-    if (!room) return fail("Room not found");
-    if (room.hostId !== playerId) return fail("Host only");
+    if (!room) {return fail("Room not found");}
+    if (room.hostId !== playerId) {return fail("Host only");}
 
     await prisma.customLocation.delete({ where: { id: locationId } });
 

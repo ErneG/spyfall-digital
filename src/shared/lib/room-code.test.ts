@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { generateRoomCode } from "./room-code";
 
 const AMBIGUOUS_CHARS = ["0", "O", "1", "I"];

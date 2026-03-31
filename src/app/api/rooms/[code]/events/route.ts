@@ -15,7 +15,7 @@ export async function GET(
   const stream = new ReadableStream({
     start(controller) {
       const send = (data: unknown) => {
-        if (isClosed) return;
+        if (isClosed) {return;}
         try {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         } catch {

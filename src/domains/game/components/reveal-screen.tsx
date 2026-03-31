@@ -1,10 +1,13 @@
 "use client";
 
-import { memo, useMemo } from "react";
-import { Button } from "@/shared/ui/button";
 import { MapPin, AlertTriangle, Trophy, RotateCcw, LogOut } from "lucide-react";
-import type { GameView } from "@/domains/game/schema";
+import { memo, useMemo } from "react";
+
 import { useTranslation } from "@/shared/i18n/context";
+import { Button } from "@/shared/ui/button";
+
+import type { GameView } from "@/domains/game/schema";
+
 
 interface RevealScreenProps {
   game: GameView;
