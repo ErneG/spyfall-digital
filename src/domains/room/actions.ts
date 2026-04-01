@@ -9,6 +9,8 @@ import {
   type CreateRoomOutput,
   type JoinRoomInput,
   type JoinRoomOutput,
+  type UpdateRoomConfigInput,
+  type UpdateRoomConfigOutput,
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
 import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
@@ -33,7 +35,9 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
     for (let attempt = 0; attempt < 10; attempt++) {
       code = generateRoomCode();
       const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) {break;}
+      if (!existing) {
+        break;
+      }
       if (attempt === 9) {
         return fail("Failed to generate unique room code");
       }
@@ -129,31 +133,15 @@ export async function joinRoom(input: JoinRoomInput): Promise<ActionResult<JoinR
 // ─── updateRoomConfig ──────────────────────────────────────
 // Replaces PATCH /api/rooms/[code]/config
 
-type UpdateRoomConfigOutput = {
-  timeLimit: number;
-  spyCount: number;
-  autoStartTimer: boolean;
-  hideSpyCount: boolean;
-  moderatorMode: boolean;
-  moderatorLocationId: string | null;
-};
-
 export async function updateRoomConfig(
-  input: { roomCode: string } & Record<string, unknown>,
+  input: UpdateRoomConfigInput,
 ): Promise<ActionResult<UpdateRoomConfigOutput>> {
-  // Validate the config fields (excluding roomCode which is routing info)
-  const { roomCode, ...rest } = input;
-
-  if (!roomCode || typeof roomCode !== "string" || roomCode.length !== 5) {
-    return fail("Invalid room code");
-  }
-
-  const parsed = updateRoomConfigInput.safeParse(rest);
+  const parsed = updateRoomConfigInput.safeParse(input);
   if (!parsed.success) {
     return fail(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const { playerId, ...config } = parsed.data;
+  const { roomCode, playerId, ...config } = parsed.data;
 
   try {
     const room = await prisma.room.findUnique({
@@ -172,19 +160,18 @@ export async function updateRoomConfig(
       return fail("Cannot change settings during a game");
     }
 
-    // Build update object from allowed fields
-    const updateData: Record<string, unknown> = {};
-    if (config.timeLimit !== undefined) {updateData.timeLimit = config.timeLimit;}
-    if (config.spyCount !== undefined) {updateData.spyCount = config.spyCount;}
-    if (config.autoStartTimer !== undefined) {updateData.autoStartTimer = config.autoStartTimer;}
-    if (config.hideSpyCount !== undefined) {updateData.hideSpyCount = config.hideSpyCount;}
-    if (config.moderatorMode !== undefined) {updateData.moderatorMode = config.moderatorMode;}
-    if (config.moderatorLocationId !== undefined)
-      {updateData.moderatorLocationId = config.moderatorLocationId ?? null;}
-
     const updated = await prisma.room.update({
       where: { id: room.id },
-      data: updateData,
+      data: {
+        ...(config.timeLimit !== undefined && { timeLimit: config.timeLimit }),
+        ...(config.spyCount !== undefined && { spyCount: config.spyCount }),
+        ...(config.autoStartTimer !== undefined && { autoStartTimer: config.autoStartTimer }),
+        ...(config.hideSpyCount !== undefined && { hideSpyCount: config.hideSpyCount }),
+        ...(config.moderatorMode !== undefined && { moderatorMode: config.moderatorMode }),
+        ...(config.moderatorLocationId !== undefined && {
+          moderatorLocationId: config.moderatorLocationId ?? null,
+        }),
+      },
     });
 
     return ok({
@@ -221,8 +208,12 @@ export async function createPassAndPlayRoom(
     for (let attempt = 0; attempt < 10; attempt++) {
       code = generateRoomCode();
       const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) {break;}
-      if (attempt === 9) {return fail("Failed to generate unique room code");}
+      if (!existing) {
+        break;
+      }
+      if (attempt === 9) {
+        return fail("Failed to generate unique room code");
+      }
     }
 
     // Fetch all locations to auto-select them

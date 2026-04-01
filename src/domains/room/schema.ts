@@ -23,6 +23,7 @@ export const joinRoomInput = z.object({
 export type JoinRoomInput = z.infer<typeof joinRoomInput>;
 
 export const updateRoomConfigInput = z.object({
+  roomCode: z.string().length(5),
   playerId: z.string().min(1),
   timeLimit: z.number().int().min(360).max(600).optional(),
   spyCount: z.number().int().min(1).max(2).optional(),
@@ -32,6 +33,16 @@ export const updateRoomConfigInput = z.object({
   moderatorLocationId: z.string().nullable().optional(),
 });
 export type UpdateRoomConfigInput = z.infer<typeof updateRoomConfigInput>;
+
+export const updateRoomConfigOutput = z.object({
+  timeLimit: z.number(),
+  spyCount: z.number(),
+  autoStartTimer: z.boolean(),
+  hideSpyCount: z.boolean(),
+  moderatorMode: z.boolean(),
+  moderatorLocationId: z.string().nullable(),
+});
+export type UpdateRoomConfigOutput = z.infer<typeof updateRoomConfigOutput>;
 
 // ─── Output schemas (for responses) ─────────────────────────
 

@@ -117,13 +117,8 @@ describe("joinRoomInput", () => {
   });
 
   it("rejects room code that is not 5 chars", () => {
-    expect(
-      joinRoomInput.safeParse({ playerName: "Bob", roomCode: "ABC" }).success,
-    ).toBe(false);
-    expect(
-      joinRoomInput.safeParse({ playerName: "Bob", roomCode: "ABCDEF" })
-        .success,
-    ).toBe(false);
+    expect(joinRoomInput.safeParse({ playerName: "Bob", roomCode: "ABC" }).success).toBe(false);
+    expect(joinRoomInput.safeParse({ playerName: "Bob", roomCode: "ABCDEF" }).success).toBe(false);
   });
 
   it("rejects empty playerName", () => {
@@ -146,13 +141,14 @@ describe("joinRoomInput", () => {
 // ─── updateRoomConfigInput ─────────────────────────────────────
 
 describe("updateRoomConfigInput", () => {
-  it("accepts minimal input (playerId only)", () => {
-    const result = updateRoomConfigInput.safeParse({ playerId: "p1" });
+  it("accepts minimal input (roomCode + playerId only)", () => {
+    const result = updateRoomConfigInput.safeParse({ roomCode: "ABCDE", playerId: "p1" });
     expect(result.success).toBe(true);
   });
 
   it("accepts all optional fields", () => {
     const result = updateRoomConfigInput.safeParse({
+      roomCode: "ABCDE",
       playerId: "p1",
       timeLimit: 420,
       spyCount: 2,
@@ -165,7 +161,7 @@ describe("updateRoomConfigInput", () => {
   });
 
   it("rejects empty playerId", () => {
-    const result = updateRoomConfigInput.safeParse({ playerId: "" });
+    const result = updateRoomConfigInput.safeParse({ roomCode: "ABCDE", playerId: "" });
     expect(result.success).toBe(false);
   });
 });
