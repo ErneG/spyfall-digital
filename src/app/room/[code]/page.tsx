@@ -31,7 +31,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           roomCode={code}
           timeLimit={room.timeLimit}
           gameStartedAt={room.gameStartedAt}
-          hideSpyCount={room.hideSpyCount}
+          shouldHideSpyCount={room.hideSpyCount}
           spyCount={room.spyCount}
           isTimerRunning={room.timerRunning}
         />

@@ -1,40 +1,16 @@
 "use client";
 
 import { Eye, EyeOff, Clock } from "lucide-react";
-import React, { useCallback } from "react";
+import React from "react";
 
 import { TIMER_PRESETS } from "@/domains/room/schema";
 import { useTranslation } from "@/shared/i18n/context";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 
+import { PnPPresetButton } from "./game-config-section-parts";
+
 const SPY_OPTIONS = [1, 2] as const;
-
-/* ── Preset button ───────────────────────────────────── */
-
-const PnPPresetButton = React.memo(function PnPPresetButton({
-  label,
-  value,
-  isSelected,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  isSelected: boolean;
-  onClick: (value: number) => void;
-}) {
-  const handleClick = useCallback(() => onClick(value), [onClick, value]);
-  return (
-    <button
-      onClick={handleClick}
-      className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-        isSelected ? "bg-white text-black" : "bg-[#141414] text-[#8E8E93] hover:bg-[#1C1C1E]"
-      }`}
-    >
-      {label}
-    </button>
-  );
-});
 
 /* ── Config section ──────────────────────────────────── */
 
