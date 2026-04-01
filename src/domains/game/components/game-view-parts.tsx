@@ -1,27 +1,61 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeOff, MapPin, Shield, AlertTriangle, Pause, Play } from "lucide-react";
-import { useEffect, useRef, memo } from "react";
+import { memo } from "react";
 
-import { toggleTimer, endGame, restartGame } from "@/domains/game/actions";
 import { Timer } from "@/domains/game/components/timer";
 import { VotePanel } from "@/domains/game/components/vote-panel";
-import { gameKeys } from "@/domains/game/hooks";
 import { useTranslation } from "@/shared/i18n/context";
-import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { Button } from "@/shared/ui/button";
 
 import type { GameView as GameViewData } from "@/domains/game/schema";
 import type { PlayerInfo } from "@/shared/types/common";
 
-const BEEP_FREQUENCY = 800;
-const BEEP_VOLUME = 0.3;
-const BEEP_GAP = 0.3;
-const BEEP_DURATION = 0.15;
-const BEEP_COUNT = 2;
+const NAME_TRUNCATE_LENGTH = 6;
 
 /* ── Sub-components ───────────────────────────────────── */
+
+const SpyRole = memo(function SpyRole({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
+  return (
+    <div className="space-y-2">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EF4444]/12">
+        <AlertTriangle className="h-6 w-6 text-[#EF4444]" />
+      </div>
+      <p className="text-2xl font-bold text-[#EF4444]">{t.game.youAreTheSpy}</p>
+      <p className="text-[13px] text-[#8E8E93]">{t.game.spyHint}</p>
+    </div>
+  );
+});
+
+const AgentRole = memo(function AgentRole({
+  location,
+  myRole,
+  t,
+  translateLocation,
+  translateRole,
+}: {
+  location: string | null;
+  myRole: string | null;
+  t: ReturnType<typeof useTranslation>["t"];
+  translateLocation: ReturnType<typeof useTranslation>["translateLocation"];
+  translateRole: ReturnType<typeof useTranslation>["translateRole"];
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#8B5CF6]/12">
+        <Shield className="h-6 w-6 text-[#8B5CF6]" />
+      </div>
+      <div className="flex items-center justify-center gap-2">
+        <MapPin className="h-4 w-4 text-[#48484A]" />
+        <p className="text-lg font-bold">{location ? translateLocation(location) : location}</p>
+      </div>
+      <p className="text-[13px] text-[#8E8E93]">
+        {t.game.yourRole}{" "}
+        <span className="font-semibold text-white">{myRole ? translateRole(myRole) : myRole}</span>
+      </p>
+    </div>
+  );
+});
 
 export const RoleCard = memo(function RoleCard({
   isSpy,
@@ -45,31 +79,15 @@ export const RoleCard = memo(function RoleCard({
         {isRoleRevealed ? (
           <>
             {isSpy ? (
-              <div className="space-y-2">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EF4444]/12">
-                  <AlertTriangle className="h-6 w-6 text-[#EF4444]" />
-                </div>
-                <p className="text-2xl font-bold text-[#EF4444]">{t.game.youAreTheSpy}</p>
-                <p className="text-[13px] text-[#8E8E93]">{t.game.spyHint}</p>
-              </div>
+              <SpyRole t={t} />
             ) : (
-              <div className="space-y-2">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#8B5CF6]/12">
-                  <Shield className="h-6 w-6 text-[#8B5CF6]" />
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <MapPin className="h-4 w-4 text-[#48484A]" />
-                  <p className="text-lg font-bold">
-                    {location ? translateLocation(location) : location}
-                  </p>
-                </div>
-                <p className="text-[13px] text-[#8E8E93]">
-                  {t.game.yourRole}{" "}
-                  <span className="font-semibold text-white">
-                    {myRole ? translateRole(myRole) : myRole}
-                  </span>
-                </p>
-              </div>
+              <AgentRole
+                location={location}
+                myRole={myRole}
+                t={t}
+                translateLocation={translateLocation}
+                translateRole={translateRole}
+              />
             )}
             <p className="mt-3 flex items-center justify-center gap-1 text-xs text-[#48484A]">
               <EyeOff className="h-3 w-3" /> {t.game.tapToHide}
@@ -114,7 +132,9 @@ export const PlayerList = memo(function PlayerList({
             <span
               className={`text-[11px] ${p.id === currentPlayerId ? "text-[#8B5CF6]" : "text-[#8E8E93]"}`}
             >
-              {p.name.length > 6 ? `${p.name.slice(0, 6)}...` : p.name}
+              {p.name.length > NAME_TRUNCATE_LENGTH
+                ? `${p.name.slice(0, NAME_TRUNCATE_LENGTH)}...`
+                : p.name}
             </span>
           </div>
         ))}
@@ -189,56 +209,4 @@ export const GameActions = memo(function GameActions({
   );
 });
 
-/* ── Hooks ────────────────────────────────────────────── */
-
-export function useExpiryBeep(isExpired: boolean) {
-  const hasBeeped = useRef(false);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
-  useEffect(() => {
-    if (isExpired && !hasBeeped.current) {
-      hasBeeped.current = true;
-      try {
-        audioCtxRef.current ??= new AudioContext();
-        const ctx = audioCtxRef.current;
-        for (let i = 0; i < BEEP_COUNT; i++) {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.frequency.value = BEEP_FREQUENCY;
-          gain.gain.value = BEEP_VOLUME;
-          osc.start(ctx.currentTime + i * BEEP_GAP);
-          osc.stop(ctx.currentTime + i * BEEP_GAP + BEEP_DURATION);
-        }
-      } catch {
-        // Audio not available
-      }
-    }
-  }, [isExpired]);
-}
-
-export function useGameActions(gameId: string, playerId: string) {
-  const queryClient = useQueryClient();
-  const queryKey = gameKeys.state(gameId, playerId);
-
-  const timerMutation = useMutation({
-    mutationFn: (isCurrentlyRunning: boolean) =>
-      toggleTimer({ gameId, playerId, action: isCurrentlyRunning ? "pause" : "resume" }).then(
-        unwrapAction,
-      ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
-  });
-
-  const endMutation = useMutation({
-    mutationFn: () => endGame({ gameId, playerId }).then(unwrapAction),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
-  });
-
-  const restartMutation = useMutation({
-    mutationFn: () => restartGame({ gameId, playerId }).then(unwrapAction),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
-  });
-
-  return { timerMutation, endMutation, restartMutation };
-}
+export { useExpiryBeep, useGameActions } from "./use-game-actions";

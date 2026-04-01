@@ -19,7 +19,7 @@ type Translations = ReturnType<typeof useTranslation>["t"];
 interface PlayingPhaseProps {
   state: HookState;
   allPlayers: Array<{ id: string; name: string }>;
-  hideSpyCount: boolean;
+  shouldHideSpyCount: boolean;
   spyCount: number;
   t: Translations;
 }
@@ -27,19 +27,19 @@ interface PlayingPhaseProps {
 export const PlayingPhase = memo(function PlayingPhase({
   state,
   allPlayers,
-  hideSpyCount,
+  shouldHideSpyCount,
   spyCount,
   t,
 }: PlayingPhaseProps) {
   const spyCountLabel = useMemo(
     () =>
-      hideSpyCount ? null : (
+      shouldHideSpyCount ? null : (
         <p className="text-muted-foreground text-center text-xs">
           <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
           {spyCount === 1 ? "1 spy among you" : `${spyCount} spies among you`}
         </p>
       ),
-    [hideSpyCount, spyCount],
+    [shouldHideSpyCount, spyCount],
   );
 
   return (
