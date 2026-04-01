@@ -12,6 +12,7 @@ import promise from "eslint-plugin-promise";
 import importX from "eslint-plugin-import-x";
 // eslint-plugin-jsx-a11y loaded by eslint-config-next (no explicit import needed)
 import reactPerf from "eslint-plugin-react-perf";
+import reactPlugin from "eslint-plugin-react";
 import queryPlugin from "@tanstack/eslint-plugin-query";
 
 const eslintConfig = defineConfig([
@@ -208,7 +209,7 @@ const eslintConfig = defineConfig([
     plugins: { sonarjs },
     rules: {
       // ── Cognitive complexity ──
-      "sonarjs/cognitive-complexity": ["warn", 15],
+      "sonarjs/cognitive-complexity": ["error", 15],
 
       // ── No identical functions (DRY) ──
       "sonarjs/no-identical-functions": "warn",
@@ -431,6 +432,7 @@ const eslintConfig = defineConfig([
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   {
     files: ["src/**/*.tsx"],
+    plugins: { react: reactPlugin },
     rules: {
       "react/jsx-key": ["error", { checkFragmentShorthand: true }],
       "react/no-array-index-key": "warn",
@@ -448,6 +450,10 @@ const eslintConfig = defineConfig([
       "react/no-string-refs": "error",
       "react/no-find-dom-node": "error",
 
+      // ── One component per file — keeps files focused ──
+      // Use -parts.tsx, -sections.tsx, -phases.tsx for multi-component files
+      "react/no-multi-comp": ["error", { ignoreStateless: false }],
+
       // ── React hooks rules — STRICT (error, not warn) ──
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",
@@ -455,6 +461,19 @@ const eslintConfig = defineConfig([
       "react/no-direct-mutation-state": "error",
       "react/no-unknown-property": "error",
       "react/display-name": "warn",
+    },
+  },
+
+  // ── Parts/sections files — allowed multiple components (subcomponent collections) ──
+  {
+    files: [
+      "src/**/*-parts.tsx",
+      "src/**/*-sections.tsx",
+      "src/**/*-phases.tsx",
+      "src/**/*-playing.tsx",
+    ],
+    rules: {
+      "react/no-multi-comp": "off",
     },
   },
 
@@ -471,17 +490,18 @@ const eslintConfig = defineConfig([
       // ── Curly braces required for all blocks ──
       curly: ["error", "all"],
 
-      complexity: ["warn", 15],
+      complexity: ["error", 15],
       "max-lines-per-function": [
-        "warn",
-        { max: 100, skipBlankLines: true, skipComments: true },
+        "error",
+        { max: 80, skipBlankLines: true, skipComments: true },
       ],
-      "max-params": ["warn", 4],
-      "max-depth": ["warn", 4],
+      "max-params": ["error", 4],
+      "max-depth": ["error", 4],
       "max-lines": [
-        "warn",
-        { max: 300, skipBlankLines: true, skipComments: true },
+        "error",
+        { max: 250, skipBlankLines: true, skipComments: true },
       ],
+      "max-statements": ["error", 25],
 
       "no-nested-ternary": "error",
       "no-duplicate-imports": "error",
@@ -746,18 +766,26 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // ── Server Actions — relaxed for DB, no client imports, no default exports ──
+  // ── Server Actions — relaxed for DB, but not unlimited ──
   {
     files: ["src/domains/**/actions.ts"],
     rules: {
       "no-console": "off",
       "no-throw-literal": "error",
-      "max-lines-per-function": "off",
-      "max-lines": "off",
+      // ── Actions can be longer but not unlimited — split into per-action files if exceeded ──
+      "max-lines-per-function": [
+        "error",
+        { max: 80, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines": [
+        "error",
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+      "max-statements": ["error", 30],
       "no-magic-numbers": "off",
-      complexity: "off",
+      complexity: ["error", 20],
       "sonarjs/no-duplicate-string": "off",
-      "sonarjs/cognitive-complexity": "off",
+      "sonarjs/cognitive-complexity": ["error", 20],
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
@@ -778,10 +806,20 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // ── Domain components — no direct DB access, no direct fetch ──
+  // ── Domain components — no direct DB access, no direct fetch, strict size limits ──
   {
     files: ["src/domains/**/components/**/*.tsx"],
     rules: {
+      // ── Component files must stay small — extract hooks & subcomponents ──
+      "max-lines": [
+        "error",
+        { max: 200, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines-per-function": [
+        "error",
+        { max: 60, skipBlankLines: true, skipComments: true },
+      ],
+      "max-statements": ["error", 20],
       "no-restricted-imports": [
         "error",
         {
@@ -814,8 +852,18 @@ const eslintConfig = defineConfig([
   {
     files: ["src/app/**/*.tsx"],
     rules: {
+      // ── Page files must stay thin — extract to domain components ──
+      "max-lines": [
+        "error",
+        { max: 200, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines-per-function": [
+        "error",
+        { max: 60, skipBlankLines: true, skipComments: true },
+      ],
+      "max-statements": ["error", 20],
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           patterns: [
             {
@@ -842,7 +890,9 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // ── API routes — relaxed for DB access ──
+  // ── API routes — only SSE is allowed; relaxed for DB access, but enforce size ──
+  // WARNING: Do NOT create new API routes. Use server actions instead.
+  // The only valid API route is src/app/api/rooms/[code]/events/route.ts (SSE).
   {
     files: ["src/app/api/**/*.ts"],
     rules: {
@@ -854,7 +904,14 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "no-magic-numbers": "off",
-      "max-lines-per-function": "off",
+      "max-lines-per-function": [
+        "error",
+        { max: 80, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines": [
+        "error",
+        { max: 250, skipBlankLines: true, skipComments: true },
+      ],
     },
   },
 
@@ -896,6 +953,7 @@ const eslintConfig = defineConfig([
       "max-lines": "off",
       "no-magic-numbers": "off",
       "react/display-name": "off",
+      "react/no-multi-comp": "off",
       "import-x/no-default-export": "off",
     },
   },
@@ -940,6 +998,19 @@ const eslintConfig = defineConfig([
     },
   },
 
+  // ── Test files — relaxed ──
+  {
+    files: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
+    rules: {
+      "react/no-multi-comp": "off",
+      "max-lines-per-function": "off",
+      "max-lines": "off",
+      "max-statements": "off",
+      "no-magic-numbers": "off",
+      "sonarjs/no-duplicate-string": "off",
+    },
+  },
+
   // ── Storybook stories — relaxed ──
   {
     files: ["src/stories/**/*.ts", "src/stories/**/*.tsx"],
@@ -948,6 +1019,7 @@ const eslintConfig = defineConfig([
       "no-magic-numbers": "off",
       "max-lines-per-function": "off",
       "max-lines": "off",
+      "react/no-multi-comp": "off",
       "react-perf/jsx-no-new-function-as-prop": "off",
       "react-perf/jsx-no-new-object-as-prop": "off",
       "react-perf/jsx-no-new-array-as-prop": "off",
