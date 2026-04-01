@@ -93,41 +93,43 @@ describe("assignRoles", () => {
       expect(fewRoles).toContain(player.role);
     }
   });
+});
 
-  // ─── Moderator pre-assignments ────────────────────────────────
+// ─── assignRoles with moderator pre-assignments ──────────────────
 
-  describe("with moderator pre-assignments", () => {
-    it("respects pre-assigned spy role", () => {
-      const result = assignRoles(playerIds, roles, 1, [{ playerId: "p3", role: "SPY" }]);
-      const p3 = result.find((r) => r.playerId === "p3");
-      expect(p3?.isSpy).toBe(true);
-      expect(p3?.role).toBe("SPY");
-      // Only one spy total
-      expect(result.filter((r) => r.isSpy)).toHaveLength(1);
-    });
+describe("assignRoles with moderator pre-assignments", () => {
+  const playerIds = ["p1", "p2", "p3", "p4", "p5"];
+  const roles = ["Doctor", "Nurse", "Patient", "Janitor", "Secretary"];
 
-    it("respects pre-assigned non-spy role", () => {
-      const result = assignRoles(playerIds, roles, 1, [{ playerId: "p2", role: "Doctor" }]);
-      const p2 = result.find((r) => r.playerId === "p2");
-      expect(p2?.role).toBe("Doctor");
-      expect(p2?.isSpy).toBe(false);
-    });
+  it("respects pre-assigned spy role", () => {
+    const result = assignRoles(playerIds, roles, 1, [{ playerId: "p3", role: "SPY" }]);
+    const p3 = result.find((r) => r.playerId === "p3");
+    expect(p3?.isSpy).toBe(true);
+    expect(p3?.role).toBe("SPY");
+    expect(result.filter((r) => r.isSpy)).toHaveLength(1);
+  });
 
-    it("reduces remaining spy slots when spy is pre-assigned", () => {
-      const result = assignRoles(playerIds, roles, 2, [{ playerId: "p1", role: "SPY" }]);
-      const spies = result.filter((r) => r.isSpy);
-      expect(spies).toHaveLength(2);
-      expect(spies.some((s) => s.playerId === "p1")).toBe(true);
-    });
+  it("respects pre-assigned non-spy role", () => {
+    const result = assignRoles(playerIds, roles, 1, [{ playerId: "p2", role: "Doctor" }]);
+    const p2 = result.find((r) => r.playerId === "p2");
+    expect(p2?.role).toBe("Doctor");
+    expect(p2?.isSpy).toBe(false);
+  });
 
-    it("handles multiple moderator pre-assignments", () => {
-      const result = assignRoles(playerIds, roles, 1, [
-        { playerId: "p1", role: "SPY" },
-        { playerId: "p5", role: "Doctor" },
-      ]);
-      expect(result.find((r) => r.playerId === "p1")?.isSpy).toBe(true);
-      expect(result.find((r) => r.playerId === "p5")?.role).toBe("Doctor");
-      expect(result).toHaveLength(playerIds.length);
-    });
+  it("reduces remaining spy slots when spy is pre-assigned", () => {
+    const result = assignRoles(playerIds, roles, 2, [{ playerId: "p1", role: "SPY" }]);
+    const spies = result.filter((r) => r.isSpy);
+    expect(spies).toHaveLength(2);
+    expect(spies.some((s) => s.playerId === "p1")).toBe(true);
+  });
+
+  it("handles multiple moderator pre-assignments", () => {
+    const result = assignRoles(playerIds, roles, 1, [
+      { playerId: "p1", role: "SPY" },
+      { playerId: "p5", role: "Doctor" },
+    ]);
+    expect(result.find((r) => r.playerId === "p1")?.isSpy).toBe(true);
+    expect(result.find((r) => r.playerId === "p5")?.role).toBe("Doctor");
+    expect(result).toHaveLength(playerIds.length);
   });
 });
