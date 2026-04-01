@@ -29,6 +29,34 @@ export function useRoomEvents(code: string | null) {
   const staleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectRef = useRef<() => void>(null);
 
+  const handleMessage = useCallback(
+    (es: EventSource, event: MessageEvent<string>, resetStale: () => void) => {
+      resetStale();
+      try {
+        const raw: unknown = JSON.parse(event.data);
+        const result = roomEventSchema.safeParse(raw);
+        if (!result.success) {
+          if (typeof raw === "object" && raw !== null && "error" in raw) {
+            es.close();
+            setIsConnected(false);
+          }
+          return;
+        }
+        if (result.data.error) {
+          es.close();
+          setIsConnected(false);
+          return;
+        }
+        if (code) {
+          queryClient.setQueryData(roomKeys.events(code), result.data);
+        }
+      } catch {
+        // ignore
+      }
+    },
+    [code, queryClient],
+  );
+
   const connect = useCallback(() => {
     if (!code) {
       return;
@@ -52,7 +80,6 @@ export function useRoomEvents(code: string | null) {
         clearTimeout(staleTimerRef.current);
       }
       staleTimerRef.current = setTimeout(() => {
-        // No message received in 10s — connection is likely dead
         es.close();
         setIsConnected(false);
         connectRef.current?.();
@@ -63,31 +90,7 @@ export function useRoomEvents(code: string | null) {
       setIsConnected(true);
       resetStaleTimer();
     };
-
-    es.onmessage = (event: MessageEvent<string>) => {
-      resetStaleTimer();
-      try {
-        const raw: unknown = JSON.parse(event.data);
-        const result = roomEventSchema.safeParse(raw);
-        if (!result.success) {
-          if (typeof raw === "object" && raw !== null && "error" in raw) {
-            es.close();
-            setIsConnected(false);
-          }
-          return;
-        }
-        if (result.data.error) {
-          es.close();
-          setIsConnected(false);
-          return;
-        }
-        // Write validated data into query cache
-        queryClient.setQueryData(roomKeys.events(code), result.data);
-      } catch {
-        // ignore
-      }
-    };
-
+    es.onmessage = (event: MessageEvent<string>) => handleMessage(es, event, resetStaleTimer);
     es.onerror = () => {
       setIsConnected(false);
       es.close();
@@ -99,7 +102,7 @@ export function useRoomEvents(code: string | null) {
       }
       reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), RECONNECT_DELAY);
     };
-  }, [code, queryClient]);
+  }, [code, handleMessage]);
 
   useEffect(() => {
     connectRef.current = connect;
