@@ -1,7 +1,7 @@
 "use client";
 
-import { Reorder, useDragControls } from "motion/react";
 import { GripVertical, Plus, X } from "lucide-react";
+import { Reorder, useDragControls } from "motion/react";
 import React, { useCallback } from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
@@ -14,6 +14,26 @@ import { Input } from "@/shared/ui/input";
 interface PlayerEntry {
   id: string;
   name: string;
+}
+
+/* ── Hooks ──────────────────────────────────────────── */
+
+function usePlayerRowHandlers(
+  entryId: string,
+  onNameChange: (id: string, value: string) => void,
+  onRemove: (id: string) => void,
+) {
+  const controls = useDragControls();
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onNameChange(entryId, event.target.value),
+    [entryId, onNameChange],
+  );
+  const handleRemove = useCallback(() => onRemove(entryId), [entryId, onRemove]);
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent) => controls.start(event),
+    [controls],
+  );
+  return { controls, handleChange, handleRemove, handlePointerDown };
 }
 
 /* ── Player name row ─────────────────────────────────── */
@@ -32,16 +52,10 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   onRemove: (id: string) => void;
 }) {
   const { t } = useTranslation();
-  const controls = useDragControls();
-
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => onNameChange(entry.id, event.target.value),
-    [entry.id, onNameChange],
-  );
-  const handleRemove = useCallback(() => onRemove(entry.id), [entry.id, onRemove]);
-  const handlePointerDown = useCallback(
-    (event: React.PointerEvent) => controls.start(event),
-    [controls],
+  const { controls, handleChange, handleRemove, handlePointerDown } = usePlayerRowHandlers(
+    entry.id,
+    onNameChange,
+    onRemove,
   );
 
   return (
@@ -118,7 +132,9 @@ export const PlayerListSection = React.memo(function PlayerListSection({
   const handleNameChange = useCallback(
     (id: string, value: string) => {
       const index = entries.findIndex((e) => e.id === id);
-      if (index !== -1) onPlayerNameChange(index, value);
+      if (index !== -1) {
+        onPlayerNameChange(index, value);
+      }
     },
     [entries, onPlayerNameChange],
   );
@@ -126,7 +142,9 @@ export const PlayerListSection = React.memo(function PlayerListSection({
   const handleRemove = useCallback(
     (id: string) => {
       const index = entries.findIndex((e) => e.id === id);
-      if (index !== -1) onRemovePlayer(index);
+      if (index !== -1) {
+        onRemovePlayer(index);
+      }
     },
     [entries, onRemovePlayer],
   );
