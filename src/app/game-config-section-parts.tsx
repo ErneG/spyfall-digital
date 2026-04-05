@@ -20,7 +20,7 @@ export const PnPPresetButton = React.memo(function PnPPresetButton({
     <button
       onClick={handleClick}
       className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-        isSelected ? "bg-white text-black" : "bg-[#141414] text-[#8E8E93] hover:bg-[#1C1C1E]"
+        isSelected ? "bg-white text-black" : "bg-surface-1 text-muted-foreground hover:bg-surface-2"
       }`}
     >
       {label}

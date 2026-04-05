@@ -35,7 +35,7 @@ export const GameConfigSection = React.memo(function GameConfigSection({
   return (
     <>
       <div className="space-y-2">
-        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+        <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
           <Clock className="mr-1 inline h-3 w-3" /> {t.config.timer}
         </p>
         <div className="flex gap-1.5">
@@ -52,7 +52,9 @@ export const GameConfigSection = React.memo(function GameConfigSection({
       </div>
 
       <div className="space-y-2">
-        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.config.spies}</p>
+        <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
+          {t.config.spies}
+        </p>
         <div className="flex gap-1.5">
           {SPY_OPTIONS.map((count) => (
             <PnPPresetButton
@@ -66,12 +68,12 @@ export const GameConfigSection = React.memo(function GameConfigSection({
         </div>
       </div>
 
-      <div className="flex h-[56px] items-center justify-between rounded-2xl bg-[#141414] px-4">
+      <div className="bg-surface-1 flex h-[56px] items-center justify-between rounded-2xl px-4">
         <Label htmlFor="pnp-hide-spy" className="flex items-center gap-1.5 text-sm">
           {hideSpyCount ? (
-            <EyeOff className="h-3.5 w-3.5 text-[#8E8E93]" />
+            <EyeOff className="text-muted-foreground h-3.5 w-3.5" />
           ) : (
-            <Eye className="h-3.5 w-3.5 text-[#8E8E93]" />
+            <Eye className="text-muted-foreground h-3.5 w-3.5" />
           )}
           {t.config.hideSpyCount}
         </Label>

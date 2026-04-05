@@ -10,6 +10,12 @@ export const sessionSchema = z.object({
   isHost: z.boolean(),
   passAndPlay: z.boolean().optional(),
   allPlayers: z.array(z.object({ id: z.string(), name: z.string() })).optional(),
+  // Pass-and-play game data (avoids SSE dependency)
+  gameId: z.string().optional(),
+  gameStartedAt: z.string().optional(),
+  timeLimit: z.number().optional(),
+  spyCount: z.number().optional(),
+  hideSpyCount: z.boolean().optional(),
 });
 
 export type Session = z.infer<typeof sessionSchema>;

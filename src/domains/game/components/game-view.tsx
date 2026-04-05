@@ -27,7 +27,7 @@ export function GameView(props: GameViewProps) {
     if (state.isLoading) {
       return (
         <main className="flex flex-1 items-center justify-center p-4">
-          <p className="text-[#8E8E93]">{state.t.common.loading}</p>
+          <p className="text-muted-foreground">{state.t.common.loading}</p>
         </main>
       );
     }

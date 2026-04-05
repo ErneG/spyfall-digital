@@ -7,7 +7,6 @@ import { useTranslation } from "@/shared/i18n/context";
 
 import type { PlayerInfo } from "@/domains/room/schema";
 
-
 interface PlayerListProps {
   players: PlayerInfo[];
   currentPlayerId: string;
@@ -19,9 +18,9 @@ export const PlayerList = React.memo(function PlayerList({
 }: PlayerListProps) {
   const { t } = useTranslation();
   return (
-    <div className="rounded-2xl bg-[#141414]">
+    <div className="bg-surface-1 rounded-2xl">
       <div className="px-4 pt-4 pb-2">
-        <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+        <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
           {t.players.title} ({players.length}/12)
         </p>
       </div>
@@ -34,8 +33,8 @@ export const PlayerList = React.memo(function PlayerList({
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                     player.id === currentPlayerId
-                      ? "bg-[#8B5CF6]/12 text-[#8B5CF6]"
-                      : "bg-white/8 text-[#8E8E93]"
+                      ? "bg-spy-purple/12 text-spy-purple"
+                      : "text-muted-foreground bg-white/8"
                   } text-sm font-semibold`}
                 >
                   {player.name.charAt(0).toUpperCase()}
@@ -43,13 +42,13 @@ export const PlayerList = React.memo(function PlayerList({
                 <span className="font-medium">
                   {player.name}
                   {player.id === currentPlayerId && (
-                    <span className="ml-1 text-[#8B5CF6]">{t.players.you}</span>
+                    <span className="text-spy-purple ml-1">{t.players.you}</span>
                   )}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 {player.isHost && (
-                  <span className="rounded-full bg-[#8B5CF6]/12 px-2.5 py-0.5 text-[11px] font-semibold text-[#8B5CF6]">
+                  <span className="bg-spy-purple/12 text-spy-purple rounded-full px-2.5 py-0.5 text-[11px] font-semibold">
                     <Crown className="mr-1 inline h-3 w-3" /> {t.players.host}
                   </span>
                 )}
@@ -58,7 +57,9 @@ export const PlayerList = React.memo(function PlayerList({
           </div>
         ))}
         {players.length === 0 && (
-          <p className="py-6 text-center text-sm text-[#48484A]">{t.players.waitingForPlayers}</p>
+          <p className="text-muted-foreground/60 py-6 text-center text-sm">
+            {t.players.waitingForPlayers}
+          </p>
         )}
       </div>
     </div>

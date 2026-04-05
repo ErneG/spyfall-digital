@@ -136,6 +136,7 @@ export function useRoomEvents(code: string | null) {
   // Read data from query cache (SSE is the writer, no HTTP fetching)
   const { data = null } = useQuery<RoomEvent | null>({
     queryKey: roomKeys.events(code ?? ""),
+    queryFn: () => null,
     enabled: false,
     initialData: null,
   });

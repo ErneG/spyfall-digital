@@ -23,6 +23,7 @@ interface ConfigHandlerParams {
   setPnpTimeLimit: Dispatch<SetStateAction<number>>;
   setPnpSpyCount: Dispatch<SetStateAction<number>>;
   setPnpHideSpyCount: Dispatch<SetStateAction<boolean>>;
+  setPnpEditions: Dispatch<SetStateAction<Array<1 | 2>>>;
 }
 
 interface ActionHandlerParams {
@@ -68,6 +69,10 @@ export function useInputHandlers(params: InputHandlerParams) {
     },
     [setPlayerNames],
   );
+  const handleReorderPlayers = useCallback(
+    (newNames: string[]) => setPlayerNames(newNames),
+    [setPlayerNames],
+  );
   const handleClearError = useCallback(() => setError(""), [setError]);
 
   return {
@@ -76,6 +81,7 @@ export function useInputHandlers(params: InputHandlerParams) {
     handlePlayerNameChange,
     handleAddPlayer,
     handleRemovePlayer,
+    handleReorderPlayers,
     handleClearError,
   };
 }
@@ -83,7 +89,7 @@ export function useInputHandlers(params: InputHandlerParams) {
 /* ── Config handlers ─────────────────────────────────── */
 
 export function useConfigHandlers(params: ConfigHandlerParams) {
-  const { setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount } = params;
+  const { setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount, setPnpEditions } = params;
 
   const handlePnpTimeLimitChange = useCallback(
     (value: number) => setPnpTimeLimit(value),
@@ -98,7 +104,17 @@ export function useConfigHandlers(params: ConfigHandlerParams) {
     [setPnpHideSpyCount],
   );
 
-  return { handlePnpTimeLimitChange, handlePnpSpyCountChange, handlePnpHideSpyCountChange };
+  const handlePnpEditionsChange = useCallback(
+    (editions: Array<1 | 2>) => setPnpEditions(editions),
+    [setPnpEditions],
+  );
+
+  return {
+    handlePnpTimeLimitChange,
+    handlePnpSpyCountChange,
+    handlePnpHideSpyCountChange,
+    handlePnpEditionsChange,
+  };
 }
 
 /* ── Action handlers ─────────────────────────────────── */

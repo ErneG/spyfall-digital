@@ -200,7 +200,13 @@ export async function createPassAndPlayRoom(
     return fail(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const { playerNames, timeLimit, spyCount, hideSpyCount: shouldHideSpyCount } = parsed.data;
+  const {
+    playerNames,
+    timeLimit,
+    spyCount,
+    hideSpyCount: shouldHideSpyCount,
+    editions,
+  } = parsed.data;
 
   try {
     // Generate unique room code
@@ -216,8 +222,9 @@ export async function createPassAndPlayRoom(
       }
     }
 
-    // Fetch all locations to auto-select them
+    // Fetch locations filtered by selected editions
     const allLocations = await prisma.location.findMany({
+      where: { edition: { in: editions } },
       select: { id: true },
     });
 

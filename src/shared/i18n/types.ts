@@ -103,6 +103,8 @@ export interface Translations {
     startPlaying: string;
     playerNofM: string; // "Player {n} of {m}"
     peekAtRole: string;
+    peekTitle: string;
+    peekSubtitle: string;
     spyGuessLocation: string;
     spyGuessTitle: string;
     spyGuessSubtitle: string;
@@ -113,6 +115,15 @@ export interface Translations {
     whoDoYouThink: string;
     backToGame: string;
     hide: string;
+  };
+  preparation: {
+    roundN: string;
+    firstToAsk: string;
+    startRound: string;
+    rule1: string;
+    rule2: string;
+    rule3: string;
+    roundRules: string;
   };
   common: {
     back: string;

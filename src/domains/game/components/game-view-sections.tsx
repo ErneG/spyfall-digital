@@ -34,9 +34,9 @@ export const GameWaitingView = React.memo(function GameWaitingView({
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4 text-center">
-        <Clock className="mx-auto h-10 w-10 text-[#8E8E93]" />
+        <Clock className="text-muted-foreground mx-auto h-10 w-10" />
         <p className="text-lg font-medium">{gameInProgressLabel}</p>
-        <p className="text-sm text-[#8E8E93]">{waitingForRoundLabel}</p>
+        <p className="text-muted-foreground text-sm">{waitingForRoundLabel}</p>
         {players && (
           <PlayerList
             players={players.map((p) => ({ ...p, isOnline: true }))}
@@ -44,7 +44,7 @@ export const GameWaitingView = React.memo(function GameWaitingView({
           />
         )}
         <div className="h-px bg-white/5" />
-        <Button variant="ghost" className="w-full text-[#8E8E93]" onClick={onLeave}>
+        <Button variant="ghost" className="text-muted-foreground w-full" onClick={onLeave}>
           {leaveLabel}
         </Button>
       </div>
@@ -75,8 +75,9 @@ export const GamePlayingView = React.memo(function GamePlayingView(props: Playin
   const spyPlayerId = game.isSpy ? playerId : undefined;
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-24">
+    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-28">
       <div className="w-full max-w-md space-y-5">
+        {/* Timer as hero element */}
         <TimerSection
           display={props.display}
           isExpired={props.isExpired}
@@ -84,12 +85,16 @@ export const GamePlayingView = React.memo(function GamePlayingView(props: Playin
           isHost={props.isHost}
           onToggle={props.onTimerToggle}
         />
+
+        {/* Spy count warning - compact banner */}
         {spyCountLabel && (
-          <p className="text-center text-xs text-[#8E8E93]">
-            <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
+          <p className="text-muted-foreground text-center text-xs">
+            <AlertTriangle className="text-spy-red mr-1 inline h-3 w-3" />
             {spyCountLabel}
           </p>
         )}
+
+        {/* Role card */}
         <RoleCard
           isSpy={game.isSpy}
           isRoleRevealed={props.isRoleRevealed}
@@ -97,7 +102,11 @@ export const GamePlayingView = React.memo(function GamePlayingView(props: Playin
           myRole={game.myRole}
           onToggle={props.toggleRole}
         />
+
+        {/* Player list */}
         <PlayerList players={game.players} currentPlayerId={playerId} />
+
+        {/* Location grid */}
         <LocationGrid
           locations={game.allLocations}
           revealedLocation={revealedLocation}
@@ -105,16 +114,17 @@ export const GamePlayingView = React.memo(function GamePlayingView(props: Playin
           gameId={spyGameId}
           playerId={spyPlayerId}
         />
-        <div className="h-px bg-white/5" />
-        <GameActions
-          isHost={props.isHost}
-          isEnding={props.isEnding}
-          onEndGame={props.onEndGame}
-          game={game}
-          playerId={playerId}
-          gameId={gameId}
-        />
       </div>
+
+      {/* Sticky bottom action bar */}
+      <GameActions
+        isHost={props.isHost}
+        isEnding={props.isEnding}
+        onEndGame={props.onEndGame}
+        game={game}
+        playerId={playerId}
+        gameId={gameId}
+      />
     </main>
   );
 });

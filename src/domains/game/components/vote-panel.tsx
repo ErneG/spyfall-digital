@@ -58,7 +58,7 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
 
   if (hasVoted) {
     return (
-      <p className="flex-1 py-2 text-center text-[13px] text-[#34D399]">{t.voting.voteSubmitted}</p>
+      <p className="text-success flex-1 py-2 text-center text-[13px]">{t.voting.voteSubmitted}</p>
     );
   }
 
@@ -84,7 +84,7 @@ export const VotePanel = memo(function VotePanel({ players, playerId, gameId }: 
           ))}
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={handleCancel} className="text-[#8E8E93]">
+          <Button variant="ghost" onClick={handleCancel} className="text-muted-foreground">
             {t.voting.cancel}
           </Button>
         </DialogFooter>

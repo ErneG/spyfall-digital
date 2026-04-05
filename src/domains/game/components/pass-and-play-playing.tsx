@@ -1,14 +1,13 @@
 "use client";
 
-import { AlertTriangle, Hand, LogOut, Crosshair } from "lucide-react";
-import { memo, useMemo } from "react";
+import { AlertTriangle, Eye, Flag } from "lucide-react";
+import { memo, useState, useCallback } from "react";
 
 import { TimerSection } from "@/domains/game/components/game-view-parts";
-import { LocationGrid } from "@/domains/game/components/location-grid";
+import { PassAndPlayLocationGrid } from "@/domains/game/components/pass-and-play-location-grid";
+import { RolePeek } from "@/domains/game/components/pass-and-play-role-peek";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { Card, CardContent } from "@/shared/ui/card";
-import { Separator } from "@/shared/ui/separator";
 
 import type { usePassAndPlay } from "@/domains/game/components/use-pass-and-play";
 import type { useTranslation } from "@/shared/i18n/context";
@@ -31,20 +30,22 @@ export const PlayingPhase = memo(function PlayingPhase({
   spyCount,
   t,
 }: PlayingPhaseProps) {
-  const spyCountLabel = useMemo(
-    () =>
-      shouldHideSpyCount ? null : (
-        <p className="text-muted-foreground text-center text-xs">
-          <AlertTriangle className="mr-1 inline h-3 w-3 text-[#EF4444]" />
-          {spyCount === 1 ? "1 spy among you" : `${spyCount} spies among you`}
-        </p>
-      ),
-    [shouldHideSpyCount, spyCount],
-  );
+  const [peekMode, setPeekMode] = useState(false);
+  const handleStartPeek = useCallback(() => setPeekMode(true), []);
+  const handleEndPeek = useCallback(() => setPeekMode(false), []);
+
+  if (peekMode) {
+    return (
+      <RolePeek gameId={state.activeGameId} allPlayers={allPlayers} onBack={handleEndPeek} t={t} />
+    );
+  }
 
   return (
-    <main className="flex flex-1 flex-col items-center p-4 pb-24">
-      <div className="w-full max-w-md space-y-4">
+    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-28">
+      <div className="w-full max-w-md space-y-5">
+        {state.roundNumber > 1 && (
+          <p className="text-muted-foreground text-center text-xs">Round {state.roundNumber}</p>
+        )}
         <TimerSection
           display={state.display}
           isExpired={state.isExpired}
@@ -52,19 +53,37 @@ export const PlayingPhase = memo(function PlayingPhase({
           isHost
           onToggle={state.onTimerToggle}
         />
-        {spyCountLabel}
+        <SpyCountBanner hide={shouldHideSpyCount} count={spyCount} />
         <PlayerListCard allPlayers={allPlayers} t={t} />
         {state.game && (
-          <LocationGrid
+          <PassAndPlayLocationGrid
             locations={state.game.allLocations}
-            revealedLocation={state.game.location}
             prevLocationName={state.game.prevLocationName}
           />
         )}
-        <Separator />
-        <PlayingActions state={state} t={t} />
       </div>
+      <StickyActions state={state} onPeek={handleStartPeek} t={t} />
     </main>
+  );
+});
+
+// ─── Sub-components ────────────────────────────────────────
+
+const SpyCountBanner = memo(function SpyCountBanner({
+  hide,
+  count,
+}: {
+  hide: boolean;
+  count: number;
+}) {
+  if (hide) {
+    return null;
+  }
+  return (
+    <p className="text-muted-foreground text-center text-xs">
+      <AlertTriangle className="text-spy-red mr-1 inline h-3 w-3" />
+      {count === 1 ? "1 spy among you" : `${count} spies among you`}
+    </p>
   );
 });
 
@@ -76,61 +95,46 @@ const PlayerListCard = memo(function PlayerListCard({
   t: Translations;
 }) {
   return (
-    <Card>
-      <CardContent className="pt-4 pb-3">
-        <p className="text-muted-foreground mb-2 text-xs">
-          {t.players.title} ({allPlayers.length})
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {allPlayers.map((p) => (
-            <Badge key={p.id} variant="secondary">
-              {p.name}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-surface-1 rounded-2xl p-4">
+      <p className="text-muted-foreground/60 mb-2 text-[11px] font-semibold tracking-[0.08em] uppercase">
+        {t.players.title} ({allPlayers.length})
+      </p>
+      <div className="flex flex-wrap gap-1.5">
+        {allPlayers.map((p) => (
+          <Badge key={p.id} variant="secondary">
+            {p.name}
+          </Badge>
+        ))}
+      </div>
+    </div>
   );
 });
 
-const PlayingActions = memo(function PlayingActions({
+const StickyActions = memo(function StickyActions({
   state,
+  onPeek,
   t,
 }: {
   state: HookState;
+  onPeek: () => void;
   t: Translations;
 }) {
   return (
-    <>
-      <Button
-        variant="outline"
-        className="border-destructive/50 text-destructive h-12 w-full gap-2"
-        onClick={state.spyGuess.handleStartSpyGuess}
-      >
-        <Crosshair className="h-4 w-4" /> {t.passAndPlay.spyGuessLocation}
-      </Button>
-
-      <div className="flex gap-2">
+    <div className="fixed right-0 bottom-0 left-0 border-t border-white/5 bg-black/90 p-4 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-md gap-2">
+        <Button variant="outline" className="h-14 flex-1 gap-2 rounded-2xl" onClick={onPeek}>
+          <Eye className="h-4 w-4" /> {t.passAndPlay.peekAtRole}
+        </Button>
         <Button
           variant="destructive"
-          className="flex-1"
+          className="h-14 gap-2 rounded-2xl px-6"
           onClick={state.onEndGameClick}
           disabled={state.endMutation.isPending}
         >
+          <Flag className="h-4 w-4" />
           {state.endMutation.isPending ? t.game.ending : t.game.endGame}
         </Button>
-        <Button variant="outline" className="flex-1 gap-2" onClick={state.voting.handleStartVoting}>
-          <Hand className="h-4 w-4" /> {t.game.vote}
-        </Button>
       </div>
-
-      <Button
-        variant="ghost"
-        className="text-muted-foreground w-full gap-2"
-        onClick={state.handleLeave}
-      >
-        <LogOut className="h-4 w-4" /> {t.game.leaveGame}
-      </Button>
-    </>
+    </div>
   );
 });

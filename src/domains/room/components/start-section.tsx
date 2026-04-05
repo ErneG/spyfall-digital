@@ -23,7 +23,7 @@ export const StartSection = React.memo(function StartSection({
   const { t } = useTranslation();
   return (
     <>
-      {error && <p className="text-center text-[13px] text-[#EF4444]">{error}</p>}
+      {error && <p className="text-spy-red text-center text-[13px]">{error}</p>}
 
       {isHost ? (
         <div className="space-y-3">
@@ -35,11 +35,13 @@ export const StartSection = React.memo(function StartSection({
             {isStarting ? t.home.starting : t.home.startGame}
           </Button>
           {playerCount < 3 && (
-            <p className="text-center text-xs text-[#48484A]">{t.players.needMinPlayers}</p>
+            <p className="text-muted-foreground/60 text-center text-xs">
+              {t.players.needMinPlayers}
+            </p>
           )}
         </div>
       ) : (
-        <p className="text-center text-sm text-[#8E8E93]">{t.players.waitingForHost}</p>
+        <p className="text-muted-foreground text-center text-sm">{t.players.waitingForHost}</p>
       )}
     </>
   );

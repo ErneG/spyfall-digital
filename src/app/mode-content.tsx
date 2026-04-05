@@ -66,11 +66,14 @@ export const ModeContent = memo(function ModeContent(props: ModeContentProps) {
       onPlayerNameChange={props.handlePlayerNameChange}
       onAddPlayer={props.handleAddPlayer}
       onRemovePlayer={props.handleRemovePlayer}
+      onReorderPlayers={props.handleReorderPlayers}
       onBack={props.handleBack}
       onStart={props.handlePassAndPlayClick}
       onTimeLimitChange={props.handlePnpTimeLimitChange}
       onSpyCountChange={props.handlePnpSpyCountChange}
       onHideSpyCountChange={props.handlePnpHideSpyCountChange}
+      editions={props.pnpEditions}
+      onEditionsChange={props.handlePnpEditionsChange}
     />
   );
 });
