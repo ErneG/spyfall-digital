@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { LanguageToggle } from "@/components/language-toggle";
 import { Providers } from "@/components/providers";
+import { AuthButton } from "@/domains/auth/components/auth-button";
 
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -49,8 +50,9 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-black">
         <Providers>
-          <header className="flex justify-end gap-1 p-2">
+          <header className="flex items-center justify-end gap-1 p-2">
             <LanguageToggle />
+            <AuthButton />
           </header>
           {children}
         </Providers>

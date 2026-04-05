@@ -1,8 +1,10 @@
 "use client";
 
-import { MapPin, Check } from "lucide-react";
+import { MapPin, Check, BookOpen } from "lucide-react";
 import { memo, useState, useCallback, useMemo } from "react";
 
+import { useAuth } from "@/domains/auth/hooks";
+import { CollectionPicker } from "@/domains/collection/components/collection-picker";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import {
@@ -50,6 +52,8 @@ export const LocationSettings = memo(function LocationSettings({
   playerId,
 }: LocationSettingsProps) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const data = useLocationData(roomCode, playerId, open, onOpenChange);
   const { filter, edition1, edition2, clearFilter, handleFilterChange } = useLocationFilter(
     data.locations,
@@ -63,6 +67,11 @@ export const LocationSettings = memo(function LocationSettings({
   const handleClose = useCallback(() => {
     onOpenChange(false);
   }, [onOpenChange]);
+  const handleOpenPicker = useCallback(() => setPickerOpen(true), []);
+  const handleImported = useCallback(() => {
+    // Refetch location data after import
+    data.refetch();
+  }, [data]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,6 +88,12 @@ export const LocationSettings = memo(function LocationSettings({
           onFilterChange={handleFilterChange}
           onClear={clearFilter}
         />
+        {isAuthenticated && (
+          <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleOpenPicker}>
+            <BookOpen className="size-3.5" />
+            Import from Collection
+          </Button>
+        )}
         <LocationSettingsBody data={data} edition1={edition1} edition2={edition2} filter={filter} />
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={handleClose}>
@@ -89,6 +104,15 @@ export const LocationSettings = memo(function LocationSettings({
           </Button>
         </div>
       </DialogContent>
+      {isAuthenticated && (
+        <CollectionPicker
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          roomCode={roomCode}
+          playerId={playerId}
+          onImported={handleImported}
+        />
+      )}
     </Dialog>
   );
 });

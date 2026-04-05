@@ -33,7 +33,14 @@ function useLocationState(roomCode: string, isOpen: boolean) {
     }
   }, [isOpen, loadLocations]);
 
-  return { locations, setLocations, customLocations, setCustomLocations, isLoading };
+  return {
+    locations,
+    setLocations,
+    customLocations,
+    setCustomLocations,
+    isLoading,
+    refetch: loadLocations,
+  };
 }
 
 function useBuiltInLocationActions(
@@ -163,6 +170,7 @@ export function useLocationData(
     locations: state.locations,
     customLocations: state.customLocations,
     isLoading: state.isLoading,
+    refetch: state.refetch,
     ...builtIn,
     ...custom,
     handleSave,

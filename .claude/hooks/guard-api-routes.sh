@@ -13,9 +13,10 @@ TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
 # Check if file is in api/ directory
 case "$FILE" in
   */src/app/api/*)
-    # Allow the existing SSE route
+    # Allow the existing SSE route and BetterAuth catch-all
     case "$FILE" in
       */rooms/*/events/route.ts) exit 0 ;;
+      */api/auth/*/route.ts) exit 0 ;;
     esac
     echo '{"block": true, "message": "Do NOT create new API routes. Use server actions in domains/*/actions.ts instead. Only SSE (streaming) requires an API route. See .claude/rules/no-api-routes.md"}' >&2
     exit 2

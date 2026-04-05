@@ -73,10 +73,12 @@ export function useInputHandlers(params: InputHandlerParams) {
     (newNames: string[]) => setPlayerNames(newNames),
     [setPlayerNames],
   );
+  const handleNameSelect = useCallback((selected: string) => setName(selected), [setName]);
   const handleClearError = useCallback(() => setError(""), [setError]);
 
   return {
     handleNameChange,
+    handleNameSelect,
     handleJoinCodeChange,
     handlePlayerNameChange,
     handleAddPlayer,

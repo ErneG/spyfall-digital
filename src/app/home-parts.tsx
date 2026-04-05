@@ -3,6 +3,7 @@
 import { Users, Crosshair, Smartphone, ChevronRight } from "lucide-react";
 import React from "react";
 
+import { NameSuggestions } from "@/domains/profile/components/name-suggestions";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -142,6 +143,7 @@ interface CreateRoomFormProps {
   error: string;
   isLoading: boolean;
   onNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onNameSelect: (name: string) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onBack: () => void;
   onCreate: () => void;
@@ -152,6 +154,7 @@ export const CreateRoomForm = React.memo(function CreateRoomForm({
   error,
   isLoading,
   onNameChange,
+  onNameSelect,
   onKeyDown,
   onBack,
   onCreate,
@@ -173,6 +176,7 @@ export const CreateRoomForm = React.memo(function CreateRoomForm({
           onKeyDown={onKeyDown}
           className="bg-surface-1 placeholder:text-muted-foreground/60 h-[52px] rounded-2xl border-transparent text-[15px] focus:border-transparent"
         />
+        <NameSuggestions onSelect={onNameSelect} />
         {error && (
           <p className="text-spy-red text-[13px]">
             {t.errors[error as keyof typeof t.errors] ?? error}
