@@ -2,6 +2,8 @@
 
 import { memo, useCallback } from "react";
 
+import { useTranslation } from "@/shared/i18n/context";
+
 export const CategoryChip = memo(function CategoryChip({
   label,
   active,
@@ -11,6 +13,7 @@ export const CategoryChip = memo(function CategoryChip({
   active: boolean;
   onToggle: (category: string) => void;
 }) {
+  const { translateCategory } = useTranslation();
   const handleClick = useCallback(() => {
     onToggle(label);
   }, [onToggle, label]);
@@ -24,7 +27,7 @@ export const CategoryChip = memo(function CategoryChip({
           : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
       }`}
     >
-      {label}
+      {translateCategory(label)}
     </button>
   );
 });
