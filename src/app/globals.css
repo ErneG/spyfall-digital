@@ -45,6 +45,8 @@
   --color-spy-red: var(--spy-red);
   --color-spy-purple: var(--spy-purple);
   --color-success: var(--success);
+  --color-spy-gold: var(--spy-gold);
+  --color-text-muted: var(--text-muted);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -99,6 +101,11 @@
   --warning: #f59e0b;
   --text-secondary: #8e8e93;
   --text-muted: #48484a;
+  --spy-gold: #f59e0b;
+
+  /* Animation timing */
+  --timing-flip: 600ms;
+  --timing-stagger: 80ms;
 
   color-scheme: dark;
 }
@@ -196,4 +203,18 @@
 .separator-subtle {
   height: 0.5px;
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* Card flip */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }

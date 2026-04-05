@@ -8,6 +8,7 @@ import { PhaseRouter } from "./pass-and-play-game-view-parts";
 interface PassAndPlayGameViewProps {
   gameId: string;
   hostPlayerId: string;
+  roomId: string;
   allPlayers: Array<{ id: string; name: string }>;
   roomCode: string;
   timeLimit: number;
@@ -23,7 +24,7 @@ export function PassAndPlayGameView(props: PassAndPlayGameViewProps) {
   const state = usePassAndPlay({
     gameId,
     hostPlayerId,
-    allPlayers,
+    roomId: props.roomId,
     timeLimit: props.timeLimit,
     gameStartedAt: props.gameStartedAt,
     isTimerRunning: props.isTimerRunning,
@@ -40,7 +41,6 @@ export function PassAndPlayGameView(props: PassAndPlayGameViewProps) {
   return (
     <PhaseRouter
       state={state}
-      gameId={gameId}
       hostPlayerId={hostPlayerId}
       allPlayers={allPlayers}
       shouldHideSpyCount={shouldHideSpyCount}

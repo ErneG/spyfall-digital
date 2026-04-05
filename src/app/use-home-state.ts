@@ -21,6 +21,7 @@ interface MutationParams {
   pnpTimeLimit: number;
   pnpSpyCount: number;
   shouldPnpHideSpyCount: boolean;
+  pnpEditions: Array<1 | 2>;
 }
 
 export type HomeStateMutations = ReturnType<typeof useMutations>;
@@ -61,22 +62,28 @@ function useMutations(params: MutationParams) {
         timeLimit: pnpTimeLimit,
         spyCount: pnpSpyCount,
         hideSpyCount: shouldPnpHideSpyCount,
+        editions: params.pnpEditions,
       });
       const room = unwrapAction(createResult);
       const startResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
-      unwrapAction(startResult);
-      return room;
+      const game = unwrapAction(startResult);
+      return { room, game };
     },
-    onSuccess: ({ hostPlayerId, code: roomCode, roomId, players }) => {
+    onSuccess: ({ room, game }) => {
       setSession({
-        playerId: hostPlayerId,
-        roomCode,
-        roomId,
+        playerId: room.hostPlayerId,
+        roomCode: room.code,
+        roomId: room.roomId,
         isHost: true,
         passAndPlay: true,
-        allPlayers: players,
+        allPlayers: room.players,
+        gameId: game.gameId,
+        gameStartedAt: game.startedAt,
+        timeLimit: pnpTimeLimit,
+        spyCount: pnpSpyCount,
+        hideSpyCount: shouldPnpHideSpyCount,
       });
-      router.push(`/room/${roomCode}`);
+      router.push(`/room/${room.code}`);
     },
     onError: (caughtError) => setError(caughtError.message),
   });
@@ -99,6 +106,7 @@ export function useHomeState() {
   const [pnpTimeLimit, setPnpTimeLimit] = useState(DEFAULT_TIME_LIMIT);
   const [pnpSpyCount, setPnpSpyCount] = useState(1);
   const [shouldPnpHideSpyCount, setPnpHideSpyCount] = useState(false);
+  const [pnpEditions, setPnpEditions] = useState<Array<1 | 2>>([1, 2]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -114,10 +122,16 @@ export function useHomeState() {
     pnpTimeLimit,
     pnpSpyCount,
     shouldPnpHideSpyCount,
+    pnpEditions,
   });
 
   const inputHandlers = useInputHandlers({ setName, setJoinCode, setPlayerNames, setError });
-  const configHandlers = useConfigHandlers({ setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount });
+  const configHandlers = useConfigHandlers({
+    setPnpTimeLimit,
+    setPnpSpyCount,
+    setPnpHideSpyCount,
+    setPnpEditions,
+  });
   const actionHandlers = useActionHandlers({
     name,
     joinCode,
@@ -139,6 +153,7 @@ export function useHomeState() {
     pnpTimeLimit,
     pnpSpyCount,
     shouldPnpHideSpyCount,
+    pnpEditions,
     ...inputHandlers,
     ...configHandlers,
     ...actionHandlers,

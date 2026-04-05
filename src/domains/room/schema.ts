@@ -90,6 +90,11 @@ export const createPassAndPlayInput = z.object({
   timeLimit: z.number().int().min(360).max(600).default(480),
   spyCount: z.number().int().min(1).max(2).default(1),
   hideSpyCount: z.boolean().default(false),
+  /** Which location editions to include (1 = Spyfall 1, 2 = Spyfall 2). Defaults to both. */
+  editions: z
+    .array(z.literal(1).or(z.literal(2)))
+    .min(1)
+    .default([1, 2]),
 });
 export type CreatePassAndPlayInput = z.input<typeof createPassAndPlayInput>;
 

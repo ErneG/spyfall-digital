@@ -18,11 +18,11 @@ const NAME_TRUNCATE_LENGTH = 6;
 const SpyRole = memo(function SpyRole({ t }: { t: ReturnType<typeof useTranslation>["t"] }) {
   return (
     <div className="space-y-2">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#EF4444]/12">
-        <AlertTriangle className="h-6 w-6 text-[#EF4444]" />
+      <div className="bg-spy-red/12 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+        <AlertTriangle className="text-spy-red h-6 w-6" />
       </div>
-      <p className="text-2xl font-bold text-[#EF4444]">{t.game.youAreTheSpy}</p>
-      <p className="text-[13px] text-[#8E8E93]">{t.game.spyHint}</p>
+      <p className="text-spy-red text-2xl font-bold">{t.game.youAreTheSpy}</p>
+      <p className="text-muted-foreground text-[13px]">{t.game.spyHint}</p>
     </div>
   );
 });
@@ -42,14 +42,14 @@ const AgentRole = memo(function AgentRole({
 }) {
   return (
     <div className="space-y-2">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#8B5CF6]/12">
-        <Shield className="h-6 w-6 text-[#8B5CF6]" />
+      <div className="bg-spy-purple/12 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+        <Shield className="text-spy-purple h-6 w-6" />
       </div>
       <div className="flex items-center justify-center gap-2">
-        <MapPin className="h-4 w-4 text-[#48484A]" />
+        <MapPin className="text-muted-foreground/60 h-4 w-4" />
         <p className="text-lg font-bold">{location ? translateLocation(location) : location}</p>
       </div>
-      <p className="text-[13px] text-[#8E8E93]">
+      <p className="text-muted-foreground text-[13px]">
         {t.game.yourRole}{" "}
         <span className="font-semibold text-white">{myRole ? translateRole(myRole) : myRole}</span>
       </p>
@@ -73,7 +73,7 @@ export const RoleCard = memo(function RoleCard({
   const { t, translateLocation, translateRole } = useTranslation();
   return (
     <div
-      className={`rounded-2xl p-6 text-center ${isRoleRevealed && isSpy ? "bg-[#EF4444]/12" : "bg-[#141414]"}`}
+      className={`rounded-2xl p-6 text-center ${isRoleRevealed && isSpy ? "bg-spy-red/12" : "bg-surface-1"}`}
     >
       <button onClick={onToggle} className="w-full cursor-pointer space-y-3">
         {isRoleRevealed ? (
@@ -89,14 +89,14 @@ export const RoleCard = memo(function RoleCard({
                 translateRole={translateRole}
               />
             )}
-            <p className="mt-3 flex items-center justify-center gap-1 text-xs text-[#48484A]">
+            <p className="text-muted-foreground/60 mt-3 flex items-center justify-center gap-1 text-xs">
               <EyeOff className="h-3 w-3" /> {t.game.tapToHide}
             </p>
           </>
         ) : (
           <div className="space-y-2 py-4">
-            <Eye className="mx-auto h-8 w-8 text-[#48484A]" />
-            <p className="text-[#8E8E93]">{t.game.tapToReveal}</p>
+            <Eye className="text-muted-foreground/60 mx-auto h-8 w-8" />
+            <p className="text-muted-foreground">{t.game.tapToReveal}</p>
           </div>
         )}
       </button>
@@ -114,7 +114,7 @@ export const PlayerList = memo(function PlayerList({
   const { t } = useTranslation();
   return (
     <div>
-      <p className="mb-2 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+      <p className="text-muted-foreground/60 mb-2 text-[11px] tracking-[0.08em] uppercase">
         {t.players.title} ({players.length})
       </p>
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -123,14 +123,14 @@ export const PlayerList = memo(function PlayerList({
             <div
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                 p.id === currentPlayerId
-                  ? "bg-[#8B5CF6]/12 text-[#8B5CF6]"
-                  : "bg-white/8 text-[#8E8E93]"
+                  ? "bg-spy-purple/12 text-spy-purple"
+                  : "text-muted-foreground bg-white/8"
               }`}
             >
               {p.name.charAt(0).toUpperCase()}
             </div>
             <span
-              className={`text-[11px] ${p.id === currentPlayerId ? "text-[#8B5CF6]" : "text-[#8E8E93]"}`}
+              className={`text-[11px] ${p.id === currentPlayerId ? "text-spy-purple" : "text-muted-foreground"}`}
             >
               {p.name.length > NAME_TRUNCATE_LENGTH
                 ? `${p.name.slice(0, NAME_TRUNCATE_LENGTH)}...`
@@ -157,19 +157,17 @@ export const TimerSection = memo(function TimerSection({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1">
-        <Timer display={display} isExpired={isExpired} isPaused={!isTimerRunning} />
-      </div>
+    <div className="relative">
+      <Timer display={display} isExpired={isExpired} isPaused={!isTimerRunning} variant="hero" />
       {isHost && (
         <button
           onClick={onToggle}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#141414] transition-colors hover:bg-[#1C1C1E]"
+          className="bg-surface-1 hover:bg-surface-2 absolute right-2 bottom-2 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
         >
           {isTimerRunning ? (
-            <Pause className="h-5 w-5 text-[#8E8E93]" />
+            <Pause className="text-muted-foreground h-4 w-4" />
           ) : (
-            <Play className="h-5 w-5 text-[#8E8E93]" />
+            <Play className="text-muted-foreground h-4 w-4" />
           )}
         </button>
       )}
@@ -194,17 +192,19 @@ export const GameActions = memo(function GameActions({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex gap-2">
-      {isHost && (
-        <Button
-          className="h-[52px] flex-1 rounded-2xl bg-[#EF4444]/12 font-semibold text-[#EF4444] hover:bg-[#EF4444]/20"
-          onClick={onEndGame}
-          disabled={isEnding}
-        >
-          {isEnding ? t.game.ending : t.game.endGame}
-        </Button>
-      )}
-      <VotePanel players={game.players} playerId={playerId} gameId={gameId} />
+    <div className="fixed right-0 bottom-0 left-0 bg-black/80 p-4 backdrop-blur-sm">
+      <div className="flex gap-2">
+        <VotePanel players={game.players} playerId={playerId} gameId={gameId} />
+        {isHost && (
+          <Button
+            className="bg-spy-red/12 text-spy-red hover:bg-spy-red/20 h-14 rounded-2xl font-semibold"
+            onClick={onEndGame}
+            disabled={isEnding}
+          >
+            {isEnding ? t.game.ending : t.game.endGame}
+          </Button>
+        )}
+      </div>
     </div>
   );
 });

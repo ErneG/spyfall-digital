@@ -6,6 +6,7 @@ import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
 import { GameConfigSection } from "./game-config-section";
+import { EditionPicker } from "./edition-picker";
 import { PlayerListSection } from "./pass-and-play-form-parts";
 
 /* ── Exported form component ─────────────────────────── */
@@ -15,14 +16,17 @@ export interface PassAndPlayFormProps {
   timeLimit: number;
   spyCount: number;
   hideSpyCount: boolean;
+  editions: Array<1 | 2>;
   error: string;
   isLoading: boolean;
   onPlayerNameChange: (index: number, value: string) => void;
   onAddPlayer: () => void;
   onRemovePlayer: (index: number) => void;
+  onReorderPlayers: (newNames: string[]) => void;
   onTimeLimitChange: (value: number) => void;
   onSpyCountChange: (value: number) => void;
   onHideSpyCountChange: (checked: boolean) => void;
+  onEditionsChange: (editions: Array<1 | 2>) => void;
   onBack: () => void;
   onStart: () => void;
 }
@@ -37,9 +41,12 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
   onPlayerNameChange,
   onAddPlayer,
   onRemovePlayer,
+  onReorderPlayers,
   onTimeLimitChange,
   onSpyCountChange,
   onHideSpyCountChange,
+  editions,
+  onEditionsChange,
   onBack,
   onStart,
 }: PassAndPlayFormProps) {
@@ -48,7 +55,7 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
     <div className="space-y-6">
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">{t.home.passAndPlay}</h2>
-        <p className="text-[13px] text-[#8E8E93]">{t.home.passAndPlayDesc}</p>
+        <p className="text-muted-foreground text-[13px]">{t.home.passAndPlayDesc}</p>
       </div>
       <div className="space-y-4">
         <PlayerListSection
@@ -56,6 +63,7 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
           onPlayerNameChange={onPlayerNameChange}
           onAddPlayer={onAddPlayer}
           onRemovePlayer={onRemovePlayer}
+          onReorderPlayers={onReorderPlayers}
         />
         <div className="h-px bg-white/5" />
         <GameConfigSection
@@ -66,13 +74,15 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
           onSpyCountChange={onSpyCountChange}
           onHideSpyCountChange={onHideSpyCountChange}
         />
+        <div className="h-px bg-white/5" />
+        <EditionPicker editions={editions} onChange={onEditionsChange} />
         {error && (
-          <p className="text-[13px] text-[#EF4444]">
+          <p className="text-spy-red text-[13px]">
             {t.errors[error as keyof typeof t.errors] ?? error}
           </p>
         )}
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack} className="text-[#8E8E93]">
+          <Button variant="ghost" onClick={onBack} className="text-muted-foreground">
             {t.common.back}
           </Button>
           <Button

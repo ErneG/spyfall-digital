@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Reorder, useDragControls } from "motion/react";
+import { GripVertical, Plus, X } from "lucide-react";
 import React, { useCallback } from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
@@ -8,47 +9,76 @@ import { MIN_PLAYERS, MAX_PLAYERS } from "@/shared/lib/constants";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
+/* ── Types ───────────────────────────────────────────── */
+
+interface PlayerEntry {
+  id: string;
+  name: string;
+}
+
 /* ── Player name row ─────────────────────────────────── */
 
-export const PlayerNameRow = React.memo(function PlayerNameRow({
+const PlayerNameRow = React.memo(function PlayerNameRow({
+  entry,
   index,
-  name,
   canRemove,
   onNameChange,
   onRemove,
 }: {
+  entry: PlayerEntry;
   index: number;
-  name: string;
   canRemove: boolean;
-  onNameChange: (index: number, value: string) => void;
-  onRemove: (index: number) => void;
+  onNameChange: (id: string, value: string) => void;
+  onRemove: (id: string) => void;
 }) {
   const { t } = useTranslation();
+  const controls = useDragControls();
+
   const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => onNameChange(index, event.target.value),
-    [index, onNameChange],
+    (event: React.ChangeEvent<HTMLInputElement>) => onNameChange(entry.id, event.target.value),
+    [entry.id, onNameChange],
   );
-  const handleRemove = useCallback(() => onRemove(index), [index, onRemove]);
+  const handleRemove = useCallback(() => onRemove(entry.id), [entry.id, onRemove]);
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent) => controls.start(event),
+    [controls],
+  );
+
   return (
-    <div className="flex gap-2">
+    <Reorder.Item
+      value={entry}
+      dragListener={false}
+      dragControls={controls}
+      className="flex items-center gap-2"
+      style={{ position: "relative" }}
+      whileDrag={{ scale: 1.02, boxShadow: "0 8px 24px rgba(0,0,0,0.3)", zIndex: 10 }}
+    >
+      <button
+        type="button"
+        onPointerDown={handlePointerDown}
+        className="text-muted-foreground/40 hover:text-muted-foreground shrink-0 cursor-grab touch-none active:cursor-grabbing"
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
       <Input
         placeholder={`${t.home.playerN} ${index + 1}`}
-        value={name}
+        value={entry.name}
         onChange={handleChange}
         maxLength={20}
-        className="h-[48px] rounded-xl border-transparent bg-[#141414] text-[15px] placeholder:text-[#48484A] focus:border-transparent"
+        className="bg-surface-1 placeholder:text-muted-foreground/60 h-[48px] rounded-xl border-transparent text-[15px] focus:border-transparent"
       />
       {canRemove && (
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 text-[#8E8E93]"
+          className="text-muted-foreground shrink-0"
           onClick={handleRemove}
         >
           <X className="h-4 w-4" />
         </Button>
       )}
-    </div>
+    </Reorder.Item>
   );
 });
 
@@ -59,6 +89,7 @@ export interface PlayerListSectionProps {
   onPlayerNameChange: (index: number, value: string) => void;
   onAddPlayer: () => void;
   onRemovePlayer: (index: number) => void;
+  onReorderPlayers: (newNames: string[]) => void;
 }
 
 export const PlayerListSection = React.memo(function PlayerListSection({
@@ -66,27 +97,65 @@ export const PlayerListSection = React.memo(function PlayerListSection({
   onPlayerNameChange,
   onAddPlayer,
   onRemovePlayer,
+  onReorderPlayers,
 }: PlayerListSectionProps) {
   const { t } = useTranslation();
+
+  // Stable entries: id is set once per session position, name is the live value.
+  // We use a stable ref-based id so Reorder can track items across renders.
+  const entries: PlayerEntry[] = playerNames.map((name, i) => ({
+    id: `player-${String(i)}`,
+    name,
+  }));
+
+  const handleReorder = useCallback(
+    (reordered: PlayerEntry[]) => {
+      onReorderPlayers(reordered.map((e) => e.name));
+    },
+    [onReorderPlayers],
+  );
+
+  const handleNameChange = useCallback(
+    (id: string, value: string) => {
+      const index = entries.findIndex((e) => e.id === id);
+      if (index !== -1) onPlayerNameChange(index, value);
+    },
+    [entries, onPlayerNameChange],
+  );
+
+  const handleRemove = useCallback(
+    (id: string) => {
+      const index = entries.findIndex((e) => e.id === id);
+      if (index !== -1) onRemovePlayer(index);
+    },
+    [entries, onRemovePlayer],
+  );
+
   return (
     <>
-      <div className="space-y-2">
-        {playerNames.map((name, index) => (
+      <Reorder.Group
+        axis="y"
+        values={entries}
+        onReorder={handleReorder}
+        className="space-y-2"
+        style={{ listStyle: "none", padding: 0, margin: 0 }}
+      >
+        {entries.map((entry, index) => (
           <PlayerNameRow
-            key={`player-${String(index)}`}
+            key={entry.id}
+            entry={entry}
             index={index}
-            name={name}
             canRemove={playerNames.length > MIN_PLAYERS}
-            onNameChange={onPlayerNameChange}
-            onRemove={onRemovePlayer}
+            onNameChange={handleNameChange}
+            onRemove={handleRemove}
           />
         ))}
-      </div>
+      </Reorder.Group>
       {playerNames.length < MAX_PLAYERS && (
         <Button
           variant="ghost"
           size="sm"
-          className="w-full gap-1 text-[#8E8E93]"
+          className="text-muted-foreground w-full gap-1"
           onClick={onAddPlayer}
         >
           <Plus className="h-4 w-4" /> {t.home.addPlayer}

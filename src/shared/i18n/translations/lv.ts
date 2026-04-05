@@ -105,6 +105,9 @@ export const lv = {
     startPlaying: "S\u0101kt sp\u0113li",
     playerNofM: "Sp\u0113l\u0113t\u0101js",
     peekAtRole: "Paskat\u012Bties savu lomu",
+    peekTitle: "Apskat\u012Bt lomu",
+    peekSubtitle:
+      "Padod ier\u012Bci sp\u0113l\u0113t\u0101jam, kur\u0161 v\u0113las p\u0101rbaud\u012Bt savu lomu.",
     spyGuessLocation: "Spiegs: Min\u0113t lok\u0101ciju",
     spyGuessTitle: "Spiegs: Min\u0113t lok\u0101ciju",
     spyGuessSubtitle: "Izv\u0113lies savu v\u0101rdu, lai apstiprin\u0101tu, ka esi spiegs.",
@@ -115,6 +118,16 @@ export const lv = {
     whoDoYouThink: "Kur\u0161, tavupr\u0101t, ir spiegs?",
     backToGame: "Atpaka\u013C uz sp\u0113li",
     hide: "Pasl\u0113pt",
+  },
+  preparation: {
+    roundN: "Raunds",
+    firstToAsk: "Pirmais jaut\u0101",
+    startRound: "S\u0101kt raundu",
+    rule1:
+      "Katrs sp\u0113l\u0113t\u0101js uzdod VIENU jaut\u0101jumu citam sp\u0113l\u0113t\u0101jam par slepeno lok\u0101ciju.",
+    rule2: "Tu nevari jaut\u0101t atpaka\u013C personai, kas tikko jaut\u0101ja tev.",
+    rule3: "Spiegi nezina lok\u0101ciju \u2014 vi\u0146iem t\u0101 j\u0101noskaidro!",
+    roundRules: "Raunda noteikumi",
   },
   common: {
     back: "Atpaka\u013C",

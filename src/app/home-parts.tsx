@@ -1,21 +1,62 @@
 "use client";
 
-import { Eye, Users, Crosshair, Smartphone, ChevronRight } from "lucide-react";
+import { Users, Crosshair, Smartphone, ChevronRight } from "lucide-react";
 import React from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
+/* ── Spy Eye Logo ────────────────────────────────────── */
+
+const SpyEyeLogo = React.memo(function SpyEyeLogo() {
+  return (
+    <svg
+      width="64"
+      height="64"
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto"
+    >
+      {/* Outer eye shape */}
+      <path
+        d="M32 16C18 16 8 32 8 32s10 16 24 16 24-16 24-16S46 16 32 16z"
+        stroke="#8E8E93"
+        strokeWidth="2"
+        fill="none"
+      />
+      {/* Iris */}
+      <circle
+        cx="32"
+        cy="32"
+        r="10"
+        stroke="#8B5CF6"
+        strokeWidth="2"
+        fill="rgba(139,92,246,0.12)"
+      />
+      {/* Pupil */}
+      <circle cx="32" cy="32" r="4" fill="#8B5CF6" />
+      {/* Crosshair lines */}
+      <line x1="32" y1="18" x2="32" y2="26" stroke="#8E8E93" strokeWidth="1" opacity="0.5" />
+      <line x1="32" y1="38" x2="32" y2="46" stroke="#8E8E93" strokeWidth="1" opacity="0.5" />
+      <line x1="18" y1="32" x2="26" y2="32" stroke="#8E8E93" strokeWidth="1" opacity="0.5" />
+      <line x1="38" y1="32" x2="46" y2="32" stroke="#8E8E93" strokeWidth="1" opacity="0.5" />
+    </svg>
+  );
+});
+
 /* ── Subcomponents ────────────────────────────────────── */
 
 export const HeroSection = React.memo(function HeroSection() {
   const { t } = useTranslation();
   return (
-    <div className="space-y-2 text-center">
-      <Eye className="mx-auto h-6 w-6 text-[#8E8E93]" />
-      <h1 className="text-5xl font-bold tracking-tight">{t.home.title}</h1>
-      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.home.subtitle}</p>
+    <div className="space-y-4 text-center">
+      <SpyEyeLogo />
+      <h1 className="text-6xl font-bold tracking-tight">{t.home.title}</h1>
+      <p className="text-muted-foreground/60 text-[11px] font-semibold tracking-[0.08em] uppercase">
+        {t.home.subtitle}
+      </p>
     </div>
   );
 });
@@ -26,6 +67,40 @@ interface ModeSelectorProps {
   onPassAndPlayMode: () => void;
 }
 
+const ModeCard = React.memo(function ModeCard({
+  onClick,
+  icon,
+  iconClass,
+  borderClass,
+  title,
+  desc,
+}: {
+  onClick: () => void;
+  icon: React.ReactNode;
+  iconClass: string;
+  borderClass: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`bg-surface-1 flex h-[72px] w-full items-center gap-3 rounded-2xl border-l-2 px-4 ${borderClass} transition-transform active:scale-[0.98]`}
+    >
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClass}`}
+      >
+        {icon}
+      </div>
+      <div className="flex-1 text-left">
+        <p className="text-[15px] font-semibold">{title}</p>
+        <p className="text-muted-foreground text-[12px]">{desc}</p>
+      </div>
+      <ChevronRight className="text-muted-foreground/60 h-4 w-4" />
+    </button>
+  );
+});
+
 export const ModeSelector = React.memo(function ModeSelector({
   onCreateMode,
   onJoinMode,
@@ -33,48 +108,31 @@ export const ModeSelector = React.memo(function ModeSelector({
 }: ModeSelectorProps) {
   const { t } = useTranslation();
   return (
-    <div className="overflow-hidden rounded-2xl bg-[#141414]">
-      <button
+    <div className="space-y-3">
+      <ModeCard
         onClick={onCreateMode}
-        className="flex h-[56px] w-full items-center gap-3 px-4 transition-colors hover:bg-white/5"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#8B5CF6]/12">
-          <Users className="h-5 w-5 text-[#8B5CF6]" />
-        </div>
-        <div className="flex-1 text-left">
-          <p className="text-[15px] font-semibold">{t.home.createRoom}</p>
-          <p className="text-[12px] text-[#8E8E93]">{t.home.createRoomDesc}</p>
-        </div>
-        <ChevronRight className="h-4 w-4 text-[#48484A]" />
-      </button>
-      <div className="mx-4 h-px bg-white/5" />
-      <button
+        icon={<Users className="text-spy-purple h-5 w-5" />}
+        iconClass="bg-spy-purple/12"
+        borderClass="border-spy-purple"
+        title={t.home.createRoom}
+        desc={t.home.createRoomDesc}
+      />
+      <ModeCard
         onClick={onJoinMode}
-        className="flex h-[56px] w-full items-center gap-3 px-4 transition-colors hover:bg-white/5"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8">
-          <Crosshair className="h-5 w-5 text-[#8E8E93]" />
-        </div>
-        <div className="flex-1 text-left">
-          <p className="text-[15px] font-semibold">{t.home.joinRoom}</p>
-          <p className="text-[12px] text-[#8E8E93]">{t.home.joinRoomDesc}</p>
-        </div>
-        <ChevronRight className="h-4 w-4 text-[#48484A]" />
-      </button>
-      <div className="mx-4 h-px bg-white/5" />
-      <button
+        icon={<Crosshair className="text-muted-foreground h-5 w-5" />}
+        iconClass="bg-white/8"
+        borderClass="border-muted-foreground/40"
+        title={t.home.joinRoom}
+        desc={t.home.joinRoomDesc}
+      />
+      <ModeCard
         onClick={onPassAndPlayMode}
-        className="flex h-[56px] w-full items-center gap-3 px-4 transition-colors hover:bg-white/5"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8">
-          <Smartphone className="h-5 w-5 text-[#8E8E93]" />
-        </div>
-        <div className="flex-1 text-left">
-          <p className="text-[15px] font-semibold">{t.home.passAndPlay}</p>
-          <p className="text-[12px] text-[#8E8E93]">{t.home.passAndPlayDesc}</p>
-        </div>
-        <ChevronRight className="h-4 w-4 text-[#48484A]" />
-      </button>
+        icon={<Smartphone className="text-success h-5 w-5" />}
+        iconClass="bg-success/12"
+        borderClass="border-success"
+        title={t.home.passAndPlay}
+        desc={t.home.passAndPlayDesc}
+      />
     </div>
   );
 });
@@ -103,7 +161,7 @@ export const CreateRoomForm = React.memo(function CreateRoomForm({
     <div className="space-y-6">
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">{t.home.createRoom}</h2>
-        <p className="text-[13px] text-[#8E8E93]">{t.home.createRoomDesc}</p>
+        <p className="text-muted-foreground text-[13px]">{t.home.createRoomDesc}</p>
       </div>
       <div className="space-y-4">
         <Input
@@ -113,15 +171,15 @@ export const CreateRoomForm = React.memo(function CreateRoomForm({
           maxLength={20}
           autoFocus
           onKeyDown={onKeyDown}
-          className="h-[52px] rounded-2xl border-transparent bg-[#141414] text-[15px] placeholder:text-[#48484A] focus:border-transparent"
+          className="bg-surface-1 placeholder:text-muted-foreground/60 h-[52px] rounded-2xl border-transparent text-[15px] focus:border-transparent"
         />
         {error && (
-          <p className="text-[13px] text-[#EF4444]">
+          <p className="text-spy-red text-[13px]">
             {t.errors[error as keyof typeof t.errors] ?? error}
           </p>
         )}
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onBack} className="text-[#8E8E93]">
+          <Button variant="ghost" onClick={onBack} className="text-muted-foreground">
             {t.common.back}
           </Button>
           <Button
@@ -142,7 +200,7 @@ export const FooterInfo = React.memo(function FooterInfo() {
   return (
     <>
       <div className="h-px bg-white/5" />
-      <div className="space-y-1 text-center text-[11px] text-[#48484A]">
+      <div className="text-muted-foreground/60 space-y-1 text-center text-[11px] font-semibold tracking-[0.06em] uppercase">
         <p>{t.home.footer}</p>
         <p>{t.home.footerInspired}</p>
       </div>

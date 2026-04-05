@@ -9,7 +9,6 @@ import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 
 const SECONDS_PER_MINUTE = 60;
-const SPY_OPTIONS = [1, 2] as const;
 
 interface GameConfigSummaryProps {
   timeLimit: number;
@@ -28,24 +27,24 @@ export const GameConfigSummary = memo(function GameConfigSummary({
 }: GameConfigSummaryProps) {
   const { t } = useTranslation();
   return (
-    <div className="rounded-2xl bg-[#141414] p-4">
-      <p className="mb-3 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+    <div className="bg-surface-1 rounded-2xl p-4">
+      <p className="text-muted-foreground/60 mb-3 text-[11px] tracking-[0.08em] uppercase">
         <Settings className="mr-1 inline h-3 w-3" /> {t.config.gameSettings}
       </p>
       <div className="flex flex-wrap gap-2 text-sm">
-        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+        <span className="text-muted-foreground rounded-lg bg-white/8 px-2.5 py-1 text-[13px]">
           <Clock className="mr-1 inline h-3 w-3" />
           {Math.floor(timeLimit / SECONDS_PER_MINUTE)}:
           {String(timeLimit % SECONDS_PER_MINUTE).padStart(2, "0")}
         </span>
-        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+        <span className="text-muted-foreground rounded-lg bg-white/8 px-2.5 py-1 text-[13px]">
           {spyCount} {spyCount === 1 ? t.config.spy : t.config.spiesPlural}
         </span>
-        <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[13px] text-[#8E8E93]">
+        <span className="text-muted-foreground rounded-lg bg-white/8 px-2.5 py-1 text-[13px]">
           {selectedLocationCount}/{totalLocationCount} {t.config.locationsSelected}
         </span>
         {moderatorMode && (
-          <span className="rounded-lg bg-[#8B5CF6]/12 px-2.5 py-1 text-[13px] text-[#8B5CF6]">
+          <span className="bg-spy-purple/12 text-spy-purple rounded-lg px-2.5 py-1 text-[13px]">
             <Shield className="mr-1 inline h-3 w-3" /> {t.config.moderatorMode}
           </span>
         )}
@@ -53,7 +52,6 @@ export const GameConfigSummary = memo(function GameConfigSummary({
     </div>
   );
 });
-
 export const PresetButton = memo(function PresetButton({
   label,
   value,
@@ -72,14 +70,13 @@ export const PresetButton = memo(function PresetButton({
     <button
       onClick={handleClick}
       className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-        isSelected ? "bg-white text-black" : "bg-[#1C1C1E] text-[#8E8E93] hover:bg-[#2C2C2E]"
+        isSelected ? "bg-white text-black" : "bg-surface-2 text-muted-foreground hover:bg-surface-3"
       }`}
     >
       {label}
     </button>
   );
 });
-
 export const ConfigToggles = memo(function ConfigToggles({
   autoStartTimer,
   hideSpyCount,
@@ -97,10 +94,10 @@ export const ConfigToggles = memo(function ConfigToggles({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="overflow-hidden rounded-2xl bg-[#141414]">
+    <div className="bg-surface-1 overflow-hidden rounded-2xl">
       <div className="flex h-[56px] items-center justify-between px-4">
         <Label htmlFor="auto-start" className="flex items-center gap-2 text-sm">
-          <Timer className="h-3.5 w-3.5 text-[#8E8E93]" /> {t.config.autoStartTimer}
+          <Timer className="text-muted-foreground h-3.5 w-3.5" /> {t.config.autoStartTimer}
         </Label>
         <Switch id="auto-start" checked={autoStartTimer} onCheckedChange={onAutoStart} />
       </div>
@@ -108,9 +105,9 @@ export const ConfigToggles = memo(function ConfigToggles({
       <div className="flex h-[56px] items-center justify-between px-4">
         <Label htmlFor="hide-spy" className="flex items-center gap-2 text-sm">
           {hideSpyCount ? (
-            <EyeOff className="h-3.5 w-3.5 text-[#8E8E93]" />
+            <EyeOff className="text-muted-foreground h-3.5 w-3.5" />
           ) : (
-            <Eye className="h-3.5 w-3.5 text-[#8E8E93]" />
+            <Eye className="text-muted-foreground h-3.5 w-3.5" />
           )}
           {t.config.hideSpyCount}
         </Label>
@@ -119,14 +116,13 @@ export const ConfigToggles = memo(function ConfigToggles({
       <div className="mx-4 h-px bg-white/5" />
       <div className="flex h-[56px] items-center justify-between px-4">
         <Label htmlFor="moderator" className="flex items-center gap-2 text-sm">
-          <Shield className="h-3.5 w-3.5 text-[#8E8E93]" /> {t.config.moderatorMode}
+          <Shield className="text-muted-foreground h-3.5 w-3.5" /> {t.config.moderatorMode}
         </Label>
         <Switch id="moderator" checked={moderatorMode} onCheckedChange={onModerator} />
       </div>
     </div>
   );
 });
-
 export const TimerSection = memo(function TimerSection({
   timeLimit,
   onSelect,
@@ -137,7 +133,7 @@ export const TimerSection = memo(function TimerSection({
   const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+      <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
         <Clock className="mr-1 inline h-3 w-3" /> {t.config.timer}
       </p>
       <div className="flex gap-1.5">
@@ -151,58 +147,6 @@ export const TimerSection = memo(function TimerSection({
           />
         ))}
       </div>
-    </div>
-  );
-});
-
-export const SpySection = memo(function SpySection({
-  spyCount,
-  onSelect,
-}: {
-  spyCount: number;
-  onSelect: (count: number) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-2">
-      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.config.spies}</p>
-      <div className="flex gap-1.5">
-        {SPY_OPTIONS.map((count) => (
-          <PresetButton
-            key={count}
-            label={`${count} ${count === 1 ? t.config.spy : t.config.spiesPlural}`}
-            value={count}
-            isSelected={spyCount === count}
-            onClick={onSelect}
-          />
-        ))}
-      </div>
-    </div>
-  );
-});
-
-export const LocationSection = memo(function LocationSection({
-  selectedLocationCount,
-  totalLocationCount,
-  onOpenLocations,
-}: {
-  selectedLocationCount: number;
-  totalLocationCount: number;
-  onOpenLocations: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div className="space-y-2">
-      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">{t.config.locations}</p>
-      <button
-        onClick={onOpenLocations}
-        className="flex h-[56px] w-full items-center justify-between rounded-2xl bg-[#141414] px-4 text-sm transition-colors hover:bg-[#1C1C1E]"
-      >
-        <span>
-          {selectedLocationCount} / {totalLocationCount} {t.config.locationsSelected}
-        </span>
-        <span className="text-[#48484A]">{t.config.edit} &rarr;</span>
-      </button>
     </div>
   );
 });

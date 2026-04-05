@@ -63,8 +63,8 @@ export const LocationGrid = memo(function LocationGrid({
 
   return (
     <>
-      <div className="rounded-2xl bg-[#141414] p-4">
-        <p className="mb-3 text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+      <div className="bg-surface-1 rounded-2xl p-4">
+        <p className="text-muted-foreground/60 mb-3 text-[11px] tracking-[0.08em] uppercase">
           <MapPin className="mr-1 inline h-3 w-3" />
           {t.locationGrid.title} ({locations.length})
         </p>

@@ -1,6 +1,5 @@
 "use client";
 
-import { SpyGuessPhase, VotingPhase } from "@/domains/game/components/pass-and-play-phases";
 import { PlayingPhase } from "@/domains/game/components/pass-and-play-playing";
 import { RevealScreen } from "@/domains/game/components/reveal-screen";
 import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
@@ -12,7 +11,6 @@ import type { useTranslation } from "@/shared/i18n/context";
 
 interface PhaseRouterProps {
   state: ReturnType<typeof usePassAndPlay>;
-  gameId: string;
   hostPlayerId: string;
   allPlayers: Array<{ id: string; name: string }>;
   shouldHideSpyCount: boolean;
@@ -22,19 +20,18 @@ interface PhaseRouterProps {
 
 export function PhaseRouter({
   state,
-  gameId,
   hostPlayerId,
   allPlayers,
   shouldHideSpyCount,
   spyCount,
   t,
 }: PhaseRouterProps) {
-  const { game, phase, shouldShowReveal } = state;
+  const { game, phase, shouldShowReveal, activeGameId } = state;
 
   if (phase === "role-reveal") {
     return (
       <RoleRevealCarousel
-        gameId={gameId}
+        gameId={activeGameId}
         players={allPlayers}
         onComplete={state.handleRoleRevealComplete}
       />
@@ -47,26 +44,12 @@ export function PhaseRouter({
         game={game}
         playerId={hostPlayerId}
         isHost
+        passAndPlay
+        isRestarting={state.playAgainMutation.isPending}
         onRestart={state.handlePlayAgain}
         onLeave={state.handleLeave}
       />
     );
-  }
-
-  if (phase === "spy-guess") {
-    return (
-      <SpyGuessPhase
-        spyGuess={state.spyGuess}
-        game={game}
-        allPlayers={allPlayers}
-        gameId={gameId}
-        t={t}
-      />
-    );
-  }
-
-  if (phase === "voting") {
-    return <VotingPhase voting={state.voting} allPlayers={allPlayers} t={t} />;
   }
 
   return (

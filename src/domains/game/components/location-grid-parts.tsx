@@ -43,13 +43,13 @@ export const LocationButton = memo(function LocationButton({
 
   let className = "text-left text-xs py-2 px-3 rounded-xl transition-colors cursor-pointer ";
   if (isRevealed) {
-    className += "bg-[#8B5CF6]/12 text-[#8B5CF6] font-bold";
+    className += "bg-spy-purple/12 text-spy-purple font-bold";
   } else if (isPrevious) {
-    className += "bg-[#1C1C1E] text-[#48484A] line-through opacity-50";
+    className += "bg-surface-2 text-muted-foreground/60 line-through opacity-50";
   } else if (isCrossed) {
-    className += "bg-[#1C1C1E] text-[#48484A] line-through";
+    className += "bg-surface-2 text-muted-foreground/60 line-through";
   } else {
-    className += "bg-[#1C1C1E] text-[#8E8E93] hover:bg-[#2C2C2E]";
+    className += "bg-surface-2 text-muted-foreground hover:bg-surface-3";
   }
 
   return (

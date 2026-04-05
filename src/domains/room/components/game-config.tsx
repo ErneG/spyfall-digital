@@ -5,13 +5,8 @@ import { memo } from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
 
-import {
-  ConfigToggles,
-  GameConfigSummary,
-  LocationSection,
-  SpySection,
-  TimerSection,
-} from "./game-config-parts";
+import { ConfigToggles, GameConfigSummary, TimerSection } from "./game-config-parts";
+import { LocationSection, SpySection } from "./game-config-sections";
 import { useGameConfig } from "./use-game-config";
 
 export interface GameConfigProps {
@@ -46,7 +41,7 @@ export const GameConfig = memo(function GameConfig(props: GameConfigProps) {
 
   return (
     <div className="space-y-5">
-      <p className="text-[11px] tracking-[0.08em] text-[#48484A] uppercase">
+      <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
         <Settings className="mr-1 inline h-3 w-3" /> {t.config.gameSettings}
       </p>
       <TimerSection timeLimit={props.timeLimit} onSelect={handlers.handleTimeSelect} />
