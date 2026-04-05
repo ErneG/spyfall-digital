@@ -126,7 +126,12 @@ export function useHomeState() {
   });
 
   const inputHandlers = useInputHandlers({ setName, setJoinCode, setPlayerNames, setError });
-  const configHandlers = useConfigHandlers({ setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount });
+  const configHandlers = useConfigHandlers({
+    setPnpTimeLimit,
+    setPnpSpyCount,
+    setPnpHideSpyCount,
+    setPnpEditions,
+  });
   const actionHandlers = useActionHandlers({
     name,
     joinCode,
@@ -148,6 +153,7 @@ export function useHomeState() {
     pnpTimeLimit,
     pnpSpyCount,
     shouldPnpHideSpyCount,
+    pnpEditions,
     ...inputHandlers,
     ...configHandlers,
     ...actionHandlers,
