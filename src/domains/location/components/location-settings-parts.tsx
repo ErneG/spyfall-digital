@@ -142,9 +142,11 @@ export const CategoryGroupSection = memo(function CategoryGroupSection({
     onDeselectAll(category);
   }, [onDeselectAll, category]);
 
+  const { translateCategory } = useTranslation();
+
   return (
     <LocationGroup
-      title={category}
+      title={translateCategory(category)}
       locations={locations}
       onToggle={onToggle}
       onSelectAll={handleSelectAll}

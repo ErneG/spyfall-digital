@@ -160,3 +160,5 @@ export interface LocationEntry {
 }
 
 export type LocationTranslations = Record<string, LocationEntry>;
+
+export type CategoryTranslations = Record<string, string>;
