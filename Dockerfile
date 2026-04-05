@@ -23,7 +23,7 @@ FROM deps AS migrator
 WORKDIR /app
 COPY . .
 RUN pnpm db:generate
-CMD ["sh", "-c", "pnpm db:push && pnpm db:seed"]
+CMD ["sh", "-c", "pnpm exec prisma db push --accept-data-loss && pnpm db:seed"]
 
 # ─── Production image ────────────────────────────────────────
 FROM node:22-alpine AS runner
