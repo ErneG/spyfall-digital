@@ -232,7 +232,7 @@ export async function createPassAndPlayRoom(
     timeLimit,
     spyCount,
     hideSpyCount: shouldHideSpyCount,
-    editions,
+    categories,
   } = parsed.data;
 
   try {
@@ -249,9 +249,9 @@ export async function createPassAndPlayRoom(
       }
     }
 
-    // Fetch locations filtered by selected editions
+    // Fetch locations filtered by selected categories
     const allLocations = await prisma.location.findMany({
-      where: { edition: { in: editions } },
+      where: { category: { in: categories } },
       select: { id: true },
     });
 

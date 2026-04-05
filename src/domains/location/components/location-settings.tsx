@@ -27,15 +27,28 @@ function useLocationFilter(locations: LocationItem[]) {
     () => locations.filter((loc) => loc.name.toLowerCase().includes(filter.toLowerCase())),
     [locations, filter],
   );
-  const edition1 = useMemo(() => filtered.filter((l) => l.edition === 1), [filtered]);
-  const edition2 = useMemo(() => filtered.filter((l) => l.edition === 2), [filtered]);
+  const categories = useMemo(() => {
+    const grouped = new Map<string, LocationItem[]>();
+    for (const loc of filtered) {
+      const cat = loc.category;
+      const list = grouped.get(cat);
+      if (list) {
+        list.push(loc);
+      } else {
+        grouped.set(cat, [loc]);
+      }
+    }
+    return Array.from(grouped.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([category, locs]) => ({ category, locations: locs }));
+  }, [filtered]);
   const clearFilter = useCallback(() => {
     setFilter("");
   }, []);
   const handleFilterChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(event.target.value);
   }, []);
-  return { filter, edition1, edition2, clearFilter, handleFilterChange };
+  return { filter, categories, clearFilter, handleFilterChange };
 }
 
 interface LocationSettingsProps {
@@ -55,9 +68,7 @@ export const LocationSettings = memo(function LocationSettings({
   const { isAuthenticated } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
   const data = useLocationData(roomCode, playerId, open, onOpenChange);
-  const { filter, edition1, edition2, clearFilter, handleFilterChange } = useLocationFilter(
-    data.locations,
-  );
+  const { filter, categories, clearFilter, handleFilterChange } = useLocationFilter(data.locations);
   const selectedCount = useMemo(
     () =>
       data.locations.filter((l) => l.selected).length +
@@ -94,7 +105,7 @@ export const LocationSettings = memo(function LocationSettings({
             Import from Collection
           </Button>
         )}
-        <LocationSettingsBody data={data} edition1={edition1} edition2={edition2} filter={filter} />
+        <LocationSettingsBody data={data} categories={categories} filter={filter} />
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="ghost" onClick={handleClose}>
             {t.common.cancel}

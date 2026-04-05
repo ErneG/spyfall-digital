@@ -147,8 +147,6 @@ export interface Translations {
     title: string;
     description: string;
     filter: string;
-    edition1: string;
-    edition2: string;
     all: string;
     none: string;
     customLocations: string;
