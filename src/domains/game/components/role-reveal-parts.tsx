@@ -1,13 +1,13 @@
 "use client";
 
-import { ChevronRight, Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
-import { memo, useState } from "react";
+import { memo, useCallback } from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
-import { CardBack, FlippableRoleCard } from "./role-card-parts";
+import { MiniCardStack, RoleCard } from "./role-card-parts";
 
 import type { PeekRole } from "@/domains/game/hooks";
 
@@ -16,10 +16,12 @@ import type { PeekRole } from "@/domains/game/hooks";
 export const HandoffScreen = memo(function HandoffScreen({
   playerName,
   isFirst,
+  remaining,
   onReady,
 }: {
   playerName: string;
   isFirst: boolean;
+  remaining: number;
   onReady: () => void;
 }) {
   const { t } = useTranslation();
@@ -29,6 +31,7 @@ export const HandoffScreen = memo(function HandoffScreen({
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8 pt-8 text-center"
     >
+      <MiniCardStack count={remaining + 1} />
       <div className="space-y-2">
         <p className="text-muted-foreground text-sm">
           {isFirst ? t.passAndPlay.startingWith : t.passAndPlay.handDeviceTo}
@@ -42,71 +45,65 @@ export const HandoffScreen = memo(function HandoffScreen({
   );
 });
 
-/* ── Ready Screen (card back preview) ────────────────── */
+/* ── Card Screen (tap to flip + confirm) ─────────────── */
 
-export const ReadyScreen = memo(function ReadyScreen({
+export const CardScreen = memo(function CardScreen({
   playerName,
-  isLoading,
-  hasError,
-  onReveal,
-}: {
-  playerName: string;
-  isLoading: boolean;
-  hasError: boolean;
-  onReveal: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
-      <div className="perspective-1000 mx-auto w-full max-w-sm">
-        <div className="relative h-[380px] w-full">
-          <CardBack playerName={playerName} />
-        </div>
-      </div>
-      {hasError && <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>}
-      <Button
-        size="lg"
-        variant="outline"
-        className="h-14 w-full text-lg"
-        onClick={onReveal}
-        disabled={isLoading}
-      >
-        {isLoading && t.common.loading}
-        {!isLoading && hasError && t.passAndPlay.retry}
-        {!isLoading && !hasError && t.passAndPlay.revealMyRole}
-      </Button>
-    </motion.div>
-  );
-});
-
-/* ── Revealed Screen (card flipped) ──────────────────── */
-
-export const RevealedScreen = memo(function RevealedScreen({
   role,
+  isFlipped,
+  isLoading,
+  hasFetchError,
   isLast,
+  remaining,
+  onFlip,
   onNext,
 }: {
-  role: PeekRole;
+  playerName: string;
+  role: PeekRole | null;
+  isFlipped: boolean;
+  isLoading: boolean;
+  hasFetchError: boolean;
   isLast: boolean;
+  remaining: number;
+  onFlip: () => void;
   onNext: () => void;
 }) {
   const { t } = useTranslation();
-  const [isFlipped] = useState(true);
+
+  const handleFlip = useCallback(() => {
+    void onFlip();
+  }, [onFlip]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
-      <FlippableRoleCard playerName="" role={role} isFlipped={isFlipped} onFlip={() => {}} />
-      <Button size="lg" className="h-14 w-full gap-2 text-lg" onClick={onNext}>
-        {isLast ? (
-          <>
-            {t.passAndPlay.gotIt} <Check className="h-5 w-5" />
-          </>
-        ) : (
-          <>
-            {t.passAndPlay.gotItNext} <ChevronRight className="h-5 w-5" />
-          </>
-        )}
-      </Button>
+      <RoleCard
+        playerName={playerName}
+        role={role}
+        isFlipped={isFlipped}
+        isLoading={isLoading}
+        remaining={remaining}
+        onFlip={handleFlip}
+      />
+
+      {hasFetchError && (
+        <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>
+      )}
+
+      {isFlipped && role && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <Button size="lg" className="h-14 w-full gap-2 text-lg" onClick={onNext}>
+            {isLast ? (
+              <>
+                {t.passAndPlay.gotIt} <Check className="h-5 w-5" />
+              </>
+            ) : (
+              <>
+                {t.passAndPlay.gotItNext} <ChevronRight className="h-5 w-5" />
+              </>
+            )}
+          </Button>
+        </motion.div>
+      )}
     </motion.div>
   );
 });
