@@ -6,6 +6,8 @@ services:
       POSTGRES_USER: spyfall
       POSTGRES_PASSWORD: spyfall
       POSTGRES_DB: spyfall
+    ports:
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
