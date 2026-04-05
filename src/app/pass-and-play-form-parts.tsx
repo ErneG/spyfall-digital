@@ -9,12 +9,7 @@ import { MIN_PLAYERS, MAX_PLAYERS } from "@/shared/lib/constants";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-/* ── Types ───────────────────────────────────────────── */
-
-interface PlayerEntry {
-  id: string;
-  name: string;
-}
+import { type PlayerEntry, usePlayerList } from "./use-player-list";
 
 /* ── Hooks ──────────────────────────────────────────── */
 
@@ -44,18 +39,31 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   canRemove,
   onNameChange,
   onRemove,
+  inputRef,
+  onEnter,
 }: {
   entry: PlayerEntry;
   index: number;
   canRemove: boolean;
   onNameChange: (id: string, value: string) => void;
   onRemove: (id: string) => void;
+  inputRef: React.RefCallback<HTMLInputElement>;
+  onEnter: (index: number) => void;
 }) {
   const { t } = useTranslation();
   const { controls, handleChange, handleRemove, handlePointerDown } = usePlayerRowHandlers(
     entry.id,
     onNameChange,
     onRemove,
+  );
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        onEnter(index);
+      }
+    },
+    [index, onEnter],
   );
 
   return (
@@ -76,9 +84,11 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
         <GripVertical className="h-4 w-4" />
       </button>
       <Input
+        ref={inputRef}
         placeholder={`${t.home.playerN} ${index + 1}`}
         value={entry.name}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         maxLength={20}
         className="bg-surface-1 placeholder:text-muted-foreground/60 h-[48px] rounded-xl border-transparent text-[15px] focus:border-transparent"
       />
@@ -114,40 +124,14 @@ export const PlayerListSection = React.memo(function PlayerListSection({
   onReorderPlayers,
 }: PlayerListSectionProps) {
   const { t } = useTranslation();
-
-  // Stable entries: id is set once per session position, name is the live value.
-  // We use a stable ref-based id so Reorder can track items across renders.
-  const entries: PlayerEntry[] = playerNames.map((name, i) => ({
-    id: `player-${String(i)}`,
-    name,
-  }));
-
-  const handleReorder = useCallback(
-    (reordered: PlayerEntry[]) => {
-      onReorderPlayers(reordered.map((e) => e.name));
-    },
-    [onReorderPlayers],
-  );
-
-  const handleNameChange = useCallback(
-    (id: string, value: string) => {
-      const index = entries.findIndex((e) => e.id === id);
-      if (index !== -1) {
-        onPlayerNameChange(index, value);
-      }
-    },
-    [entries, onPlayerNameChange],
-  );
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      const index = entries.findIndex((e) => e.id === id);
-      if (index !== -1) {
-        onRemovePlayer(index);
-      }
-    },
-    [entries, onRemovePlayer],
-  );
+  const { entries, makeInputRef, handleEnter, handleReorder, handleNameChange, handleRemove } =
+    usePlayerList({
+      playerNames,
+      onPlayerNameChange,
+      onAddPlayer,
+      onRemovePlayer,
+      onReorderPlayers,
+    });
 
   return (
     <>
@@ -166,6 +150,8 @@ export const PlayerListSection = React.memo(function PlayerListSection({
             canRemove={playerNames.length > MIN_PLAYERS}
             onNameChange={handleNameChange}
             onRemove={handleRemove}
+            inputRef={makeInputRef(index)}
+            onEnter={handleEnter}
           />
         ))}
       </Reorder.Group>
