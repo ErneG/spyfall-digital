@@ -7,6 +7,119 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── BetterAuth ──────────────────────────────────────────────
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  displayName   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      AuthSession[]
+  accounts      Account[]
+  players       Player[]
+  nameHistory   NameHistory[]
+  collections   LocationCollection[]
+}
+
+model AuthSession {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Name History ────────────────────────────────────────────
+
+model NameHistory {
+  id     String   @id @default(cuid())
+  userId String
+  name   String
+  usedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+// ─── Location Collections (per user) ─────────────────────────
+
+model LocationCollection {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locations CollectionLocation[]
+
+  @@index([userId])
+}
+
+model CollectionLocation {
+  id           String  @id @default(cuid())
+  collectionId String
+  name         String
+  allSpies     Boolean @default(false)
+
+  collection LocationCollection    @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  roles      CollectionLocationRole[]
+
+  @@index([collectionId])
+}
+
+model CollectionLocationRole {
+  id                   String @id @default(cuid())
+  name                 String
+  collectionLocationId String
+
+  collectionLocation CollectionLocation @relation(fields: [collectionLocationId], references: [id], onDelete: Cascade)
+
+  @@index([collectionLocationId])
+}
+
 // ─── Game Room ───────────────────────────────────────────────
 
 model Room {
@@ -89,10 +202,12 @@ model Player {
   isOnline       Boolean @default(true)
   moderatorRole  String? // pre-assigned role in moderator mode
   roomId         String
+  userId         String? // optional link to authenticated user
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   assignments Assignment[]
   votes       Vote[]       @relation("voter")
   votesAgainst Vote[]      @relation("suspect")

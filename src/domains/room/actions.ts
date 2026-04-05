@@ -13,10 +13,31 @@ import {
   type UpdateRoomConfigOutput,
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
+import { getAuthUser } from "@/shared/lib/auth-session";
 import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
 import { prisma } from "@/shared/lib/prisma";
 import { generateRoomCode } from "@/shared/lib/room-code";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
+
+/** Link player to authenticated user and save name to history. */
+async function linkPlayerToUser(playerId: string, playerName: string) {
+  const user = await getAuthUser();
+  if (!user) {
+    return;
+  }
+
+  await prisma.$transaction([
+    prisma.player.update({
+      where: { id: playerId },
+      data: { userId: user.id },
+    }),
+    prisma.nameHistory.upsert({
+      where: { userId_name: { userId: user.id, name: playerName } },
+      update: { usedAt: new Date() },
+      create: { userId: user.id, name: playerName },
+    }),
+  ]);
+}
 
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms
@@ -70,6 +91,9 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
       data: { hostId: host.id },
     });
 
+    // Link to authenticated user (non-blocking — don't fail room creation)
+    await linkPlayerToUser(host.id, hostName).catch(() => {});
+
     return ok({
       roomId: room.id,
       code: room.code,
@@ -118,6 +142,9 @@ export async function joinRoom(input: JoinRoomInput): Promise<ActionResult<JoinR
         roomId: room.id,
       },
     });
+
+    // Link to authenticated user (non-blocking)
+    await linkPlayerToUser(player.id, playerName).catch(() => {});
 
     return ok({
       playerId: player.id,
@@ -261,6 +288,28 @@ export async function createPassAndPlayRoom(
     });
 
     const host = room.players[0];
+
+    // Link host to authenticated user and save all player names (non-blocking)
+    const saveNames = async () => {
+      const user = await getAuthUser();
+      if (!user) {
+        return;
+      }
+      await prisma.$transaction([
+        prisma.player.update({
+          where: { id: host.id },
+          data: { userId: user.id },
+        }),
+        ...playerNames.map((name) =>
+          prisma.nameHistory.upsert({
+            where: { userId_name: { userId: user.id, name } },
+            update: { usedAt: new Date() },
+            create: { userId: user.id, name },
+          }),
+        ),
+      ]);
+    };
+    await saveNames().catch(() => {});
 
     return ok({
       roomId: room.id,

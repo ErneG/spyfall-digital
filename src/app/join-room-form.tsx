@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import { NameSuggestions } from "@/domains/profile/components/name-suggestions";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -12,6 +13,7 @@ interface JoinRoomFormProps {
   error: string;
   isLoading: boolean;
   onNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onNameSelect: (name: string) => void;
   onJoinCodeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onBack: () => void;
@@ -24,6 +26,7 @@ export const JoinRoomForm = React.memo(function JoinRoomForm({
   error,
   isLoading,
   onNameChange,
+  onNameSelect,
   onJoinCodeChange,
   onKeyDown,
   onBack,
@@ -45,6 +48,7 @@ export const JoinRoomForm = React.memo(function JoinRoomForm({
           autoFocus
           className="bg-surface-1 placeholder:text-muted-foreground/60 h-[52px] rounded-2xl border-transparent text-[15px] focus:border-transparent"
         />
+        <NameSuggestions onSelect={onNameSelect} />
         <Input
           placeholder={t.home.roomCode}
           value={joinCode}
