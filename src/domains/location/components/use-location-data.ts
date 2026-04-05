@@ -55,42 +55,25 @@ function useBuiltInLocationActions(
     [setLocations],
   );
 
-  const selectAll = useCallback(
-    (edition?: number) => {
+  const selectAllCategory = useCallback(
+    (category: string) => {
       setLocations((previous) =>
-        previous.map((loc) =>
-          edition === undefined || loc.edition === edition ? { ...loc, selected: true } : loc,
-        ),
+        previous.map((loc) => (loc.category === category ? { ...loc, selected: true } : loc)),
       );
     },
     [setLocations],
   );
 
-  const deselectAll = useCallback(
-    (edition?: number) => {
+  const deselectAllCategory = useCallback(
+    (category: string) => {
       setLocations((previous) =>
-        previous.map((loc) =>
-          edition === undefined || loc.edition === edition ? { ...loc, selected: false } : loc,
-        ),
+        previous.map((loc) => (loc.category === category ? { ...loc, selected: false } : loc)),
       );
     },
     [setLocations],
   );
 
-  const selectAllEd1 = useCallback(() => {
-    selectAll(1);
-  }, [selectAll]);
-  const deselectAllEd1 = useCallback(() => {
-    deselectAll(1);
-  }, [deselectAll]);
-  const selectAllEd2 = useCallback(() => {
-    selectAll(2);
-  }, [selectAll]);
-  const deselectAllEd2 = useCallback(() => {
-    deselectAll(2);
-  }, [deselectAll]);
-
-  return { toggleLocation, selectAllEd1, deselectAllEd1, selectAllEd2, deselectAllEd2 };
+  return { toggleLocation, selectAllCategory, deselectAllCategory };
 }
 
 function useCustomLocationActions(

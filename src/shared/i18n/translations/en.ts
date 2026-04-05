@@ -147,8 +147,6 @@ export const en = {
     title: "Locations",
     description: "Choose which locations to include in the game.",
     filter: "Filter locations...",
-    edition1: "Spyfall 1",
-    edition2: "Spyfall 2",
     all: "All",
     none: "None",
     customLocations: "Custom Locations",

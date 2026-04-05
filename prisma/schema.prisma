@@ -273,7 +273,7 @@ model Location {
   id       String @id @default(cuid())
   name     String @unique
   imageUrl String?
-  edition  Int    @default(1) // 1 = classic, 2 = spyfall 2
+  category String @default("Classic")
 
   roles         Role[]
   games         Game[]

@@ -152,8 +152,6 @@ export const lv = {
     title: "Lok\u0101cijas",
     description: "Izv\u0113lies, kuras lok\u0101cijas iekl\u0101ut sp\u0113l\u0113.",
     filter: "Filtr\u0113t lok\u0101cijas...",
-    edition1: "Spyfall 1",
-    edition2: "Spyfall 2",
     all: "Visas",
     none: "Neviena",
     customLocations: "Piel\u0101gotas lok\u0101cijas",

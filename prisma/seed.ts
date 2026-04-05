@@ -12,10 +12,10 @@ async function main() {
   for (const loc of DEFAULT_LOCATIONS) {
     await prisma.location.upsert({
       where: { name: loc.name },
-      update: {},
+      update: { category: loc.category },
       create: {
         name: loc.name,
-        edition: loc.edition,
+        category: loc.category,
         roles: {
           create: loc.roles.map((role) => ({ name: role })),
         },

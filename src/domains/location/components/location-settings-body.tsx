@@ -1,27 +1,29 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { memo } from "react";
+import React, { memo } from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 
-import { CustomLocationRow, LocationGroup } from "./location-settings-parts";
+import { CategoryGroupSection, CustomLocationRow } from "./location-settings-parts";
 
 import type { LocationDataReturn } from "./use-location-data";
 import type { LocationItem } from "@/domains/location/schema";
 
+interface CategoryGroup {
+  category: string;
+  locations: LocationItem[];
+}
 
 export const LocationSettingsBody = memo(function LocationSettingsBody({
   data,
-  edition1,
-  edition2,
+  categories,
   filter,
 }: {
   data: LocationDataReturn;
-  edition1: LocationItem[];
-  edition2: LocationItem[];
+  categories: CategoryGroup[];
   filter: string;
 }) {
   const { t } = useTranslation();
@@ -32,21 +34,18 @@ export const LocationSettingsBody = memo(function LocationSettingsBody({
 
   return (
     <div className="space-y-4">
-      <LocationGroup
-        title={t.locationSettings.edition1}
-        locations={edition1}
-        onToggle={data.toggleLocation}
-        onSelectAll={data.selectAllEd1}
-        onDeselectAll={data.deselectAllEd1}
-      />
-      <Separator />
-      <LocationGroup
-        title={t.locationSettings.edition2}
-        locations={edition2}
-        onToggle={data.toggleLocation}
-        onSelectAll={data.selectAllEd2}
-        onDeselectAll={data.deselectAllEd2}
-      />
+      {categories.map((cat, i) => (
+        <React.Fragment key={cat.category}>
+          {i > 0 && <Separator />}
+          <CategoryGroupSection
+            category={cat.category}
+            locations={cat.locations}
+            onToggle={data.toggleLocation}
+            onSelectAll={data.selectAllCategory}
+            onDeselectAll={data.deselectAllCategory}
+          />
+        </React.Fragment>
+      ))}
       {(data.customLocations.length > 0 || !filter) && (
         <>
           <Separator />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
 
 import { startGame } from "@/domains/game/actions";
+import { LOCATION_CATEGORIES } from "@/domains/location/data";
 import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
@@ -21,7 +22,7 @@ interface MutationParams {
   pnpTimeLimit: number;
   pnpSpyCount: number;
   shouldPnpHideSpyCount: boolean;
-  pnpEditions: Array<1 | 2>;
+  pnpCategories: string[];
 }
 
 export type HomeStateMutations = ReturnType<typeof useMutations>;
@@ -62,7 +63,7 @@ function useMutations(params: MutationParams) {
         timeLimit: pnpTimeLimit,
         spyCount: pnpSpyCount,
         hideSpyCount: shouldPnpHideSpyCount,
-        editions: params.pnpEditions,
+        categories: params.pnpCategories,
       });
       const room = unwrapAction(createResult);
       const startResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
@@ -106,7 +107,7 @@ export function useHomeState() {
   const [pnpTimeLimit, setPnpTimeLimit] = useState(DEFAULT_TIME_LIMIT);
   const [pnpSpyCount, setPnpSpyCount] = useState(1);
   const [shouldPnpHideSpyCount, setPnpHideSpyCount] = useState(false);
-  const [pnpEditions, setPnpEditions] = useState<Array<1 | 2>>([1, 2]);
+  const [pnpCategories, setPnpCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -122,7 +123,7 @@ export function useHomeState() {
     pnpTimeLimit,
     pnpSpyCount,
     shouldPnpHideSpyCount,
-    pnpEditions,
+    pnpCategories,
   });
 
   const inputHandlers = useInputHandlers({ setName, setJoinCode, setPlayerNames, setError });
@@ -130,7 +131,7 @@ export function useHomeState() {
     setPnpTimeLimit,
     setPnpSpyCount,
     setPnpHideSpyCount,
-    setPnpEditions,
+    setPnpCategories,
   });
   const actionHandlers = useActionHandlers({
     name,
@@ -153,7 +154,7 @@ export function useHomeState() {
     pnpTimeLimit,
     pnpSpyCount,
     shouldPnpHideSpyCount,
-    pnpEditions,
+    pnpCategories,
     ...inputHandlers,
     ...configHandlers,
     ...actionHandlers,

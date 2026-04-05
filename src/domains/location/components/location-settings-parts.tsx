@@ -122,6 +122,37 @@ export const CustomLocationRow = memo(function CustomLocationRow({
   );
 });
 
+export const CategoryGroupSection = memo(function CategoryGroupSection({
+  category,
+  locations,
+  onToggle,
+  onSelectAll,
+  onDeselectAll,
+}: {
+  category: string;
+  locations: LocationItem[];
+  onToggle: (id: string) => void;
+  onSelectAll: (category: string) => void;
+  onDeselectAll: (category: string) => void;
+}) {
+  const handleSelectAll = useCallback(() => {
+    onSelectAll(category);
+  }, [onSelectAll, category]);
+  const handleDeselectAll = useCallback(() => {
+    onDeselectAll(category);
+  }, [onDeselectAll, category]);
+
+  return (
+    <LocationGroup
+      title={category}
+      locations={locations}
+      onToggle={onToggle}
+      onSelectAll={handleSelectAll}
+      onDeselectAll={handleDeselectAll}
+    />
+  );
+});
+
 export const LocationFilterInput = memo(function LocationFilterInput({
   filter,
   onFilterChange,

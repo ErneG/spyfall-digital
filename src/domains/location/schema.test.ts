@@ -18,26 +18,15 @@ describe("locationItemSchema", () => {
     const result = locationItemSchema.safeParse({
       id: "loc-1",
       name: "Hospital",
-      edition: 1,
+      category: "Healthcare",
       selected: true,
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts without optional edition", () => {
-    const result = locationItemSchema.safeParse({
-      id: "loc-1",
-      name: "Hospital",
-      selected: false,
     });
     expect(result.success).toBe(true);
   });
 
   it("rejects missing required fields", () => {
     expect(locationItemSchema.safeParse({ id: "loc-1" }).success).toBe(false);
-    expect(
-      locationItemSchema.safeParse({ id: "loc-1", name: "Hospital" }).success,
-    ).toBe(false);
+    expect(locationItemSchema.safeParse({ id: "loc-1", name: "Hospital" }).success).toBe(false);
   });
 });
 
@@ -75,7 +64,7 @@ describe("customLocationSchema", () => {
 describe("locationsResponseSchema", () => {
   it("accepts a valid response", () => {
     const result = locationsResponseSchema.safeParse({
-      locations: [{ id: "loc-1", name: "Hospital", selected: true }],
+      locations: [{ id: "loc-1", name: "Hospital", category: "Healthcare", selected: true }],
       customLocations: [],
     });
     expect(result.success).toBe(true);
@@ -197,14 +186,12 @@ describe("deleteCustomLocationInput", () => {
   });
 
   it("rejects empty fields", () => {
-    expect(
-      deleteCustomLocationInput.safeParse({ playerId: "", locationId: "loc-1" })
-        .success,
-    ).toBe(false);
-    expect(
-      deleteCustomLocationInput.safeParse({ playerId: "p1", locationId: "" })
-        .success,
-    ).toBe(false);
+    expect(deleteCustomLocationInput.safeParse({ playerId: "", locationId: "loc-1" }).success).toBe(
+      false,
+    );
+    expect(deleteCustomLocationInput.safeParse({ playerId: "p1", locationId: "" }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -214,7 +201,7 @@ describe("locationSeedSchema", () => {
   it("accepts valid seed data", () => {
     const result = locationSeedSchema.safeParse({
       name: "Hospital",
-      edition: 1,
+      category: "Healthcare",
       roles: ["Doctor", "Nurse", "Patient"],
     });
     expect(result.success).toBe(true);
@@ -223,7 +210,7 @@ describe("locationSeedSchema", () => {
   it("rejects missing roles", () => {
     const result = locationSeedSchema.safeParse({
       name: "Hospital",
-      edition: 1,
+      category: "Healthcare",
     });
     expect(result.success).toBe(false);
   });

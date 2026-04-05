@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 export const locationItemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  edition: z.number().optional(),
+  category: z.string(),
   selected: z.boolean(),
 });
 export type LocationItem = z.infer<typeof locationItemSchema>;
@@ -64,7 +64,7 @@ export type DeleteCustomLocationInput = z.infer<typeof deleteCustomLocationInput
 
 export const locationSeedSchema = z.object({
   name: z.string(),
-  edition: z.number(),
+  category: z.string(),
   roles: z.array(z.string()),
 });
 export type LocationSeed = z.infer<typeof locationSeedSchema>;

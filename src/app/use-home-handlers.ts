@@ -23,7 +23,7 @@ interface ConfigHandlerParams {
   setPnpTimeLimit: Dispatch<SetStateAction<number>>;
   setPnpSpyCount: Dispatch<SetStateAction<number>>;
   setPnpHideSpyCount: Dispatch<SetStateAction<boolean>>;
-  setPnpEditions: Dispatch<SetStateAction<Array<1 | 2>>>;
+  setPnpCategories: Dispatch<SetStateAction<string[]>>;
 }
 
 interface ActionHandlerParams {
@@ -91,7 +91,7 @@ export function useInputHandlers(params: InputHandlerParams) {
 /* ── Config handlers ─────────────────────────────────── */
 
 export function useConfigHandlers(params: ConfigHandlerParams) {
-  const { setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount, setPnpEditions } = params;
+  const { setPnpTimeLimit, setPnpSpyCount, setPnpHideSpyCount, setPnpCategories } = params;
 
   const handlePnpTimeLimitChange = useCallback(
     (value: number) => setPnpTimeLimit(value),
@@ -106,16 +106,16 @@ export function useConfigHandlers(params: ConfigHandlerParams) {
     [setPnpHideSpyCount],
   );
 
-  const handlePnpEditionsChange = useCallback(
-    (editions: Array<1 | 2>) => setPnpEditions(editions),
-    [setPnpEditions],
+  const handlePnpCategoriesChange = useCallback(
+    (categories: string[]) => setPnpCategories(categories),
+    [setPnpCategories],
   );
 
   return {
     handlePnpTimeLimitChange,
     handlePnpSpyCountChange,
     handlePnpHideSpyCountChange,
-    handlePnpEditionsChange,
+    handlePnpCategoriesChange,
   };
 }
 
