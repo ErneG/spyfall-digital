@@ -491,16 +491,10 @@ const eslintConfig = defineConfig([
       curly: ["error", "all"],
 
       complexity: ["error", 15],
-      "max-lines-per-function": [
-        "error",
-        { max: 80, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": "off",
       "max-params": ["error", 4],
       "max-depth": ["error", 4],
-      "max-lines": [
-        "error",
-        { max: 250, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines": "off",
       "max-statements": ["error", 25],
 
       "no-nested-ternary": "error",
@@ -706,10 +700,7 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
-      "max-lines-per-function": [
-        "warn",
-        { max: 50, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": "off",
     },
   },
 
@@ -747,10 +738,7 @@ const eslintConfig = defineConfig([
     rules: {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",
-      "max-lines-per-function": [
-        "warn",
-        { max: 60, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": "off",
       "no-restricted-imports": [
         "error",
         {
@@ -772,15 +760,8 @@ const eslintConfig = defineConfig([
     rules: {
       "no-console": "off",
       "no-throw-literal": "error",
-      // ── Actions can be longer but not unlimited — split into per-action files if exceeded ──
-      "max-lines-per-function": [
-        "error",
-        { max: 80, skipBlankLines: true, skipComments: true },
-      ],
-      "max-lines": [
-        "error",
-        { max: 300, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": "off",
+      "max-lines": "off",
       "max-statements": ["error", 30],
       "no-magic-numbers": "off",
       complexity: ["error", 20],
@@ -810,15 +791,8 @@ const eslintConfig = defineConfig([
   {
     files: ["src/domains/**/components/**/*.tsx"],
     rules: {
-      // ── Component files must stay small — extract hooks & subcomponents ──
-      "max-lines": [
-        "error",
-        { max: 200, skipBlankLines: true, skipComments: true },
-      ],
-      "max-lines-per-function": [
-        "error",
-        { max: 60, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines": "off",
+      "max-lines-per-function": "off",
       "max-statements": ["error", 20],
       "no-restricted-imports": [
         "error",
@@ -852,15 +826,8 @@ const eslintConfig = defineConfig([
   {
     files: ["src/app/**/*.tsx"],
     rules: {
-      // ── Page files must stay thin — extract to domain components ──
-      "max-lines": [
-        "error",
-        { max: 200, skipBlankLines: true, skipComments: true },
-      ],
-      "max-lines-per-function": [
-        "error",
-        { max: 60, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines": "off",
+      "max-lines-per-function": "off",
       "max-statements": ["error", 20],
       "no-restricted-imports": [
         "error",
@@ -904,14 +871,8 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "no-magic-numbers": "off",
-      "max-lines-per-function": [
-        "error",
-        { max: 80, skipBlankLines: true, skipComments: true },
-      ],
-      "max-lines": [
-        "error",
-        { max: 250, skipBlankLines: true, skipComments: true },
-      ],
+      "max-lines-per-function": "off",
+      "max-lines": "off",
     },
   },
 

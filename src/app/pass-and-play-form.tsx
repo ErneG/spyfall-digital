@@ -5,8 +5,8 @@ import React from "react";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
-import { GameConfigSection } from "./game-config-section";
 import { EditionPicker } from "./edition-picker";
+import { GameConfigSection } from "./game-config-section";
 import { PlayerListSection } from "./pass-and-play-form-parts";
 
 /* ── Exported form component ─────────────────────────── */
