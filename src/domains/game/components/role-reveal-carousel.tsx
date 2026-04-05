@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/shared/i18n/context";
 
-import { AllReadyScreen, HandoffScreen, ReadyScreen, RevealedScreen } from "./role-reveal-parts";
+import { AllReadyScreen, CardScreen, HandoffScreen } from "./role-reveal-parts";
 import { useRoleReveal } from "./use-role-reveal";
 
 export function RoleRevealCarousel({
@@ -38,21 +38,23 @@ export function RoleRevealCarousel({
           <HandoffScreen
             playerName={state.currentPlayer.name}
             isFirst={state.playerIndex === 0}
+            remaining={state.remaining}
             onReady={state.handleReady}
           />
         )}
 
-        {state.step === "ready" && (
-          <ReadyScreen
+        {state.step === "card" && (
+          <CardScreen
             playerName={state.currentPlayer.name}
+            role={state.role}
+            isFlipped={state.isFlipped}
             isLoading={state.isLoading}
-            hasError={state.hasFetchError}
-            onReveal={state.handleRevealClick}
+            hasFetchError={state.hasFetchError}
+            isLast={state.isLast}
+            remaining={state.remaining}
+            onFlip={state.handleFlip}
+            onNext={state.handleNext}
           />
-        )}
-
-        {state.step === "revealed" && state.role && (
-          <RevealedScreen role={state.role} isLast={state.isLast} onNext={state.handleNext} />
         )}
       </div>
     </main>

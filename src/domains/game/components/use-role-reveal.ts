@@ -4,39 +4,40 @@ import { useState, useCallback } from "react";
 
 import { fetchPlayerRole, type PeekRole } from "@/domains/game/hooks";
 
-type RevealStep = "handoff" | "ready" | "revealed";
+type RevealStep = "handoff" | "card";
 
 export function useRoleReveal(gameId: string, players: Array<{ id: string; name: string }>) {
   const [playerIndex, setPlayerIndex] = useState(0);
   const [step, setStep] = useState<RevealStep>("handoff");
   const [role, setRole] = useState<PeekRole | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetchError, setHasFetchError] = useState(false);
   const [isAllDone, setIsAllDone] = useState(false);
 
   const currentPlayer = players[playerIndex];
   const isLast = playerIndex === players.length - 1;
+  const remaining = players.length - playerIndex - 1;
 
   const handleReady = useCallback(() => {
-    setStep("ready");
+    setStep("card");
   }, []);
 
-  const revealRole = useCallback(async () => {
+  const handleFlip = useCallback(async () => {
+    if (isFlipped || isLoading) {
+      return;
+    }
     setIsLoading(true);
     setHasFetchError(false);
     const fetched = await fetchPlayerRole(gameId, currentPlayer.id);
     if (fetched) {
       setRole(fetched);
-      setStep("revealed");
+      setIsFlipped(true);
     } else {
       setHasFetchError(true);
     }
     setIsLoading(false);
-  }, [gameId, currentPlayer.id]);
-
-  const handleRevealClick = useCallback(() => {
-    void revealRole();
-  }, [revealRole]);
+  }, [isFlipped, isLoading, gameId, currentPlayer.id]);
 
   const handleNext = useCallback(() => {
     if (isLast) {
@@ -45,6 +46,7 @@ export function useRoleReveal(gameId: string, players: Array<{ id: string; name:
       setPlayerIndex((previous) => previous + 1);
       setStep("handoff");
       setRole(null);
+      setIsFlipped(false);
     }
   }, [isLast]);
 
@@ -52,13 +54,15 @@ export function useRoleReveal(gameId: string, players: Array<{ id: string; name:
     playerIndex,
     step,
     role,
+    isFlipped,
     isLoading,
     hasFetchError,
     isAllDone,
     currentPlayer,
     isLast,
+    remaining,
     handleReady,
-    handleRevealClick,
+    handleFlip,
     handleNext,
   };
 }
