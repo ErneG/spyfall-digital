@@ -19,7 +19,9 @@ Important project context:
 - Main worktree: `/Users/ernestsdane/.config/superpowers/worktrees/spyfall-digital/spyfall-v2`
 - The app is mid-revamp with pass-and-play as the main product, Library/content management second, and online rooms being converged later.
 - Guardrails and stabilization are already in place.
-- The current session previously confirmed that the machine has local Stitch-related auth state, but the blocker was missing Stitch tool exposure in the session itself.
+- Stitch is now callable through `stitch-mcp` on this machine, but the CLI has a few quirks documented in `.stitch/STITCH_NOTES.md`.
+- Active Stitch project: `projects/14798622379269638155`
+- Active design system asset: `assets/9802825457640323583`
 
 What is already done:
 
@@ -31,10 +33,13 @@ What is already done:
 - room custom locations use a real editor instead of placeholder values
 - the app has started moving to a light-first, restrained glassmorphic shell
 - room runtime moved off the old SSE path
+- a first home mode picker concept was generated and saved locally, but it is not approved yet because the copy drifted into sci-fi/system-console language
+- saved Stitch artifacts and working-state notes now live under `.stitch/designs` and `.stitch/STITCH_NOTES.md`
 
 What you should do:
 
 1. Use Stitch to generate high-fidelity screen explorations that follow `.stitch/DESIGN.md`.
+   Use the working CLI pattern in `.stitch/STITCH_NOTES.md`.
 2. Be strict about rejecting anything that looks like generic dashboard UI, loud purple gradients, or over-designed “AI slop”.
 3. Prioritize these screens in order:
    - home mode picker
@@ -76,6 +81,7 @@ Before making design changes, verify Stitch is actually callable in this session
 ## Session checklist
 
 - confirm the Stitch tool or CLI is present before relying on it
+- read `.stitch/STITCH_NOTES.md` before invoking Stitch tools
 - do not commit secrets or API keys into repo files
 - prefer generated direction that can be decomposed into reusable primitives
 - keep product logic authoritative over generated visuals
