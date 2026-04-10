@@ -21,7 +21,7 @@
     "build-storybook": "storybook build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --maxWorkers=1"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
