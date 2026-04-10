@@ -14,14 +14,14 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/domains/auth/hooks", () => ({
+vi.mock("@/entities/auth/use-auth", () => ({
   useAuth: () => ({
     isAuthenticated: true,
     isLoading: false,
   }),
 }));
 
-vi.mock("@/domains/collection/actions", () => ({
+vi.mock("@/entities/library/actions", () => ({
   createCollection: vi.fn(),
   deleteCollection: vi.fn(),
   getCollections: vi.fn(() =>

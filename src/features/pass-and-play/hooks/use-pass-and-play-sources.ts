@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { getCollection, getCollections } from "@/domains/collection/actions";
+import { getCollection, getCollections } from "@/entities/library/actions";
 import { type CollectionDetail, type CollectionListItem } from "@/entities/library/collection";
 import {
   createBuiltInContentSource,

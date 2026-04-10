@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getCollections } from "@/domains/collection/actions";
+import { getCollections } from "@/entities/library/actions";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 import type { CollectionListItem } from "@/entities/library/collection";

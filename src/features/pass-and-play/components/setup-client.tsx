@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
+import { useAuth } from "@/entities/auth/use-auth";
 import { type ContentSourceInput } from "@/entities/library/content-source";
 import { LIBRARY_COLLECTIONS_ROUTE, LIBRARY_ROUTE } from "@/features/library/routes";
 import {

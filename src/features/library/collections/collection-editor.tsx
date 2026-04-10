@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
+import { useAuth } from "@/entities/auth/use-auth";
 import {
   addLocationToCollection,
   getCollection,
@@ -12,7 +12,7 @@ import {
   importSavedLocationToCollection,
   removeLocationFromCollection,
   updateCollection,
-} from "@/domains/collection/actions";
+} from "@/entities/library/actions";
 import { type CollectionDetail, type SavedLocationImportItem } from "@/entities/library/collection";
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";

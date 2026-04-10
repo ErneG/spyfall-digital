@@ -4,8 +4,8 @@ import { ArrowLeft, BookOpen, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
-import { createCollection, deleteCollection, getCollections } from "@/domains/collection/actions";
+import { useAuth } from "@/entities/auth/use-auth";
+import { createCollection, deleteCollection, getCollections } from "@/entities/library/actions";
 import { type CollectionListItem } from "@/entities/library/collection";
 import { getLibraryCollectionRoute, LIBRARY_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";

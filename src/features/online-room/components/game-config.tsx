@@ -3,7 +3,7 @@
 import { Settings } from "lucide-react";
 import { memo } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
+import { useAuth } from "@/entities/auth/use-auth";
 import { useTranslation } from "@/shared/i18n/context";
 
 import { ConfigToggles, GameConfigSummary, TimerSection } from "./game-config-parts";
