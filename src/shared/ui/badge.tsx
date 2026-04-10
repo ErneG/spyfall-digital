@@ -12,7 +12,7 @@ const badgeVariants = cva(
         default: "bg-slate-950 text-white",
         secondary: "border border-slate-200 bg-white text-slate-700 [a]:hover:bg-slate-50",
         destructive: "bg-[#B5454F]/12 text-[#B5454F]",
-        purple: "bg-[#314556]/12 text-[#314556]",
+        ink: "bg-[#314556]/12 text-[#314556]",
         success: "bg-[#2C7A66]/12 text-[#2C7A66]",
         outline: "border-slate-200 text-foreground [a]:hover:bg-slate-50",
         ghost: "hover:bg-slate-100 hover:text-slate-950",

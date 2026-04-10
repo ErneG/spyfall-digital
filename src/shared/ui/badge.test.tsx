@@ -23,6 +23,12 @@ describe("Badge", () => {
     expect(badge.className).toContain("B5454F");
   });
 
+  it("renders with ink variant", () => {
+    render(<Badge variant="ink">Ink</Badge>);
+    const badge = screen.getByText("Ink");
+    expect(badge.className).toContain("314556");
+  });
+
   it("renders with outline variant", () => {
     render(<Badge variant="outline">Outline</Badge>);
     const badge = screen.getByText("Outline");

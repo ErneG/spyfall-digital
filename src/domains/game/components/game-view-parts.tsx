@@ -42,8 +42,8 @@ const AgentRole = memo(function AgentRole({
 }) {
   return (
     <div className="space-y-2">
-      <div className="bg-spy-purple/12 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
-        <Shield className="text-spy-purple h-6 w-6" />
+      <div className="bg-spy-ink/12 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+        <Shield className="text-spy-ink h-6 w-6" />
       </div>
       <div className="flex items-center justify-center gap-2">
         <MapPin className="text-muted-foreground/60 h-4 w-4" />
@@ -131,14 +131,14 @@ export const PlayerList = memo(function PlayerList({
             <div
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                 p.id === currentPlayerId
-                  ? "bg-spy-purple/12 text-spy-purple"
+                  ? "bg-spy-ink/12 text-spy-ink"
                   : "bg-slate-100 text-slate-500"
               }`}
             >
               {p.name.charAt(0).toUpperCase()}
             </div>
             <span
-              className={`text-[11px] ${p.id === currentPlayerId ? "text-spy-purple" : "text-muted-foreground"}`}
+              className={`text-[11px] ${p.id === currentPlayerId ? "text-spy-ink" : "text-muted-foreground"}`}
             >
               {p.name.length > NAME_TRUNCATE_LENGTH
                 ? `${p.name.slice(0, NAME_TRUNCATE_LENGTH)}...`

@@ -43,7 +43,7 @@ export const LocationButton = memo(function LocationButton({
 
   let className = "text-left text-xs py-2 px-3 rounded-xl transition-colors cursor-pointer ";
   if (isRevealed) {
-    className += "bg-spy-purple/12 text-spy-purple font-bold";
+    className += "bg-spy-ink/12 text-spy-ink font-bold";
   } else if (isPrevious) {
     className += "bg-surface-2 text-muted-foreground/60 line-through opacity-50";
   } else if (isCrossed) {

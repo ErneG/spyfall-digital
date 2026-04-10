@@ -39,7 +39,7 @@ export const FirstQuestioner = memo(function FirstQuestioner({
       className="flex flex-col items-center gap-3"
     >
       <span className={OVERLINE}>{label}</span>
-      <div className="bg-spy-purple/12 text-spy-purple flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold">
+      <div className="bg-spy-ink/12 text-spy-ink flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold">
         {name.charAt(0).toUpperCase()}
       </div>
       <span className="text-2xl font-bold">{name}</span>

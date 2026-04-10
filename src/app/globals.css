@@ -43,7 +43,7 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
   --color-spy-red: var(--spy-red);
-  --color-spy-purple: var(--spy-purple);
+  --color-spy-ink: var(--spy-ink);
   --color-success: var(--success);
   --color-spy-gold: var(--spy-gold);
   --color-text-muted: var(--text-muted);
@@ -96,7 +96,7 @@
   --surface-2: #e5edf4;
   --surface-3: #d6e0e8;
   --spy-red: #b5454f;
-  --spy-purple: #314556;
+  --spy-ink: #314556;
   --success: #2c7a66;
   --warning: #b6842c;
   --text-secondary: #64748b;
@@ -147,7 +147,7 @@
   --surface-2: #e5edf4;
   --surface-3: #d6e0e8;
   --spy-red: #b5454f;
-  --spy-purple: #314556;
+  --spy-ink: #314556;
   --success: #2c7a66;
   --warning: #b6842c;
   --text-secondary: #64748b;
@@ -188,7 +188,7 @@
 .icon-circle-default {
   background: rgba(255, 255, 255, 0.72);
 }
-.icon-circle-purple {
+.icon-circle-ink {
   background: rgba(49, 69, 86, 0.12);
 }
 .icon-circle-red {
