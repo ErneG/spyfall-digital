@@ -5,8 +5,10 @@ This directory is the durable handoff surface for the Spyfall Digital rebuild.
 Use these files when continuing the work in a later session:
 
 - `spyfall-v2-roadmap.md`: the full product, architecture, UX, and execution roadmap with current status.
-- `../../.stitch/DESIGN.md`: the active design system brief for Stitch generation.
-- `../../.stitch/SESSION_HANDOFF.md`: a ready-to-paste handoff prompt for a session where Stitch tooling is actually available.
+- `2026-04-10-pause-handoff.md`: the latest pause checkpoint with exact remaining work, verified commands, and next actions.
+- `../../.stitch/DESIGN.md`: the active design brief for Stitch generation.
+- `../../.stitch/SESSION_HANDOFF.md`: the ready-to-paste prompt for resuming in a later Codex session.
+- `../../.stitch/STITCH_NOTES.md`: the CLI quirks, active project IDs, and screen-quality notes for Stitch.
 
 ## Current status
 
@@ -24,4 +26,6 @@ Use these files when continuing the work in a later session:
 
 ## Important note about Stitch
 
-The machine appears to have Stitch-related local auth state under `~/.stitch-mcp`, but this Codex session does not expose a callable Stitch MCP tool or `stitch` CLI binary. The next design-focused session should be launched with Stitch tooling actually mounted into the session.
+Stitch is now callable in this environment through `stitch-mcp`. The active project, working auth pattern, current screen IDs, and CLI quirks are documented in `.stitch/STITCH_NOTES.md`.
+
+The current Stitch outputs are useful reference material but are not fully approved for integration yet. Read `docs/revamp/2026-04-10-pause-handoff.md` before continuing design work.
