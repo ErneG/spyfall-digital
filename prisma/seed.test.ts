@@ -4,7 +4,6 @@ import { syncDefaultLocations } from "./seed-lib";
 
 import type { LocationSeed } from "../src/domains/location/schema";
 
-
 describe("syncDefaultLocations", () => {
   it("replaces roles when a seeded location already exists", async () => {
     const upsert = vi.fn().mockResolvedValue(undefined);

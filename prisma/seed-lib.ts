@@ -1,7 +1,9 @@
 import type { LocationSeed } from "../src/domains/location/schema";
 import type { PrismaClient } from "../src/generated/prisma/client";
 
-type SeedPrisma = Pick<PrismaClient, "location">;
+type SeedPrisma = {
+  location: Pick<PrismaClient["location"], "upsert">;
+};
 
 export async function syncDefaultLocations(prisma: SeedPrisma, locations: LocationSeed[]) {
   for (const location of locations) {
