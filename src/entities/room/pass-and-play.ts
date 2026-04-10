@@ -32,7 +32,7 @@ async function getCollectionPassAndPlayLocations(
 > {
   const user = await getAuthUser();
   if (!user) {
-    return { success: false, error: "Sign in to use saved collections" };
+    return { success: false, error: "Sign in to use Library collections" };
   }
 
   const collection = await prisma.locationCollection.findFirst({

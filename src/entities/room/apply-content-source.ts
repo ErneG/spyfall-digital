@@ -24,7 +24,7 @@ async function resolveCollectionLocations(source: CollectionContentSourceInput) 
   const user = await getAuthUser();
   if (!user) {
     return {
-      error: "Sign in to use saved collections",
+      error: "Sign in to use Library collections",
       success: false as const,
     };
   }

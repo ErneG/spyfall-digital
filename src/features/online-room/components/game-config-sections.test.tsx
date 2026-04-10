@@ -11,10 +11,10 @@ vi.mock("@/shared/i18n/context", () => ({
         advancedRoomCustomization: "Advanced room customization",
         builtInCatalog: "Built-in catalog",
         collection: "Collection",
-        collectionImportHint: "Import a saved Library collection into this room.",
-        importCollection: "Import Collection",
+        collectionImportHint: "Switch this room to one of your saved Library collections.",
+        importCollection: "Use Collection",
         locationsSelected: "locations selected",
-        signInForCollections: "Sign in to import Library collections.",
+        signInForCollections: "Sign in to use Library collections.",
         source: "Source",
       },
     },
@@ -46,7 +46,7 @@ describe("SourceSection", () => {
     expect(screen.getByText("Collection")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Advanced room customization" }));
-    await user.click(screen.getByRole("button", { name: "Import Collection" }));
+    await user.click(screen.getByRole("button", { name: "Use Collection" }));
 
     expect(openBuiltIn).toHaveBeenCalledOnce();
     expect(openCollection).toHaveBeenCalledOnce();
@@ -63,7 +63,7 @@ describe("SourceSection", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Import Collection" })).toBeDisabled();
-    expect(screen.getByText("Sign in to import Library collections.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Use Collection" })).toBeDisabled();
+    expect(screen.getByText("Sign in to use Library collections.")).toBeInTheDocument();
   });
 });

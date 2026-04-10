@@ -33,7 +33,7 @@ describe("PassAndPlaySourceSection", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: /saved collection/i }));
+    await user.click(screen.getByRole("button", { name: /Collection/i }));
 
     expect(onSourceChange).toHaveBeenCalledWith({
       kind: "collection",

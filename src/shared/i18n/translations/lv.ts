@@ -44,10 +44,10 @@ export const lv = {
     builtInCatalog: "Ieb\u016Bv\u0113tais katalogs",
     collection: "Kolekcija",
     advancedRoomCustomization: "Papildu istabas piel\u0101go\u0161ana",
-    importCollection: "Import\u0113t kolekciju",
+    importCollection: "Lietot kolekciju",
     collectionImportHint:
-      "Import\u0113 saglab\u0101tu bibliot\u0113kas kolekciju \u0161aj\u0101 istab\u0101.",
-    signInForCollections: "Piesakies, lai import\u0113tu bibliot\u0113kas kolekcijas.",
+      "P\u0101rsl\u0113dz \u0161o istabu uz k\u0101du no saglab\u0101taj\u0101m bibliot\u0113kas kolekcij\u0101m.",
+    signInForCollections: "Piesakies, lai lietotu bibliot\u0113kas kolekcijas.",
     autoStartTimer: "Autom\u0101tiski s\u0101kt taimeri",
     hideSpyCount: "Sl\u0113pt spiegu skaitu",
     moderatorMode: "Moderatora re\u017E\u012Bms",

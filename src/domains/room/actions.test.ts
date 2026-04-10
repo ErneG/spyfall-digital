@@ -195,7 +195,7 @@ describe("createPassAndPlayRoom", () => {
 
     expect(result).toEqual({
       success: false,
-      error: "Sign in to use saved collections",
+      error: "Sign in to use Library collections",
     });
     expect(collectionFindFirst).not.toHaveBeenCalled();
   });

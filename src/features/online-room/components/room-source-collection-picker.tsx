@@ -68,7 +68,7 @@ export const RoomSourceCollectionPicker = memo(function RoomSourceCollectionPick
     >
       <DialogContent className="border-white/80 bg-white/82 shadow-[0_32px_90px_rgba(148,163,184,0.22)] sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-slate-950">Import from Library</DialogTitle>
+          <DialogTitle className="text-slate-950">Use a Library Collection</DialogTitle>
           <DialogDescription className="text-slate-500">
             Replace the active room pool with a saved collection snapshot from your Library.
           </DialogDescription>
@@ -81,7 +81,7 @@ export const RoomSourceCollectionPicker = memo(function RoomSourceCollectionPick
         ) : !isAuthenticated ? (
           <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
             <p className="text-sm font-medium text-slate-950">
-              Sign in to import Library collections.
+              Sign in to use Library collections.
             </p>
           </div>
         ) : collections.length === 0 ? (
@@ -121,7 +121,7 @@ export const RoomSourceCollectionPicker = memo(function RoomSourceCollectionPick
                       }}
                       disabled={sourceMutation.isPending}
                     >
-                      {isImporting ? "Importing…" : "Import"}
+                      {isImporting ? "Applying…" : "Use"}
                     </Button>
                   </div>
                 </div>

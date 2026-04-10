@@ -85,7 +85,7 @@ describe("RoomSourceCollectionPicker", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: /import/i }));
+    await user.click(screen.getByRole("button", { name: /use/i }));
 
     await waitFor(() =>
       expect(applyRoomContentSource).toHaveBeenCalledWith({
@@ -120,6 +120,6 @@ describe("RoomSourceCollectionPicker", () => {
       />,
     );
 
-    expect(screen.getByText("Sign in to import Library collections.")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to use Library collections.")).toBeInTheDocument();
   });
 });

@@ -38,7 +38,7 @@ export function PassAndPlaySourceSection({
       <div className="space-y-1">
         <h3 className="text-sm font-semibold text-slate-950">Source</h3>
         <p className="text-sm leading-6 text-slate-500">
-          Choose whether this round should draw from the built-in catalog or one of your saved
+          Choose whether this round should draw from the built-in catalog or one of your Library
           collections.
         </p>
       </div>
@@ -90,11 +90,11 @@ export function PassAndPlaySourceSection({
         >
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
             <BookMarked className="size-4" />
-            Saved collection
+            Collection
           </div>
           <p className="mt-2 text-xs leading-5 text-slate-500">
-            Reuse one of your curated collections so custom locations and roles are playable in
-            pass-and-play.
+            Reuse one of your curated Library collections so custom locations and roles are playable
+            in pass-and-play.
           </p>
         </button>
       </div>
@@ -136,7 +136,7 @@ export function PassAndPlaySourceSection({
               ? "Use a collection when you want the exact saved locations and role lists you already curated."
               : isAuthenticated
                 ? "Create a collection from the Library to use it here."
-                : "Sign in to use your saved collections in pass-and-play."}
+                : "Sign in to use your Library collections in pass-and-play."}
           </p>
           {selectedCollection ? (
             <p className="text-xs font-medium text-slate-600">
