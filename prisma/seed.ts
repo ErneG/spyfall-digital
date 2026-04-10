@@ -6,6 +6,8 @@ import { DEFAULT_LOCATIONS } from "../src/domains/location/data";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { getServerEnv } from "../src/shared/config/env";
 
+import { syncDefaultLocations } from "./seed-lib";
+
 const adapter = new PrismaPg({ connectionString: getServerEnv().DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
@@ -16,19 +18,7 @@ function logSeedProgress(message: string) {
 async function main() {
   logSeedProgress("Seeding locations and roles...");
 
-  for (const loc of DEFAULT_LOCATIONS) {
-    await prisma.location.upsert({
-      where: { name: loc.name },
-      update: { category: loc.category },
-      create: {
-        name: loc.name,
-        category: loc.category,
-        roles: {
-          create: loc.roles.map((role) => ({ name: role })),
-        },
-      },
-    });
-  }
+  await syncDefaultLocations(prisma, DEFAULT_LOCATIONS);
 
   logSeedProgress(`Seeded ${DEFAULT_LOCATIONS.length} locations.`);
 }

@@ -105,6 +105,29 @@ CREATE TABLE "CollectionLocationRole" (
 );
 
 -- CreateTable
+CREATE TABLE "SavedLocation" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "allSpies" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SavedLocation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SavedLocationRole" (
+    "id" TEXT NOT NULL,
+    "savedLocationId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+
+    CONSTRAINT "SavedLocationRole_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Room" (
     "id" TEXT NOT NULL,
     "code" VARCHAR(6) NOT NULL,
@@ -246,6 +269,18 @@ CREATE INDEX "CollectionLocation_collectionId_idx" ON "CollectionLocation"("coll
 CREATE INDEX "CollectionLocationRole_collectionLocationId_idx" ON "CollectionLocationRole"("collectionLocationId");
 
 -- CreateIndex
+CREATE INDEX "SavedLocation_userId_idx" ON "SavedLocation"("userId");
+
+-- CreateIndex
+CREATE INDEX "SavedLocation_userId_updatedAt_idx" ON "SavedLocation"("userId", "updatedAt");
+
+-- CreateIndex
+CREATE INDEX "SavedLocationRole_savedLocationId_idx" ON "SavedLocationRole"("savedLocationId");
+
+-- CreateIndex
+CREATE INDEX "SavedLocationRole_savedLocationId_order_idx" ON "SavedLocationRole"("savedLocationId", "order");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Room_code_key" ON "Room"("code");
 
 -- CreateIndex
@@ -300,6 +335,12 @@ ALTER TABLE "CollectionLocation" ADD CONSTRAINT "CollectionLocation_collectionId
 ALTER TABLE "CollectionLocationRole" ADD CONSTRAINT "CollectionLocationRole_collectionLocationId_fkey" FOREIGN KEY ("collectionLocationId") REFERENCES "CollectionLocation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "SavedLocation" ADD CONSTRAINT "SavedLocation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SavedLocationRole" ADD CONSTRAINT "SavedLocationRole_savedLocationId_fkey" FOREIGN KEY ("savedLocationId") REFERENCES "SavedLocation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "RoomLocation" ADD CONSTRAINT "RoomLocation_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -340,4 +381,3 @@ ALTER TABLE "Vote" ADD CONSTRAINT "Vote_suspectId_fkey" FOREIGN KEY ("suspectId"
 
 -- AddForeignKey
 ALTER TABLE "Role" ADD CONSTRAINT "Role_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
