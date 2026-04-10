@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const createPassAndPlayRoom = vi.fn();
 const startGame = vi.fn();
 
-vi.mock("@/domains/room/actions", () => ({
+vi.mock("@/entities/room/pass-and-play", () => ({
   createPassAndPlayRoom,
 }));
 
