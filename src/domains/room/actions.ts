@@ -6,7 +6,6 @@ import {
   updateRoomConfigInput,
   createPassAndPlayInput,
   getRoomStateInput,
-  type RoomState,
   type CreateRoomInput,
   type CreateRoomOutput,
   type JoinRoomInput,
@@ -19,6 +18,7 @@ import {
   type CollectionContentSourceInput,
   type ContentSourceInput,
 } from "@/entities/library/content-source";
+import { type RoomState } from "@/entities/room/state";
 import { getAuthUser } from "@/shared/lib/auth-session";
 import { MAX_PLAYERS } from "@/shared/lib/constants";
 import { prisma } from "@/shared/lib/prisma";

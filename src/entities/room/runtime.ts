@@ -1,5 +1,6 @@
-import { type RoomState } from "@/domains/room/schema";
 import { type Session } from "@/shared/hooks/use-session";
+
+import { type RoomState } from "./state";
 
 export function getPassAndPlayAutoStartRequest(
   session: Session | null,

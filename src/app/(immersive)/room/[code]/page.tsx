@@ -1,7 +1,13 @@
 import { RoomPageClient } from "@/features/online-room/room-page-client";
 
-export default async function RoomPage(props: PageProps<"/room/[code]">) {
-  const { code } = await props.params;
+interface RoomPageProps {
+  params: Promise<{
+    code: string;
+  }>;
+}
+
+export default async function RoomPage({ params }: RoomPageProps) {
+  const { code } = await params;
 
   return <RoomPageClient code={code} />;
 }

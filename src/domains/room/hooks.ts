@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getRoomState } from "@/domains/room/actions";
-import { type RoomState } from "@/domains/room/schema";
+import { type RoomState } from "@/entities/room/state";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
 // Re-export useSession from shared for backward compatibility

@@ -6,11 +6,10 @@ import { useEffect, useState, useCallback, useRef } from "react";
 
 import { startGame } from "@/domains/game/actions";
 import { useRoomState } from "@/domains/room/hooks";
+import { getPassAndPlayAutoStartRequest } from "@/entities/room/runtime";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
-
-import { getPassAndPlayAutoStartRequest } from "./runtime";
 
 const EMPTY_PLAYERS: never[] = [];
 
