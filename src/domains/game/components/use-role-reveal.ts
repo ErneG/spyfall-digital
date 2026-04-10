@@ -20,6 +20,7 @@ export function useRoleReveal(gameId: string, players: Array<{ id: string; name:
   const remaining = players.length - playerIndex - 1;
 
   const handleReady = useCallback(() => {
+    setHasFetchError(false);
     setStep("card");
   }, []);
 
@@ -27,16 +28,26 @@ export function useRoleReveal(gameId: string, players: Array<{ id: string; name:
     if (isFlipped || isLoading) {
       return;
     }
+
     setIsLoading(true);
     setHasFetchError(false);
-    const fetched = await fetchPlayerRole(gameId, currentPlayer.id);
-    if (fetched) {
-      setRole(fetched);
-      setIsFlipped(true);
-    } else {
+
+    try {
+      const fetched = await fetchPlayerRole(gameId, currentPlayer.id);
+      if (fetched) {
+        setRole(fetched);
+        setIsFlipped(true);
+        return;
+      }
+
       setHasFetchError(true);
+    } catch {
+      setRole(null);
+      setIsFlipped(false);
+      setHasFetchError(true);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [isFlipped, isLoading, gameId, currentPlayer.id]);
 
   const handleNext = useCallback(() => {
@@ -47,6 +58,7 @@ export function useRoleReveal(gameId: string, players: Array<{ id: string; name:
       setStep("handoff");
       setRole(null);
       setIsFlipped(false);
+      setHasFetchError(false);
     }
   }, [isLast]);
 

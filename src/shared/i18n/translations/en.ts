@@ -105,6 +105,7 @@ export const en = {
     peekAtRole: "Peek at My Role",
     peekTitle: "Peek at Role",
     peekSubtitle: "Pass the device to the player who wants to check their role.",
+    choosePlayer: "Choose Player",
     spyGuessLocation: "Spy: Guess Location",
     spyGuessTitle: "Spy: Guess the Location",
     spyGuessSubtitle: "Select your name to verify you're the spy.",

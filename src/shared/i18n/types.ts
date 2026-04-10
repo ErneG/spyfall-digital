@@ -105,6 +105,7 @@ export interface Translations {
     peekAtRole: string;
     peekTitle: string;
     peekSubtitle: string;
+    choosePlayer: string;
     spyGuessLocation: string;
     spyGuessTitle: string;
     spyGuessSubtitle: string;

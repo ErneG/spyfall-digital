@@ -108,6 +108,7 @@ export const lv = {
     peekTitle: "Apskat\u012Bt lomu",
     peekSubtitle:
       "Padod ier\u012Bci sp\u0113l\u0113t\u0101jam, kur\u0161 v\u0113las p\u0101rbaud\u012Bt savu lomu.",
+    choosePlayer: "Izv\u0113l\u0113ties sp\u0113l\u0113t\u0101ju",
     spyGuessLocation: "Spiegs: Min\u0113t lok\u0101ciju",
     spyGuessTitle: "Spiegs: Min\u0113t lok\u0101ciju",
     spyGuessSubtitle: "Izv\u0113lies savu v\u0101rdu, lai apstiprin\u0101tu, ka esi spiegs.",
