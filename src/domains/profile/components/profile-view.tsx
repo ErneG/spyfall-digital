@@ -44,7 +44,7 @@ export function ProfileView() {
         setNames(namesResult.data);
       }
     };
-    load();
+    void load();
   }, [isAuthenticated, authLoading, router]);
 
   const handleSaveDisplayName = useCallback(async () => {
@@ -54,7 +54,9 @@ export function ProfileView() {
     setSaving(true);
     const result = await updateProfile({ displayName: displayName.trim() });
     if (result.success) {
-      setProfile((previous) => (previous ? { ...previous, displayName: result.data.displayName } : previous));
+      setProfile((previous) =>
+        previous ? { ...previous, displayName: result.data.displayName } : previous,
+      );
     }
     setSaving(false);
   }, [displayName]);

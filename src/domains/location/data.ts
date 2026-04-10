@@ -5,21 +5,7 @@
 
 import type { LocationSeed } from "@/domains/location/schema";
 
-/** Canonical category ordering for UI display. */
-export const LOCATION_CATEGORIES = [
-  "Transportation",
-  "Entertainment",
-  "Nightlife & Events",
-  "Food & Dining",
-  "Government & Law",
-  "Military & Combat",
-  "Education & Science",
-  "Healthcare",
-  "Outdoors & Nature",
-  "Workplace",
-] as const;
-
-export type LocationCategory = (typeof LOCATION_CATEGORIES)[number];
+export { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
 
 export const DEFAULT_LOCATIONS: LocationSeed[] = [
   // ─── Transportation ─────────────────────────────────────

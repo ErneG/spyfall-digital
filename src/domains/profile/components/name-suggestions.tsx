@@ -1,10 +1,12 @@
 "use client";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
 
 import { getNameSuggestions } from "../actions";
+
+import { NameChip } from "./name-suggestions-parts";
 
 interface NameSuggestionsProps {
   onSelect: (name: string) => void;
@@ -35,28 +37,5 @@ export const NameSuggestions = memo(function NameSuggestions({ onSelect }: NameS
         <NameChip key={name} name={name} onSelect={onSelect} />
       ))}
     </div>
-  );
-});
-
-// ─── Chip ────────────────────────────────────────────────────
-
-interface NameChipProps {
-  name: string;
-  onSelect: (name: string) => void;
-}
-
-const NameChip = memo(function NameChip({ name, onSelect }: NameChipProps) {
-  const handleClick = useCallback(() => {
-    onSelect(name);
-  }, [name, onSelect]);
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="bg-surface-2 text-muted-foreground hover:bg-surface-3 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors hover:text-white"
-    >
-      {name}
-    </button>
   );
 });

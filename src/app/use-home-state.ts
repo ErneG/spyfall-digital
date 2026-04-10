@@ -2,11 +2,11 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { type Dispatch, type SetStateAction, useState, useEffect } from "react";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react";
 
 import { startGame } from "@/domains/game/actions";
-import { LOCATION_CATEGORIES } from "@/domains/location/data";
 import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
+import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
@@ -143,6 +143,9 @@ export function useHomeState() {
     joinRoomMutation,
     passAndPlayMutation,
   });
+  const handleOpenPassAndPlaySetup = useCallback(() => {
+    router.push("/play/pass-and-play");
+  }, [router]);
 
   return {
     mode,
@@ -155,6 +158,7 @@ export function useHomeState() {
     pnpSpyCount,
     shouldPnpHideSpyCount,
     pnpCategories,
+    handleOpenPassAndPlaySetup,
     ...inputHandlers,
     ...configHandlers,
     ...actionHandlers,

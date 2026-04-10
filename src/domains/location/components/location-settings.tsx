@@ -81,7 +81,7 @@ export const LocationSettings = memo(function LocationSettings({
   const handleOpenPicker = useCallback(() => setPickerOpen(true), []);
   const handleImported = useCallback(() => {
     // Refetch location data after import
-    data.refetch();
+    void data.refetch();
   }, [data]);
 
   return (

@@ -3,7 +3,7 @@
 import { MapPin } from "lucide-react";
 import { memo, useCallback } from "react";
 
-import { LOCATION_CATEGORIES } from "@/domains/location/data";
+import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { useTranslation } from "@/shared/i18n/context";
 
 import { CategoryChip } from "./category-picker-parts";

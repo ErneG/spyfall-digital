@@ -19,7 +19,7 @@ export const ModeContent = memo(function ModeContent(props: ModeContentProps) {
         <ModeSelector
           onCreateMode={props.handleSetModeCreate}
           onJoinMode={props.handleSetModeJoin}
-          onPassAndPlayMode={props.handleSetModePassAndPlay}
+          onPassAndPlayMode={props.handleOpenPassAndPlaySetup}
         />
       );
     case "create":

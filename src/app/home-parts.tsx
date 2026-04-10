@@ -1,11 +1,13 @@
 "use client";
 
 import { Users, Crosshair, Smartphone, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 import { NameSuggestions } from "@/domains/profile/components/name-suggestions";
 import { useTranslation } from "@/shared/i18n/context";
-import { Button } from "@/shared/ui/button";
+import { cn } from "@/shared/lib/utils";
+import { Button, buttonVariants } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
 /* ── Spy Eye Logo ────────────────────────────────────── */
@@ -134,6 +136,17 @@ export const ModeSelector = React.memo(function ModeSelector({
         title={t.home.passAndPlay}
         desc={t.home.passAndPlayDesc}
       />
+      <div className="flex justify-end">
+        <Link
+          href="/library"
+          className={cn(
+            buttonVariants({ size: "sm", variant: "outline" }),
+            "rounded-full border-white/10 bg-white/[0.03] px-4 text-white/70 hover:bg-white/[0.06] hover:text-white",
+          )}
+        >
+          Browse Library
+        </Link>
+      </div>
     </div>
   );
 });

@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 
+import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { gamePhaseSchema, playerSchema } from "@/shared/types/common";
 
 // Re-export shared types for convenience
@@ -91,7 +92,10 @@ export const createPassAndPlayInput = z.object({
   spyCount: z.number().int().min(1).max(2).default(1),
   hideSpyCount: z.boolean().default(false),
   /** Which location categories to include. Defaults to all. */
-  categories: z.array(z.string().min(1)).min(1),
+  categories: z
+    .array(z.string().min(1))
+    .min(1)
+    .default([...LOCATION_CATEGORIES]),
 });
 export type CreatePassAndPlayInput = z.input<typeof createPassAndPlayInput>;
 

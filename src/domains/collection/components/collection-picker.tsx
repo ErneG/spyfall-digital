@@ -1,6 +1,5 @@
 "use client";
 
-import { BookOpen } from "lucide-react";
 import { memo, useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
@@ -13,6 +12,8 @@ import {
 } from "@/shared/ui/dialog";
 
 import { getCollections, importCollectionToRoom } from "../actions";
+
+import { CollectionPickerRow } from "./collection-picker-parts";
 
 import type { CollectionListItem } from "../schema";
 
@@ -40,13 +41,22 @@ export const CollectionPicker = memo(function CollectionPicker({
     if (!open || !isAuthenticated) {
       return;
     }
-    setLoading(true);
-    getCollections().then((result) => {
+    let cancelled = false;
+    const loadCollections = async () => {
+      setLoading(true);
+      const result = await getCollections();
+      if (cancelled) {
+        return;
+      }
       if (result.success) {
         setCollections(result.data);
       }
       setLoading(false);
-    });
+    };
+    void loadCollections();
+    return () => {
+      cancelled = true;
+    };
   }, [open, isAuthenticated]);
 
   const handleImport = useCallback(
@@ -93,40 +103,5 @@ export const CollectionPicker = memo(function CollectionPicker({
         )}
       </DialogContent>
     </Dialog>
-  );
-});
-
-// ─── Row ─────────────────────────────────────────────────────
-
-interface CollectionPickerRowProps {
-  collection: CollectionListItem;
-  onImport: (id: string) => void;
-  isImporting: boolean;
-}
-
-const CollectionPickerRow = memo(function CollectionPickerRow({
-  collection,
-  onImport,
-  isImporting,
-}: CollectionPickerRowProps) {
-  const handleClick = useCallback(() => onImport(collection.id), [onImport, collection.id]);
-
-  return (
-    <button
-      onClick={handleClick}
-      disabled={isImporting}
-      className="bg-surface-1 hover:bg-surface-2 flex w-full items-center gap-3 rounded-xl p-3 text-left transition-colors disabled:opacity-50"
-    >
-      <BookOpen className="size-4 shrink-0 text-[#8B5CF6]" />
-      <div className="flex-1">
-        <p className="text-sm font-medium text-white">{collection.name}</p>
-        <p className="text-muted-foreground text-xs">
-          {collection.locationCount} location{collection.locationCount !== 1 ? "s" : ""}
-        </p>
-      </div>
-      <span className="text-muted-foreground text-xs">
-        {isImporting ? "Importing..." : "Import"}
-      </span>
-    </button>
   );
 });

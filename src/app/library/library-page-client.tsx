@@ -1,0 +1,111 @@
+"use client";
+
+import { BookOpen, ChevronLeft, Search } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+import { CategoryPicker } from "@/app/category-picker";
+import { DEFAULT_LOCATIONS } from "@/domains/location/data";
+import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
+import { cn } from "@/shared/lib/utils";
+import { Input } from "@/shared/ui/input";
+import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
+
+import { StatCard } from "./library-page-parts";
+
+const shellClassName =
+  "rounded-[32px] border border-white/10 bg-white/[0.05] shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl";
+
+export function LibraryPageClient() {
+  const [query, setQuery] = useState("");
+  const [categories, setCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
+
+  const filteredLocations = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return DEFAULT_LOCATIONS.filter((location) => {
+      if (!categories.includes(location.category)) {
+        return false;
+      }
+      if (!normalizedQuery) {
+        return true;
+      }
+      return (
+        location.name.toLowerCase().includes(normalizedQuery) ||
+        location.category.toLowerCase().includes(normalizedQuery) ||
+        location.roles.some((role) => role.toLowerCase().includes(normalizedQuery))
+      );
+    });
+  }, [categories, query]);
+
+  return (
+    <main className="relative min-h-dvh overflow-hidden bg-[#06070a] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.14),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(148,163,184,0.16),transparent_32%),linear-gradient(180deg,#080b12_0%,#050608_100%)]" />
+      <div className="relative mx-auto flex min-h-dvh max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <header className={cn(shellClassName, "space-y-5 p-6")}>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-white/55">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.03]"
+            >
+              <ChevronLeft className="size-3.5" />
+              Home
+            </Link>
+            <Link
+              href="/play/pass-and-play"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.03]"
+            >
+              <BookOpen className="size-3.5" />
+              Pass &amp; Play setup
+            </Link>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold tracking-[0.24em] text-white/45 uppercase">
+              Built-in catalog
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Browse every location before the game starts.
+            </h1>
+            <p className="max-w-3xl text-sm leading-6 text-white/60 sm:text-base">
+              The library is now a first-class surface. Search the built-in catalog, filter by
+              category, and inspect every role list without having to open a room first.
+            </p>
+          </div>
+        </header>
+
+        <section className={cn(shellClassName, "space-y-5 p-6")}>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+            <label className="relative">
+              <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-white/35" />
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search locations, categories, or roles"
+                className="h-12 rounded-2xl border-white/10 bg-black/20 pl-11 text-white placeholder:text-white/35"
+              />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <StatCard label="Shown" value={String(filteredLocations.length)} />
+              <StatCard label="Categories" value={String(categories.length)} />
+              <StatCard
+                label="Roles"
+                value={String(
+                  filteredLocations.reduce((sum, location) => sum + location.roles.length, 0),
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-white/8 bg-black/20 p-4">
+            <CategoryPicker categories={categories} onChange={setCategories} />
+          </div>
+
+          <LocationCatalogPreview
+            locations={filteredLocations}
+            emptyTitle="Nothing matched that filter"
+            emptyDescription="Try a broader search or re-enable one of the categories."
+          />
+        </section>
+      </div>
+    </main>
+  );
+}
