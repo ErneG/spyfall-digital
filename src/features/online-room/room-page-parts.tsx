@@ -40,7 +40,7 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
   session,
 }: RoomLobbyContentProps) {
   const { t, room, isConnected, isCopied, error, isLocationsOpen } = state;
-  const { handleCopy, handleLeave, players, setIsLocationsOpen, startGameMutation } = state;
+  const { setIsLocationsOpen, startGameMutation, players, handleCopy, handleLeave } = state;
 
   return (
     <div className="mx-auto w-full max-w-4xl">

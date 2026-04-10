@@ -2,13 +2,15 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 import { startGame } from "@/domains/game/actions";
 import { useRoomState } from "@/domains/room/hooks";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
+
+import { getPassAndPlayAutoStartRequest } from "./runtime";
 
 const EMPTY_PLAYERS: never[] = [];
 
@@ -37,25 +39,18 @@ export function useRoomPage(code: string) {
     }
   }, [isLoaded, session, code, router]);
 
-  // Auto-start new game for pass-and-play when room returns to LOBBY (after "Play Again")
   useEffect(() => {
-    if (
-      session?.mode !== "pass-and-play" ||
-      !room ||
-      room.state !== "LOBBY" ||
-      autoStartRef.current
-    ) {
+    const autoStartRequest = getPassAndPlayAutoStartRequest(session, room, autoStartRef.current);
+    if (!autoStartRequest) {
       return;
     }
+
     autoStartRef.current = true;
-    startGameMutation.mutate(
-      { roomId: session.roomId, playerId: session.playerId },
-      {
-        onSettled: () => {
-          autoStartRef.current = false;
-        },
+    startGameMutation.mutate(autoStartRequest, {
+      onSettled: () => {
+        autoStartRef.current = false;
       },
-    );
+    });
   }, [session, room, startGameMutation]);
 
   const handleCopy = useCallback(() => {

@@ -9,11 +9,14 @@ import {
   type CollectionContentSourceInput,
   type ContentSourceInput,
 } from "@/entities/library/content-source";
+import { roomEventSchema, roomStateSchema } from "@/entities/room/state";
 import { gamePhaseSchema, playerSchema } from "@/shared/types/common";
 
 // Re-export shared types for convenience
 export { gamePhaseSchema, playerSchema };
+export { roomEventSchema, roomStateSchema };
 export type { GamePhase, PlayerInfo } from "@/shared/types/common";
+export type { RoomEvent, RoomState } from "@/entities/room/state";
 
 // ─── Input schemas (for mutations) ──────────────────────────
 
@@ -75,28 +78,6 @@ export const getRoomStateInput = z.object({
   roomCode: z.string().length(5).toUpperCase(),
 });
 export type GetRoomStateInput = z.infer<typeof getRoomStateInput>;
-
-export const roomStateSchema = z.object({
-  state: gamePhaseSchema,
-  players: z.array(playerSchema),
-  timeLimit: z.number(),
-  spyCount: z.number(),
-  autoStartTimer: z.boolean(),
-  hideSpyCount: z.boolean(),
-  moderatorMode: z.boolean(),
-  moderatorLocationId: z.string().nullable(),
-  selectedLocationCount: z.number(),
-  totalLocationCount: z.number(),
-  currentGameId: z.string().nullable(),
-  gameStartedAt: z.string().nullable(),
-  timerRunning: z.boolean(),
-});
-export type RoomState = z.infer<typeof roomStateSchema>;
-
-export const roomEventSchema = roomStateSchema.extend({
-  error: z.string().optional(),
-});
-export type RoomEvent = z.infer<typeof roomEventSchema>;
 
 // ─── Pass & Play schemas ────────────────────────────────────
 
