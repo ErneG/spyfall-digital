@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
-import { startGame } from "@/domains/game/actions";
-import { createPassAndPlayRoom } from "@/domains/room/actions";
 import { type ContentSourceInput } from "@/entities/library/content-source";
 import { LIBRARY_COLLECTIONS_ROUTE, LIBRARY_ROUTE } from "@/features/library/routes";
 import {
@@ -26,6 +24,7 @@ import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { cn } from "@/shared/lib/utils";
 import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
 
+import { startPassAndPlaySession } from "../actions";
 import { usePassAndPlaySources } from "../hooks/use-pass-and-play-sources";
 
 import { PassAndPlayForm } from "./form";
@@ -72,7 +71,7 @@ export function PassAndPlaySetupClient() {
 
   const passAndPlayMutation = useMutation({
     mutationFn: async (trimmedNames: string[]) => {
-      const roomResult = await createPassAndPlayRoom({
+      const sessionResult = await startPassAndPlaySession({
         players: {
           names: trimmedNames,
         },
@@ -83,10 +82,7 @@ export function PassAndPlaySetupClient() {
         },
         source,
       });
-      const room = unwrapAction(roomResult);
-      const gameResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
-      const game = unwrapAction(gameResult);
-      return { game, room };
+      return unwrapAction(sessionResult);
     },
     onSuccess: ({ room, game }) => {
       setSession({
