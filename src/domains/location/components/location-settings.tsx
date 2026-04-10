@@ -1,10 +1,8 @@
 "use client";
 
-import { MapPin, Check, BookOpen } from "lucide-react";
-import { memo, useState, useCallback, useMemo } from "react";
+import { Check, MapPin } from "lucide-react";
+import { memo, useCallback, useMemo, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
-import { CollectionPicker } from "@/domains/collection/components/collection-picker";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import {
@@ -65,8 +63,6 @@ export const LocationSettings = memo(function LocationSettings({
   playerId,
 }: LocationSettingsProps) {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
-  const [pickerOpen, setPickerOpen] = useState(false);
   const data = useLocationData(roomCode, playerId, open, onOpenChange);
   const { filter, categories, clearFilter, handleFilterChange } = useLocationFilter(data.locations);
   const selectedCount = useMemo(
@@ -78,11 +74,6 @@ export const LocationSettings = memo(function LocationSettings({
   const handleClose = useCallback(() => {
     onOpenChange(false);
   }, [onOpenChange]);
-  const handleOpenPicker = useCallback(() => setPickerOpen(true), []);
-  const handleImported = useCallback(() => {
-    // Refetch location data after import
-    void data.refetch();
-  }, [data]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,17 +92,6 @@ export const LocationSettings = memo(function LocationSettings({
           onFilterChange={handleFilterChange}
           onClear={clearFilter}
         />
-        {isAuthenticated && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full gap-2 rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
-            onClick={handleOpenPicker}
-          >
-            <BookOpen className="size-3.5" />
-            Import from Collection
-          </Button>
-        )}
         <LocationSettingsBody data={data} categories={categories} filter={filter} />
         <div className="flex justify-end gap-2 pt-2">
           <Button
@@ -129,15 +109,6 @@ export const LocationSettings = memo(function LocationSettings({
           </Button>
         </div>
       </DialogContent>
-      {isAuthenticated && (
-        <CollectionPicker
-          open={pickerOpen}
-          onOpenChange={setPickerOpen}
-          roomCode={roomCode}
-          playerId={playerId}
-          onImported={handleImported}
-        />
-      )}
     </Dialog>
   );
 });
