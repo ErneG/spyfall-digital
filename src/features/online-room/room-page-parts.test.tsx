@@ -9,9 +9,9 @@ vi.mock("@/domains/location/components/location-settings", () => ({
   ),
 }));
 
-vi.mock("@/domains/collection/components/collection-picker", () => ({
-  CollectionPicker: ({ open }: { open: boolean }) => (
-    <div>{`Collection picker ${open ? "open" : "closed"}`}</div>
+vi.mock("./components/room-source-collection-picker", () => ({
+  RoomSourceCollectionPicker: ({ open }: { open: boolean }) => (
+    <div>{`Room source collection picker ${open ? "open" : "closed"}`}</div>
   ),
 }));
 
@@ -83,7 +83,7 @@ describe("RoomLobby", () => {
       />,
     );
 
-    expect(screen.getByText("Collection picker open")).toBeInTheDocument();
+    expect(screen.getByText("Room source collection picker open")).toBeInTheDocument();
     expect(screen.getByText("Location settings closed")).toBeInTheDocument();
   });
 });

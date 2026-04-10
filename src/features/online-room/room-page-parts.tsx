@@ -2,7 +2,6 @@
 
 import React from "react";
 
-import { CollectionPicker } from "@/domains/collection/components/collection-picker";
 import { LocationSettings } from "@/domains/location/components/location-settings";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
@@ -10,6 +9,7 @@ import { Separator } from "@/shared/ui/separator";
 import { GameConfig } from "./components/game-config";
 import { PlayerList } from "./components/player-list";
 import { RoomCodeHeader } from "./components/room-code-header";
+import { RoomSourceCollectionPicker } from "./components/room-source-collection-picker";
 import { StartSection } from "./components/start-section";
 
 import type { useRoomPage } from "./use-room-page";
@@ -123,12 +123,11 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
         roomCode={code}
         playerId={session.playerId}
       />
-      <CollectionPicker
+      <RoomSourceCollectionPicker
         open={isCollectionPickerOpen}
         onOpenChange={setIsCollectionPickerOpen}
         roomCode={code}
         playerId={session.playerId}
-        onImported={() => {}}
       />
     </div>
   );
