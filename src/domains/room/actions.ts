@@ -6,8 +6,6 @@ import {
   updateRoomConfigInput,
   createPassAndPlayInput,
   getRoomStateInput,
-  type CollectionPassAndPlaySourceInput,
-  type PassAndPlaySourceInput,
   type RoomState,
   type CreateRoomInput,
   type CreateRoomOutput,
@@ -17,6 +15,10 @@ import {
   type UpdateRoomConfigOutput,
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
+import {
+  type CollectionContentSourceInput,
+  type ContentSourceInput,
+} from "@/entities/library/content-source";
 import { getAuthUser } from "@/shared/lib/auth-session";
 import { MAX_PLAYERS } from "@/shared/lib/constants";
 import { prisma } from "@/shared/lib/prisma";
@@ -58,7 +60,7 @@ async function generateUniqueRoomCode(): Promise<string | null> {
 }
 
 async function getCollectionPassAndPlayLocations(
-  source: CollectionPassAndPlaySourceInput,
+  source: CollectionContentSourceInput,
 ): Promise<
   | { success: true; customLocations: Array<{ allSpies: boolean; name: string; roles: string[] }> }
   | { success: false; error: string }
@@ -107,7 +109,7 @@ function buildPassAndPlayRoomCreateData({
   collectionLocations: Array<{ allSpies: boolean; name: string; roles: string[] }>;
   playerNames: string[];
   settings: { hideSpyCount: boolean; spyCount: number; timeLimit: number };
-  source: PassAndPlaySourceInput;
+  source: ContentSourceInput;
 }) {
   return {
     code,
