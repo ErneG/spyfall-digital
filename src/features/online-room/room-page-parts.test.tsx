@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { RoomLobby } from "./room-page-parts";
 
-vi.mock("@/domains/location/components/location-settings", () => ({
+vi.mock("./components/location-settings", () => ({
   LocationSettings: ({ open }: { open: boolean }) => (
     <div>{`Location settings ${open ? "open" : "closed"}`}</div>
   ),

@@ -2,11 +2,11 @@
 
 import React from "react";
 
-import { LocationSettings } from "@/domains/location/components/location-settings";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 
 import { GameConfig } from "./components/game-config";
+import { LocationSettings } from "./components/location-settings";
 import { PlayerList } from "./components/player-list";
 import { RoomCodeHeader } from "./components/room-code-header";
 import { RoomSourceCollectionPicker } from "./components/room-source-collection-picker";
