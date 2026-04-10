@@ -1,11 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/entities/game/reveal-screen", () => ({
+vi.mock("@/entities/game/pass-and-play", () => ({
   RevealScreen: () => <div>Reveal screen</div>,
-}));
-
-vi.mock("@/entities/game/role-reveal-carousel", () => ({
   RoleRevealCarousel: () => <div>Role reveal carousel</div>,
 }));
 
@@ -20,7 +17,9 @@ afterEach(() => {
 
 async function renderPhaseRouter(props: Record<string, unknown>) {
   const { PhaseRouter } = await import("./pass-and-play-game-view-parts");
-  return render(<PhaseRouter {...(props as never)} />);
+  const TestPhaseRouter = PhaseRouter as unknown as React.ComponentType<Record<string, unknown>>;
+
+  return render(<TestPhaseRouter {...props} />);
 }
 
 const baseState = {

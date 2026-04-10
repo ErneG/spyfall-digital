@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 
 import { restartGame, startGame } from "@/entities/game/actions";
-import { useExpiryBeep, useGameActions } from "@/entities/game/game-view-parts";
-import { useGameState, useTimer } from "@/entities/game/query";
+import { useGameState, useTimer } from "@/entities/game/hooks";
+import { useExpiryBeep, useGameActions } from "@/entities/game/pass-and-play";
 import { useSession } from "@/shared/hooks/use-session";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 

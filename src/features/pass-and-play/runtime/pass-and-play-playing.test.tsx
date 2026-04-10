@@ -2,15 +2,9 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/entities/game/game-view-parts", () => ({
+vi.mock("@/entities/game/pass-and-play", () => ({
   TimerSection: () => <div>Timer section</div>,
-}));
-
-vi.mock("@/entities/game/pass-and-play-location-grid", () => ({
   PassAndPlayLocationGrid: () => <div>Location grid</div>,
-}));
-
-vi.mock("@/entities/game/pass-and-play-role-peek", () => ({
   RolePeek: () => <div>Role peek</div>,
 }));
 
@@ -21,7 +15,9 @@ afterEach(() => {
 
 async function renderPlayingPhase(props: Record<string, unknown>) {
   const { PlayingPhase } = await import("./pass-and-play-playing");
-  return render(<PlayingPhase {...(props as never)} />);
+  const TestPlayingPhase = PlayingPhase as unknown as React.ComponentType<Record<string, unknown>>;
+
+  return render(<TestPlayingPhase {...props} />);
 }
 
 const translations = {

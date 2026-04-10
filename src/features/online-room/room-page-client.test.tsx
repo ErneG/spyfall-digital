@@ -20,7 +20,7 @@ vi.mock("./room-page-parts", () => ({
   RoomLoadingSpinner: ({ label }: { label: string }) => <div>{label}</div>,
 }));
 
-vi.mock("@/entities/game/game-view", () => ({
+vi.mock("@/entities/game/view", () => ({
   GameView: ({ gameId }: { gameId: string }) => <div>Online Game {gameId}</div>,
 }));
 
