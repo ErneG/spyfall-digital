@@ -7,18 +7,18 @@ import type { CollectionListItem } from "../schema";
 
 interface CollectionPickerRowProps {
   collection: CollectionListItem;
-  onImport: (id: string) => Promise<void>;
+  onUse: (id: string) => Promise<void>;
   isImporting: boolean;
 }
 
 export const CollectionPickerRow = memo(function CollectionPickerRow({
   collection,
-  onImport,
+  onUse,
   isImporting,
 }: CollectionPickerRowProps) {
   const handleClick = useCallback(() => {
-    void onImport(collection.id);
-  }, [onImport, collection.id]);
+    void onUse(collection.id);
+  }, [onUse, collection.id]);
 
   return (
     <button
@@ -36,7 +36,7 @@ export const CollectionPickerRow = memo(function CollectionPickerRow({
         </p>
       </div>
       <span className="text-xs font-medium text-slate-500">
-        {isImporting ? "Importing…" : "Import"}
+        {isImporting ? "Applying…" : "Use"}
       </span>
     </button>
   );
