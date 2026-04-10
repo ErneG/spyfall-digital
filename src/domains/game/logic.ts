@@ -49,7 +49,9 @@ export function assignRoles(
   let remainingSpySlots = spyCount;
   for (const ma of moderatorAssignments) {
     const isSpy = ma.role === "SPY";
-    if (isSpy) {remainingSpySlots--;}
+    if (isSpy) {
+      remainingSpySlots--;
+    }
     result.push({ playerId: ma.playerId, role: ma.role, isSpy });
   }
 
@@ -77,6 +79,11 @@ export const BEEP_AUDIO =
   "data:audio/wav;base64,UklGRl9vT19teleQQFMATWIBAAEAEQBRAAAiIQACABAAAGRhdGE/b09f";
 
 // Re-export shared constants for backward compatibility
-export { MIN_PLAYERS, MAX_PLAYERS, DEFAULT_TIME_LIMIT, MAX_ROLES_PER_LOCATION } from "@/shared/lib/constants";
+export {
+  MIN_PLAYERS,
+  MAX_PLAYERS,
+  DEFAULT_TIME_LIMIT,
+  MAX_ROLES_PER_LOCATION,
+} from "@/shared/lib/constants";
 // Re-export room code generator
 export { generateRoomCode } from "@/shared/lib/room-code";

@@ -1,14 +1,7 @@
 import { render, screen, cleanup } from "@testing-library/react";
 import { describe, it, expect, afterEach } from "vitest";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "./card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card";
 
 afterEach(cleanup);
 
@@ -37,10 +30,7 @@ describe("Card", () => {
 describe("CardHeader", () => {
   it("renders and has correct slot", () => {
     const { container } = render(<CardHeader>Header</CardHeader>);
-    expect(container.firstElementChild).toHaveAttribute(
-      "data-slot",
-      "card-header",
-    );
+    expect(container.firstElementChild).toHaveAttribute("data-slot", "card-header");
   });
 });
 
@@ -52,10 +42,7 @@ describe("CardTitle", () => {
 
   it("has correct data-slot", () => {
     const { container } = render(<CardTitle>Title</CardTitle>);
-    expect(container.firstElementChild).toHaveAttribute(
-      "data-slot",
-      "card-title",
-    );
+    expect(container.firstElementChild).toHaveAttribute("data-slot", "card-title");
   });
 });
 
@@ -66,13 +53,8 @@ describe("CardDescription", () => {
   });
 
   it("has correct data-slot", () => {
-    const { container } = render(
-      <CardDescription>Description</CardDescription>,
-    );
-    expect(container.firstElementChild).toHaveAttribute(
-      "data-slot",
-      "card-description",
-    );
+    const { container } = render(<CardDescription>Description</CardDescription>);
+    expect(container.firstElementChild).toHaveAttribute("data-slot", "card-description");
   });
 });
 
@@ -84,10 +66,7 @@ describe("CardContent", () => {
 
   it("has correct data-slot", () => {
     const { container } = render(<CardContent>Content</CardContent>);
-    expect(container.firstElementChild).toHaveAttribute(
-      "data-slot",
-      "card-content",
-    );
+    expect(container.firstElementChild).toHaveAttribute("data-slot", "card-content");
   });
 });
 
@@ -99,10 +78,7 @@ describe("CardFooter", () => {
 
   it("has correct data-slot", () => {
     const { container } = render(<CardFooter>Footer</CardFooter>);
-    expect(container.firstElementChild).toHaveAttribute(
-      "data-slot",
-      "card-footer",
-    );
+    expect(container.firstElementChild).toHaveAttribute("data-slot", "card-footer");
   });
 });
 

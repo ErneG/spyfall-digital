@@ -6,7 +6,6 @@ import { useCallback } from "react";
 
 import { Button } from "@/shared/ui/button";
 
-
 export default function RoomError({
   error,
   reset,
@@ -25,18 +24,16 @@ export default function RoomError({
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex max-w-md flex-col items-center gap-4 text-center">
-        <AlertTriangle className="h-10 w-10 text-destructive" />
+        <AlertTriangle className="text-destructive h-10 w-10" />
         <h2 className="text-lg font-semibold">Room error</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {error.message || "Could not load the room. It may no longer exist."}
         </p>
         <div className="flex gap-2">
           <Button onClick={handleRetry} variant="outline">
             Try again
           </Button>
-          <Button onClick={handleHome}>
-            Back to home
-          </Button>
+          <Button onClick={handleHome}>Back to home</Button>
         </div>
       </div>
     </div>

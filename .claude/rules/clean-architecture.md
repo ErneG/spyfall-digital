@@ -18,6 +18,7 @@ app/ → domains/ → shared/
 ## Domain Structure
 
 Each domain (`src/domains/{name}/`) contains:
+
 - `schema.ts` — Zod schemas as single source of truth. All types inferred via `z.infer<>`
 - `actions.ts` — Server Actions (`"use server"`) for all mutations
 - `hooks.ts` — Client-side hooks for data fetching, SSE, state
@@ -27,6 +28,7 @@ Each domain (`src/domains/{name}/`) contains:
 ## SOLID Principles
 
 ### Single Responsibility
+
 - Each file has ONE reason to change
 - `schema.ts` changes when the data shape changes
 - `actions.ts` changes when server mutations change
@@ -35,18 +37,22 @@ Each domain (`src/domains/{name}/`) contains:
 - Components change when UI changes
 
 ### Open/Closed
+
 - Server Actions accept Zod-validated input — extend by adding new schemas, not modifying existing ones
 - Use composition over inheritance in components
 
 ### Liskov Substitution
+
 - All hooks return consistent shapes — `{ data, isLoading, error }` pattern
 - Components accept props interfaces, never concrete implementations
 
 ### Interface Segregation
+
 - Don't pass entire `GameView` to a subcomponent — pass only the props it needs
 - Don't export unused types from schema files
 
 ### Dependency Inversion
+
 - Domain logic depends on abstractions (Zod schemas), not concrete implementations (Prisma types)
 - Components depend on hook interfaces, not fetch implementations
 

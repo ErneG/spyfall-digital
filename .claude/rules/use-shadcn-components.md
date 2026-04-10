@@ -4,6 +4,7 @@ globs: src/components/**,src/app/**
 ---
 
 Never use raw HTML elements when a shadcn/ui component exists:
+
 - `<button>` → `<Button>` from `@/components/ui/button`
 - `<input>` → `<Input>` from `@/components/ui/input`
 - `<dialog>` → `<Dialog>` from `@/components/ui/dialog`

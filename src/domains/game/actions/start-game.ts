@@ -47,7 +47,9 @@ function buildAssignments(
 /** Start a new game round in a room (host only). */
 export async function startGame(input: unknown): Promise<ActionResult<StartGameOutput>> {
   const parsed = startGameInput.safeParse(input);
-  if (!parsed.success) {return fail("roomId and playerId are required");}
+  if (!parsed.success) {
+    return fail("roomId and playerId are required");
+  }
 
   const { roomId, playerId } = parsed.data;
 
@@ -61,15 +63,23 @@ export async function startGame(input: unknown): Promise<ActionResult<StartGameO
       },
     });
 
-    if (!room) {return fail("Room not found");}
-    if (room.hostId !== playerId) {return fail("Only the host can start");}
-    if (room.players.length < MIN_PLAYERS) {return fail(`Need at least ${MIN_PLAYERS} players`);}
+    if (!room) {
+      return fail("Room not found");
+    }
+    if (room.hostId !== playerId) {
+      return fail("Only the host can start");
+    }
+    if (room.players.length < MIN_PLAYERS) {
+      return fail(`Need at least ${MIN_PLAYERS} players`);
+    }
 
     const candidates = await buildCandidates(
       room.selectedLocations.map((sl) => sl.locationId),
       room.customLocations,
     );
-    if (candidates.length === 0) {return fail("No locations selected");}
+    if (candidates.length === 0) {
+      return fail("No locations selected");
+    }
 
     const chosen = pickLocation(
       candidates,

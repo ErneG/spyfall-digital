@@ -13,10 +13,9 @@ globs: src/domains/**/actions.ts
 ## Return Pattern
 
 All server actions return a discriminated union:
+
 ```ts
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
 ```
 
 ## Error Handling

@@ -1,180 +1,253 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Spyfall Digital - Premium Social Deduction</title>
-<!-- Typography -->
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<!-- Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "secondary-fixed": "#dbe4e8",
-                      "tertiary": "#4f626b",
-                      "secondary-container": "#dbe4e8",
-                      "surface-tint": "#4c616c",
-                      "surface-variant": "#dbe4e7",
-                      "on-primary-container": "#40555f",
-                      "on-secondary-fixed": "#384144",
-                      "primary-fixed-dim": "#c1d8e4",
-                      "error-container": "#fe8983",
-                      "on-primary": "#f0f9ff",
-                      "surface-bright": "#f8f9fa",
-                      "tertiary-fixed-dim": "#d1e6f0",
-                      "secondary-dim": "#4c5458",
-                      "on-secondary-container": "#4a5357",
-                      "primary-fixed": "#cfe6f2",
-                      "surface-container": "#eaeff1",
-                      "surface-container-highest": "#dbe4e7",
-                      "primary-container": "#cfe6f2",
-                      "on-secondary-fixed-variant": "#545d60",
-                      "secondary-fixed-dim": "#cdd6da",
-                      "tertiary-fixed": "#dff4ff",
-                      "inverse-surface": "#0c0f10",
-                      "surface-container-lowest": "#ffffff",
-                      "inverse-on-surface": "#9b9d9e",
-                      "on-tertiary-fixed": "#384b53",
-                      "surface-dim": "#d1dce0",
-                      "primary-dim": "#40555f",
-                      "on-tertiary-container": "#4a5d66",
-                      "on-error-container": "#752121",
-                      "on-tertiary": "#f2faff",
-                      "on-tertiary-fixed-variant": "#546770",
-                      "tertiary-dim": "#43565f",
-                      "surface-container-low": "#f1f4f6",
-                      "on-error": "#fff7f6",
-                      "on-primary-fixed-variant": "#495f69",
-                      "surface": "#f8f9fa",
-                      "outline-variant": "#abb3b7",
-                      "on-surface-variant": "#586064",
-                      "on-background": "#2b3437",
-                      "secondary": "#586064",
-                      "primary": "#4c616c",
-                      "on-surface": "#2b3437",
-                      "on-secondary": "#f1fafe",
-                      "inverse-primary": "#d8effb",
-                      "error-dim": "#4e0309",
-                      "background": "#f8f9fa",
-                      "error": "#9f403d",
-                      "surface-container-high": "#e3e9ec",
-                      "tertiary-container": "#dff4ff",
-                      "outline": "#737c7f",
-                      "on-primary-fixed": "#2d424c"
-              },
-              "borderRadius": {
-                      "DEFAULT": "1rem",
-                      "lg": "2rem",
-                      "xl": "3rem",
-                      "full": "9999px"
-              },
-              "fontFamily": {
-                      "headline": [
-                              "Newsreader"
-                      ],
-                      "body": [
-                              "Manrope"
-                      ],
-                      "label": [
-                              "Manrope"
-                      ]
-              }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Spyfall Digital - Premium Social Deduction</title>
+    <!-- Typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#dbe4e8",
+              tertiary: "#4f626b",
+              "secondary-container": "#dbe4e8",
+              "surface-tint": "#4c616c",
+              "surface-variant": "#dbe4e7",
+              "on-primary-container": "#40555f",
+              "on-secondary-fixed": "#384144",
+              "primary-fixed-dim": "#c1d8e4",
+              "error-container": "#fe8983",
+              "on-primary": "#f0f9ff",
+              "surface-bright": "#f8f9fa",
+              "tertiary-fixed-dim": "#d1e6f0",
+              "secondary-dim": "#4c5458",
+              "on-secondary-container": "#4a5357",
+              "primary-fixed": "#cfe6f2",
+              "surface-container": "#eaeff1",
+              "surface-container-highest": "#dbe4e7",
+              "primary-container": "#cfe6f2",
+              "on-secondary-fixed-variant": "#545d60",
+              "secondary-fixed-dim": "#cdd6da",
+              "tertiary-fixed": "#dff4ff",
+              "inverse-surface": "#0c0f10",
+              "surface-container-lowest": "#ffffff",
+              "inverse-on-surface": "#9b9d9e",
+              "on-tertiary-fixed": "#384b53",
+              "surface-dim": "#d1dce0",
+              "primary-dim": "#40555f",
+              "on-tertiary-container": "#4a5d66",
+              "on-error-container": "#752121",
+              "on-tertiary": "#f2faff",
+              "on-tertiary-fixed-variant": "#546770",
+              "tertiary-dim": "#43565f",
+              "surface-container-low": "#f1f4f6",
+              "on-error": "#fff7f6",
+              "on-primary-fixed-variant": "#495f69",
+              surface: "#f8f9fa",
+              "outline-variant": "#abb3b7",
+              "on-surface-variant": "#586064",
+              "on-background": "#2b3437",
+              secondary: "#586064",
+              primary: "#4c616c",
+              "on-surface": "#2b3437",
+              "on-secondary": "#f1fafe",
+              "inverse-primary": "#d8effb",
+              "error-dim": "#4e0309",
+              background: "#f8f9fa",
+              error: "#9f403d",
+              "surface-container-high": "#e3e9ec",
+              "tertiary-container": "#dff4ff",
+              outline: "#737c7f",
+              "on-primary-fixed": "#2d424c",
             },
-          }
-        }
-      </script>
-<style>
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        }
-      </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+            borderRadius: {
+              DEFAULT: "1rem",
+              lg: "2rem",
+              xl: "3rem",
+              full: "9999px",
+            },
+            fontFamily: {
+              headline: ["Newsreader"],
+              body: ["Manrope"],
+              label: ["Manrope"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 300,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
   </head>
-<body class="bg-surface font-body text-on-background selection:bg-primary-container selection:text-on-primary-container min-h-screen overflow-x-hidden relative">
-<!-- Atmospheric Background Layers -->
-<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-<div class="absolute top-[-10%] right-[-10%] w-[80%] h-[60%] rounded-full bg-primary-container opacity-30 blur-[120px]"></div>
-<div class="absolute bottom-[-5%] left-[-10%] w-[70%] h-[50%] rounded-full bg-secondary-fixed opacity-40 blur-[100px]"></div>
-</div>
-<!-- Top Navigation Anchor -->
-<nav class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl flex items-center justify-between px-6 py-4 max-w-screen-xl mx-auto">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-blue-900" data-icon="menu">menu</span>
-<span class="text-2xl font-serif italic text-blue-900">Spyfall Digital</span>
-</div>
-</nav>
-<main class="relative z-10 pt-28 px-6 pb-12 flex flex-col min-h-screen max-w-md mx-auto">
-<!-- Hero Section -->
-<header class="mb-12">
-<p class="font-label text-on-surface-variant text-sm tracking-[0.2em] uppercase mb-3">Choose your mode</p>
-<h1 class="font-headline text-4xl leading-tight text-on-surface mb-6 font-medium">Pick how you want to play tonight.</h1>
-<p class="text-on-surface-variant leading-relaxed text-lg font-light">
-                Pass &amp; Play is fastest on one shared device. Online Rooms are for remote groups.
+  <body
+    class="bg-surface font-body text-on-background selection:bg-primary-container selection:text-on-primary-container relative min-h-screen overflow-x-hidden"
+  >
+    <!-- Atmospheric Background Layers -->
+    <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      <div
+        class="bg-primary-container absolute top-[-10%] right-[-10%] h-[60%] w-[80%] rounded-full opacity-30 blur-[120px]"
+      ></div>
+      <div
+        class="bg-secondary-fixed absolute bottom-[-5%] left-[-10%] h-[50%] w-[70%] rounded-full opacity-40 blur-[100px]"
+      ></div>
+    </div>
+    <!-- Top Navigation Anchor -->
+    <nav
+      class="fixed top-0 z-50 mx-auto flex w-full max-w-screen-xl items-center justify-between bg-slate-50/80 px-6 py-4 backdrop-blur-xl"
+    >
+      <div class="flex items-center gap-4">
+        <span class="material-symbols-outlined text-blue-900" data-icon="menu">menu</span>
+        <span class="font-serif text-2xl text-blue-900 italic">Spyfall Digital</span>
+      </div>
+    </nav>
+    <main class="relative z-10 mx-auto flex min-h-screen max-w-md flex-col px-6 pt-28 pb-12">
+      <!-- Hero Section -->
+      <header class="mb-12">
+        <p class="font-label text-on-surface-variant mb-3 text-sm tracking-[0.2em] uppercase">
+          Choose your mode
+        </p>
+        <h1 class="font-headline text-on-surface mb-6 text-4xl leading-tight font-medium">
+          Pick how you want to play tonight.
+        </h1>
+        <p class="text-on-surface-variant text-lg leading-relaxed font-light">
+          Pass &amp; Play is fastest on one shared device. Online Rooms are for remote groups.
+        </p>
+      </header>
+      <!-- Primary Card (Pass & Play) -->
+      <section class="mb-6">
+        <div
+          class="glass-panel flex flex-col items-center rounded-lg border border-white/40 p-8 text-center shadow-[0_20px_40px_rgba(76,97,108,0.06)] transition-all active:scale-[0.98]"
+        >
+          <div
+            class="bg-primary-container mb-6 flex h-16 w-16 items-center justify-center rounded-full"
+          >
+            <span
+              class="material-symbols-outlined text-on-primary-container text-4xl"
+              data-icon="transfer_within_a_station"
+              >transfer_within_a_station</span
+            >
+          </div>
+          <h2 class="font-headline text-on-surface mb-2 text-2xl font-medium">Pass &amp; Play</h2>
+          <p class="font-label text-on-surface-variant mb-8 text-sm">
+            Play locally with friends in the room.
+          </p>
+          <button
+            class="bg-primary text-on-primary font-headline hover:bg-primary-dim flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-medium transition-colors"
+          >
+            <span>Start Local Session</span>
+            <span class="material-symbols-outlined text-lg" data-icon="arrow_forward"
+              >arrow_forward</span
+            >
+          </button>
+        </div>
+      </section>
+      <!-- Secondary Card (Online Room) -->
+      <section class="mb-10">
+        <div
+          class="glass-panel flex items-center gap-6 rounded-lg border border-white/30 p-6 shadow-[0_15px_30px_rgba(76,97,108,0.04)] transition-all active:scale-[0.98]"
+        >
+          <div
+            class="bg-secondary-container flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full"
+          >
+            <span
+              class="material-symbols-outlined text-on-secondary-container text-2xl"
+              data-icon="public"
+              >public</span
+            >
+          </div>
+          <div class="flex-grow">
+            <h2 class="font-headline text-on-surface mb-1 text-xl font-medium">Online Room</h2>
+            <p class="font-label text-on-surface-variant text-xs tracking-wide">
+              Join friends remotely via invite code.
             </p>
-</header>
-<!-- Primary Card (Pass & Play) -->
-<section class="mb-6">
-<div class="glass-panel p-8 rounded-lg shadow-[0_20px_40px_rgba(76,97,108,0.06)] border border-white/40 flex flex-col items-center text-center transition-all active:scale-[0.98]">
-<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-on-primary-container text-4xl" data-icon="transfer_within_a_station">transfer_within_a_station</span>
-</div>
-<h2 class="font-headline text-2xl font-medium text-on-surface mb-2">Pass &amp; Play</h2>
-<p class="font-label text-sm text-on-surface-variant mb-8">Play locally with friends in the room.</p>
-<button class="w-full bg-primary py-4 px-8 rounded-full text-on-primary font-headline text-lg font-medium hover:bg-primary-dim transition-colors flex items-center justify-center gap-2">
-<span>Start Local Session</span>
-<span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
-</button>
-</div>
-</section>
-<!-- Secondary Card (Online Room) -->
-<section class="mb-10">
-<div class="glass-panel p-6 rounded-lg shadow-[0_15px_30px_rgba(76,97,108,0.04)] border border-white/30 flex items-center gap-6 transition-all active:scale-[0.98]">
-<div class="flex-shrink-0 w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-on-secondary-container text-2xl" data-icon="public">public</span>
-</div>
-<div class="flex-grow">
-<h2 class="font-headline text-xl font-medium text-on-surface mb-1">Online Room</h2>
-<p class="font-label text-xs tracking-wide text-on-surface-variant">Join friends remotely via invite code.</p>
-</div>
-<button class="bg-surface-container-highest px-6 py-3 rounded-full text-sm font-label font-bold text-on-secondary-container hover:bg-secondary-fixed transition-colors">
-                    Join
-                </button>
-</div>
-</section>
-<!-- Tertiary Row -->
-<section class="mt-auto pt-6">
-<button class="w-full py-5 px-6 rounded-xl bg-surface-container-low/50 hover:bg-surface-container-high transition-all flex items-center justify-between group">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="auto_stories">auto_stories</span>
-<span class="font-label text-on-surface-variant text-sm font-medium">Open Library</span>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant/40" data-icon="chevron_right">chevron_right</span>
-</button>
-</section>
-</main>
-<!-- Footer -->
-<footer class="w-full py-12 px-6 bg-slate-50 flex flex-col items-center justify-center space-y-4">
-<div class="text-sm font-serif text-blue-900">Spyfall Digital</div>
-<div class="flex gap-8">
-<a class="text-slate-500 font-label text-xs tracking-wider uppercase hover:text-blue-900 transition-all" href="#">Legal</a>
-<a class="text-slate-500 font-label text-xs tracking-wider uppercase hover:text-blue-900 transition-all" href="#">Privacy</a>
-<a class="text-slate-500 font-label text-xs tracking-wider uppercase hover:text-blue-900 transition-all" href="#">Support</a>
-</div>
-<p class="text-slate-500 font-label text-xs tracking-wider uppercase opacity-60">© 2024 Spyfall Digital. All rights reserved.</p>
-</footer>
-</body></html>
+          </div>
+          <button
+            class="bg-surface-container-highest font-label text-on-secondary-container hover:bg-secondary-fixed rounded-full px-6 py-3 text-sm font-bold transition-colors"
+          >
+            Join
+          </button>
+        </div>
+      </section>
+      <!-- Tertiary Row -->
+      <section class="mt-auto pt-6">
+        <button
+          class="bg-surface-container-low/50 hover:bg-surface-container-high group flex w-full items-center justify-between rounded-xl px-6 py-5 transition-all"
+        >
+          <div class="flex items-center gap-4">
+            <span
+              class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors"
+              data-icon="auto_stories"
+              >auto_stories</span
+            >
+            <span class="font-label text-on-surface-variant text-sm font-medium">Open Library</span>
+          </div>
+          <span
+            class="material-symbols-outlined text-on-surface-variant/40"
+            data-icon="chevron_right"
+            >chevron_right</span
+          >
+        </button>
+      </section>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="flex w-full flex-col items-center justify-center space-y-4 bg-slate-50 px-6 py-12"
+    >
+      <div class="font-serif text-sm text-blue-900">Spyfall Digital</div>
+      <div class="flex gap-8">
+        <a
+          class="font-label text-xs tracking-wider text-slate-500 uppercase transition-all hover:text-blue-900"
+          href="#"
+          >Legal</a
+        >
+        <a
+          class="font-label text-xs tracking-wider text-slate-500 uppercase transition-all hover:text-blue-900"
+          href="#"
+          >Privacy</a
+        >
+        <a
+          class="font-label text-xs tracking-wider text-slate-500 uppercase transition-all hover:text-blue-900"
+          href="#"
+          >Support</a
+        >
+      </div>
+      <p class="font-label text-xs tracking-wider text-slate-500 uppercase opacity-60">
+        © 2024 Spyfall Digital. All rights reserved.
+      </p>
+    </footer>
+  </body>
+</html>

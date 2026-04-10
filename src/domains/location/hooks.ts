@@ -11,6 +11,8 @@ export const locationKeys = {
 
 export async function fetchLocations(roomCode: string): Promise<LocationsResponse | null> {
   const result = await getLocations(roomCode);
-  if (!result.success) {return null;}
+  if (!result.success) {
+    return null;
+  }
   return result.data;
 }

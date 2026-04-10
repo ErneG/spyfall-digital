@@ -51,18 +51,15 @@ describe("castVoteInput", () => {
   });
 
   it("rejects empty strings", () => {
-    expect(
-      castVoteInput.safeParse({ gameId: "", voterId: "p1", suspectId: "p2" })
-        .success,
-    ).toBe(false);
-    expect(
-      castVoteInput.safeParse({ gameId: "g1", voterId: "", suspectId: "p2" })
-        .success,
-    ).toBe(false);
-    expect(
-      castVoteInput.safeParse({ gameId: "g1", voterId: "p1", suspectId: "" })
-        .success,
-    ).toBe(false);
+    expect(castVoteInput.safeParse({ gameId: "", voterId: "p1", suspectId: "p2" }).success).toBe(
+      false,
+    );
+    expect(castVoteInput.safeParse({ gameId: "g1", voterId: "", suspectId: "p2" }).success).toBe(
+      false,
+    );
+    expect(castVoteInput.safeParse({ gameId: "g1", voterId: "p1", suspectId: "" }).success).toBe(
+      false,
+    );
   });
 });
 

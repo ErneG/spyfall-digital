@@ -7,7 +7,6 @@ import { calculateTimeRemaining, fetchCombinedLocations, REVEAL_STATES } from ".
 
 import type { GameView } from "@/domains/game/schema";
 
-
 /** Get game state for a specific player (replaces GET /api/games/[id]). */
 export async function getGameState(
   gameId: string,
