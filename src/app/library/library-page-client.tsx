@@ -92,9 +92,8 @@ export function LibraryPageClient() {
                 Save custom locations with proper role editing.
               </h2>
               <p className="max-w-3xl text-sm leading-6 text-slate-600">
-                This is the first real content-management slice for v2: user-owned saved locations,
-                explicit role rows, and a reusable authoring surface instead of room-scoped
-                placeholders.
+                Create saved locations with explicit role rows, keep your custom role lists tidy,
+                and reuse them anywhere the app supports your library.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -119,9 +118,8 @@ export function LibraryPageClient() {
                 Sign in to save your own locations
               </h3>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                The built-in catalog is open to everyone, but saved locations are tied to your
-                account so you can reuse them across pass-and-play and the upcoming collection
-                system.
+                The built-in catalog is open to everyone, and saved locations stay with your account
+                so you can reuse them across pass-and-play and collections.
               </p>
             </div>
           )}

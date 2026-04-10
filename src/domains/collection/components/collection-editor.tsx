@@ -197,8 +197,8 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
           </div>
 
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-500">
-            Collections are now curated snapshot packs. Import saved locations from the library or
-            add manual room-only entries with explicit role rows.
+            Collections are curated packs. Import saved locations from the Library or add
+            collection-only entries with explicit role rows.
           </p>
 
           <section className="mt-8 space-y-6">
@@ -237,7 +237,8 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
                   Import from saved locations
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Pull reusable saved locations into this collection as curated snapshots.
+                  Pull reusable saved locations into this collection while keeping every role list
+                  intact.
                 </p>
               </div>
               <div className="mt-5">

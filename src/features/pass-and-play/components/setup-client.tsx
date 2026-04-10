@@ -253,7 +253,7 @@ export function PassAndPlaySetupClient() {
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-slate-600">
                   {source.kind === "collection"
-                    ? "This preview mirrors the selected collection snapshot, so saved locations and custom role lists are visible before the round starts."
+                    ? "This preview shows the exact locations in the selected collection, so saved role lists stay visible before the round starts."
                     : "This preview updates instantly as categories change, so pass-and-play no longer hides the actual location pool behind a blind start button."}
                 </p>
               </div>

@@ -241,7 +241,7 @@ export const SavedLocationImportList = memo(function SavedLocationImportList({
       <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
         <p className="text-sm font-semibold text-slate-950">No saved locations yet</p>
         <p className="mt-2 text-xs leading-5 text-slate-500">
-          Create them from the Library first, then import them here as collection snapshots.
+          Create them from the Library first, then import them here.
         </p>
       </div>
     );

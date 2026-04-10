@@ -129,7 +129,7 @@ export function PassAndPlaySourceSection({
           </select>
           <p className="text-xs leading-5 text-slate-500">
             {hasCollections
-              ? "Collections are imported as curated snapshots, so your saved role lists stay intact."
+              ? "Use a collection when you want the exact saved locations and role lists you already curated."
               : isAuthenticated
                 ? "Create a collection from the Library to use it here."
                 : "Sign in to use your saved collections in pass-and-play."}
