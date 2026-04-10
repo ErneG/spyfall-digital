@@ -11,6 +11,18 @@ export interface DefaultLocation {
   roles: string[];
 }
 
+const BARTENDER = "Bartender";
+const CUSTOMER = "Customer";
+const EDUCATION_AND_SCIENCE = "Education & Science";
+const FOOD_AND_DINING = "Food & Dining";
+const GOVERNMENT_AND_LAW = "Government & Law";
+const NIGHTLIFE_AND_EVENTS = "Nightlife & Events";
+const OUTDOORS_AND_NATURE = "Outdoors & Nature";
+const SECURITY_GUARD = "Security Guard";
+const STUDENT = "Student";
+const TOURIST = "Tourist";
+const VISITOR = "Visitor";
+
 export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   // ─── Transportation ─────────────────────────────────────
   {
@@ -28,7 +40,7 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Ocean Liner",
     category: "Transportation",
-    roles: ["Captain", "Passenger", "Bartender", "Musician", "Rich Couple", "Waiter"],
+    roles: ["Captain", "Passenger", BARTENDER, "Musician", "Rich Couple", "Waiter"],
   },
   {
     name: "Passenger Train",
@@ -48,12 +60,12 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Sightseeing Bus",
     category: "Transportation",
-    roles: ["Tourist", "Bus Driver", "Tour Guide", "Pickpocket", "Photographer", "Souvenir Seller"],
+    roles: [TOURIST, "Bus Driver", "Tour Guide", "Pickpocket", "Photographer", "Souvenir Seller"],
   },
   {
     name: "Subway",
     category: "Transportation",
-    roles: ["Commuter", "Busker", "Pickpocket", "Transit Officer", "Driver", "Tourist"],
+    roles: ["Commuter", "Busker", "Pickpocket", "Transit Officer", "Driver", TOURIST],
   },
 
   // ─── Entertainment ──────────────────────────────────────
@@ -75,92 +87,85 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Amusement Park",
     category: "Entertainment",
-    roles: ["Ride Operator", "Mascot", "Food Vendor", "Visitor", "Security Guard", "Ticket Seller"],
+    roles: ["Ride Operator", "Mascot", "Food Vendor", VISITOR, SECURITY_GUARD, "Ticket Seller"],
   },
   {
     name: "Art Museum",
     category: "Entertainment",
-    roles: ["Curator", "Artist", "Security Guard", "Visitor", "Art Thief", "Restoration Expert"],
+    roles: ["Curator", "Artist", SECURITY_GUARD, VISITOR, "Art Thief", "Restoration Expert"],
   },
   {
     name: "Gaming Convention",
     category: "Entertainment",
-    roles: ["Cosplayer", "Gamer", "Vendor", "Developer", "Journalist", "Security Guard"],
+    roles: ["Cosplayer", "Gamer", "Vendor", "Developer", "Journalist", SECURITY_GUARD],
   },
   {
     name: "Stadium",
     category: "Entertainment",
-    roles: ["Athlete", "Coach", "Referee", "Spectator", "Security Guard", "Vendor"],
+    roles: ["Athlete", "Coach", "Referee", "Spectator", SECURITY_GUARD, "Vendor"],
   },
 
   // ─── Nightlife & Events ─────────────────────────────────
   {
     name: "Casino",
-    category: "Nightlife & Events",
-    roles: ["Dealer", "Gambler", "Bouncer", "Bartender", "Pit Boss", "Security"],
+    category: NIGHTLIFE_AND_EVENTS,
+    roles: ["Dealer", "Gambler", "Bouncer", BARTENDER, "Pit Boss", "Security"],
   },
   {
     name: "Corporate Party",
-    category: "Nightlife & Events",
+    category: NIGHTLIFE_AND_EVENTS,
     roles: ["CEO", "Manager", "Intern", "Entertainer", "Secretary", "Accountant"],
   },
   {
     name: "Night Club",
-    category: "Nightlife & Events",
-    roles: ["DJ", "Bouncer", "Bartender", "Dancer", "Regular", "VIP Guest"],
+    category: NIGHTLIFE_AND_EVENTS,
+    roles: ["DJ", "Bouncer", BARTENDER, "Dancer", "Regular", "VIP Guest"],
   },
   {
     name: "Jazz Club",
-    category: "Nightlife & Events",
-    roles: ["Saxophonist", "Singer", "Bartender", "Bouncer", "Patron", "Drummer"],
+    category: NIGHTLIFE_AND_EVENTS,
+    roles: ["Saxophonist", "Singer", BARTENDER, "Bouncer", "Patron", "Drummer"],
   },
   {
     name: "Rock Concert",
-    category: "Nightlife & Events",
+    category: NIGHTLIFE_AND_EVENTS,
     roles: ["Guitarist", "Drummer", "Singer", "Roadie", "Groupie", "Sound Engineer"],
   },
   {
     name: "Cat Show",
-    category: "Nightlife & Events",
+    category: NIGHTLIFE_AND_EVENTS,
     roles: ["Judge", "Cat Owner", "Veterinarian", "Spectator", "Groomer", "Security"],
   },
   {
     name: "Wedding",
-    category: "Nightlife & Events",
+    category: NIGHTLIFE_AND_EVENTS,
     roles: ["Bride", "Groom", "Priest", "Best Man", "Wedding Planner", "Photographer"],
   },
 
   // ─── Food & Dining ──────────────────────────────────────
   {
     name: "Restaurant",
-    category: "Food & Dining",
-    roles: ["Chef", "Waiter", "Customer", "Musician", "Food Critic", "Hostess"],
+    category: FOOD_AND_DINING,
+    roles: ["Chef", "Waiter", CUSTOMER, "Musician", "Food Critic", "Hostess"],
   },
   {
     name: "Sushi Restaurant",
-    category: "Food & Dining",
-    roles: ["Sushi Chef", "Customer", "Waiter", "Manager", "Fish Supplier", "Food Critic"],
+    category: FOOD_AND_DINING,
+    roles: ["Sushi Chef", CUSTOMER, "Waiter", "Manager", "Fish Supplier", "Food Critic"],
   },
   {
     name: "Hotel",
-    category: "Food & Dining",
+    category: FOOD_AND_DINING,
     roles: ["Doorman", "Manager", "Bellboy", "Guest", "Maid", "Chef"],
   },
   {
     name: "Day Spa",
-    category: "Food & Dining",
-    roles: [
-      "Masseuse",
-      "Customer",
-      "Manicurist",
-      "Receptionist",
-      "Dermatologist",
-      "Yoga Instructor",
-    ],
+    category: FOOD_AND_DINING,
+    roles: ["Masseuse", CUSTOMER, "Manicurist", "Receptionist", "Dermatologist", "Yoga Instructor"],
   },
   {
     name: "Vineyard",
-    category: "Food & Dining",
+    category: FOOD_AND_DINING,
     roles: [
       "Winemaker",
       "Grape Picker",
@@ -172,37 +177,30 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   },
   {
     name: "Candy Factory",
-    category: "Food & Dining",
+    category: FOOD_AND_DINING,
     roles: ["Factory Worker", "Inspector", "Oompa-Loompa", "Machine Operator", "Taster", "Owner"],
   },
 
   // ─── Government & Law ───────────────────────────────────
   {
     name: "Embassy",
-    category: "Government & Law",
-    roles: ["Ambassador", "Diplomat", "Security Guard", "Secretary", "Tourist", "Refugee"],
+    category: GOVERNMENT_AND_LAW,
+    roles: ["Ambassador", "Diplomat", SECURITY_GUARD, "Secretary", TOURIST, "Refugee"],
   },
   {
     name: "Police Station",
-    category: "Government & Law",
+    category: GOVERNMENT_AND_LAW,
     roles: ["Detective", "Patrol Officer", "Criminal", "Forensic Scientist", "Archivist", "Lawyer"],
   },
   {
     name: "The United Nations",
-    category: "Government & Law",
-    roles: [
-      "Diplomat",
-      "Translator",
-      "Secretary General",
-      "Security Guard",
-      "Journalist",
-      "Tourist",
-    ],
+    category: GOVERNMENT_AND_LAW,
+    roles: ["Diplomat", "Translator", "Secretary General", SECURITY_GUARD, "Journalist", TOURIST],
   },
   {
     name: "Jail",
-    category: "Government & Law",
-    roles: ["Prisoner", "Guard", "Warden", "Lawyer", "Snitch", "Visitor"],
+    category: GOVERNMENT_AND_LAW,
+    roles: ["Prisoner", "Guard", "Warden", "Lawyer", "Snitch", VISITOR],
   },
 
   // ─── Military & Combat ──────────────────────────────────
@@ -225,27 +223,27 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   // ─── Education & Science ────────────────────────────────
   {
     name: "School",
-    category: "Education & Science",
-    roles: ["Teacher", "Student", "Principal", "Janitor", "Cafeteria Lady", "Security Guard"],
+    category: EDUCATION_AND_SCIENCE,
+    roles: ["Teacher", STUDENT, "Principal", "Janitor", "Cafeteria Lady", SECURITY_GUARD],
   },
   {
     name: "University",
-    category: "Education & Science",
-    roles: ["Professor", "Student", "Dean", "Researcher", "Janitor", "Psychologist"],
+    category: EDUCATION_AND_SCIENCE,
+    roles: ["Professor", STUDENT, "Dean", "Researcher", "Janitor", "Psychologist"],
   },
   {
     name: "Library",
-    category: "Education & Science",
-    roles: ["Librarian", "Student", "Old Man", "Homeless Person", "Book Club Member", "Author"],
+    category: EDUCATION_AND_SCIENCE,
+    roles: ["Librarian", STUDENT, "Old Man", "Homeless Person", "Book Club Member", "Author"],
   },
   {
     name: "Space Station",
-    category: "Education & Science",
+    category: EDUCATION_AND_SCIENCE,
     roles: ["Commander", "Scientist", "Engineer", "Pilot", "Doctor", "Alien"],
   },
   {
     name: "Polar Station",
-    category: "Education & Science",
+    category: EDUCATION_AND_SCIENCE,
     roles: ["Expedition Leader", "Biologist", "Geologist", "Meteorologist", "Radioman", "Medic"],
   },
 
@@ -253,34 +251,34 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Hospital",
     category: "Healthcare",
-    roles: ["Doctor", "Nurse", "Patient", "Surgeon", "Intern", "Visitor"],
+    roles: ["Doctor", "Nurse", "Patient", "Surgeon", "Intern", VISITOR],
   },
   {
     name: "Retirement Home",
     category: "Healthcare",
-    roles: ["Nurse", "Resident", "Visitor", "Activities Director", "Chef", "Janitor"],
+    roles: ["Nurse", "Resident", VISITOR, "Activities Director", "Chef", "Janitor"],
   },
 
   // ─── Outdoors & Nature ──────────────────────────────────
   {
     name: "Beach",
-    category: "Outdoors & Nature",
+    category: OUTDOORS_AND_NATURE,
     roles: [
       "Lifeguard",
       "Swimmer",
       "Ice Cream Vendor",
       "Surfer",
-      "Tourist",
+      TOURIST,
       "Beach Volleyball Player",
     ],
   },
   {
     name: "Zoo",
-    category: "Outdoors & Nature",
+    category: OUTDOORS_AND_NATURE,
     roles: [
       "Zookeeper",
       "Veterinarian",
-      "Visitor",
+      VISITOR,
       "Tour Guide",
       "Animal Trainer",
       "Gift Shop Clerk",
@@ -288,12 +286,12 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   },
   {
     name: "Cemetery",
-    category: "Outdoors & Nature",
+    category: OUTDOORS_AND_NATURE,
     roles: ["Gravedigger", "Mourner", "Priest", "Florist", "Relative", "Ghost Hunter"],
   },
   {
     name: "Harbor Docks",
-    category: "Outdoors & Nature",
+    category: OUTDOORS_AND_NATURE,
     roles: [
       "Longshoreman",
       "Ship Captain",
@@ -305,7 +303,7 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   },
   {
     name: "Coal Mine",
-    category: "Outdoors & Nature",
+    category: OUTDOORS_AND_NATURE,
     roles: [
       "Miner",
       "Geologist",
@@ -320,22 +318,22 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Bank",
     category: "Workplace",
-    roles: ["Teller", "Manager", "Security Guard", "Armored Car Driver", "Customer", "Robber"],
+    roles: ["Teller", "Manager", SECURITY_GUARD, "Armored Car Driver", CUSTOMER, "Robber"],
   },
   {
     name: "Supermarket",
     category: "Workplace",
-    roles: ["Cashier", "Butcher", "Customer", "Janitor", "Shelf Stocker", "Manager"],
+    roles: ["Cashier", "Butcher", CUSTOMER, "Janitor", "Shelf Stocker", "Manager"],
   },
   {
     name: "Service Station",
     category: "Workplace",
-    roles: ["Mechanic", "Customer", "Manager", "Car Washer", "Tow Truck Driver", "Gas Attendant"],
+    roles: ["Mechanic", CUSTOMER, "Manager", "Car Washer", "Tow Truck Driver", "Gas Attendant"],
   },
   {
     name: "Gas Station",
     category: "Workplace",
-    roles: ["Attendant", "Customer", "Mechanic", "Cashier", "Car Washer", "Manager"],
+    roles: ["Attendant", CUSTOMER, "Mechanic", "Cashier", "Car Washer", "Manager"],
   },
   {
     name: "Construction Site",
@@ -355,6 +353,6 @@ export const DEFAULT_LOCATIONS: DefaultLocation[] = [
   {
     name: "Cathedral",
     category: "Workplace",
-    roles: ["Priest", "Nun", "Tourist", "Choir Singer", "Parishioner", "Organ Player"],
+    roles: ["Priest", "Nun", TOURIST, "Choir Singer", "Parishioner", "Organ Player"],
   },
 ];
