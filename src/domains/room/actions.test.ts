@@ -199,6 +199,45 @@ describe("createPassAndPlayRoom", () => {
     });
     expect(collectionFindFirst).not.toHaveBeenCalled();
   });
+
+  it("uses the resolved built-in catalog names when creating a built-in pass-and-play room", async () => {
+    getAuthUser.mockResolvedValue(null);
+    locationFindMany.mockResolvedValue([{ id: "seed-1" }, { id: "seed-2" }]);
+    roomCreate.mockResolvedValue({
+      id: "room-1",
+      code: "ABCDE",
+      players: [
+        { id: "player-1", name: "Alice" },
+        { id: "player-2", name: "Bob" },
+        { id: "player-3", name: "Charlie" },
+      ],
+    });
+
+    const { createPassAndPlayRoom } = await import("./actions");
+    const result = await createPassAndPlayRoom({
+      players: { names: ["Alice", "Bob", "Charlie"] },
+      source: {
+        kind: "built-in",
+        categories: ["Transportation"],
+      },
+    });
+
+    expect(result.success).toBe(true);
+    expect(locationFindMany).toHaveBeenCalledOnce();
+    const locationQuery = locationFindMany.mock.calls[0]?.[0] as {
+      select: { id: true };
+      where: {
+        name: {
+          in: string[];
+        };
+      };
+    };
+
+    expect(locationQuery.select).toEqual({ id: true });
+    expect(locationQuery.where.name.in).toContain("Airplane");
+    expect(locationQuery.where.name.in).toContain("Submarine");
+    expect(locationQuery.where.name.in).toContain("Subway");
+  });
 });
 
 describe("getRoomState", () => {

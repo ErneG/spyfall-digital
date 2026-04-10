@@ -8,9 +8,9 @@ import { type CollectionDetail, type CollectionListItem } from "@/entities/libra
 import {
   createBuiltInContentSource,
   createCollectionContentSource,
+  resolveContentSourceLocations,
   type ContentSourceInput,
 } from "@/entities/library/content-source";
-import { DEFAULT_LOCATIONS } from "@/entities/library/default-locations";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { type LocationCatalogItem } from "@/shared/ui/location-catalog-preview";
@@ -50,26 +50,13 @@ function buildPassAndPlaySource(
 
 function buildPreviewLocations(
   source: ContentSourceInput,
-  categories: LocationCategory[],
   collection: CollectionDetail | undefined,
 ): LocationCatalogItem[] {
-  if (source.kind === "collection") {
-    if (!collection) {
-      return [];
-    }
-
-    return collection.locations.map((location) => ({
-      category: collection.name,
-      name: location.name,
-      roles: location.allSpies
-        ? ["All players are spies"]
-        : location.roles.map((role) => role.name),
-    }));
-  }
-
-  return DEFAULT_LOCATIONS.filter((location) =>
-    categories.includes(location.category as LocationCategory),
-  );
+  return resolveContentSourceLocations(source, { collection }).map((location) => ({
+    category: location.category,
+    name: location.name,
+    roles: location.allSpies ? ["All players are spies"] : location.roles,
+  }));
 }
 
 function calculateTotalRoles(
@@ -128,8 +115,8 @@ export function usePassAndPlaySources({
   });
 
   const previewLocations = useMemo(
-    () => buildPreviewLocations(source, categories, collectionDetailQuery.data),
-    [categories, collectionDetailQuery.data, source],
+    () => buildPreviewLocations(source, collectionDetailQuery.data),
+    [collectionDetailQuery.data, source],
   );
   const totalRoles = useMemo(
     () => calculateTotalRoles(source, previewLocations, collectionDetailQuery.data),

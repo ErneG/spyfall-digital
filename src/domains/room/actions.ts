@@ -17,6 +17,8 @@ import {
 import {
   type CollectionContentSourceInput,
   type ContentSourceInput,
+  resolveBuiltInContentSourceLocations,
+  resolveCollectionContentSourceLocations,
 } from "@/entities/library/content-source";
 import { type RoomState } from "@/entities/room/state";
 import { getAuthUser } from "@/shared/lib/auth-session";
@@ -88,10 +90,21 @@ async function getCollectionPassAndPlayLocations(
 
   return {
     success: true,
-    customLocations: collection.locations.map((location) => ({
+    customLocations: resolveCollectionContentSourceLocations({
+      name: collection.name,
+      locations: collection.locations.map((location) => ({
+        id: location.id,
+        name: location.name,
+        allSpies: location.allSpies,
+        roles: location.roles.map((role) => ({
+          id: role.name,
+          name: role.name,
+        })),
+      })),
+    }).map((location) => ({
       name: location.name,
       allSpies: location.allSpies,
-      roles: location.roles.map((role) => role.name),
+      roles: location.roles,
     })),
   };
 }
@@ -430,8 +443,11 @@ export async function createPassAndPlayRoom(
       }
       collectionLocations = collectionSource.customLocations;
     } else {
+      const builtInLocationNames = resolveBuiltInContentSourceLocations(source.categories).map(
+        (location) => location.name,
+      );
       builtInLocations = await prisma.location.findMany({
-        where: { category: { in: source.categories } },
+        where: { name: { in: builtInLocationNames } },
         select: { id: true },
       });
     }
