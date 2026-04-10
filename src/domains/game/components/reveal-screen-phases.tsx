@@ -18,7 +18,7 @@ export const RevealGameOver = memo(function RevealGameOver() {
       <div className="bg-spy-gold/12 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
         <Trophy className="text-spy-gold h-8 w-8" />
       </div>
-      <h1 className="text-3xl font-bold">{t.game.gameOver}</h1>
+      <h1 className="text-3xl font-bold text-slate-950">{t.game.gameOver}</h1>
     </motion.div>
   );
 });
@@ -35,7 +35,7 @@ export const RevealLocation = memo(function RevealLocation({ location }: { locat
       <p className="text-muted-foreground/60 flex items-center justify-center gap-1 text-[11px] tracking-[0.08em] uppercase">
         <MapPin className="h-3 w-3" /> {t.game.locationWas}
       </p>
-      <p className="text-2xl font-bold">{translateLocation(location)}</p>
+      <p className="text-2xl font-bold text-slate-950">{translateLocation(location)}</p>
     </motion.div>
   );
 });
@@ -89,7 +89,7 @@ export const RevealRoleInfo = memo(function RevealRoleInfo({
       transition={{ delay: 2.2, duration: 0.5 }}
     >
       {didSpy ? t.game.youWereSpy : t.game.yourRoleWas}{" "}
-      <span className="font-semibold text-white">{translateRole(myRole)}</span>
+      <span className="font-semibold text-slate-950">{translateRole(myRole)}</span>
     </motion.p>
   );
 });

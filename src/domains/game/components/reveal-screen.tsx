@@ -37,7 +37,7 @@ export const RevealScreen = memo(function RevealScreen({
   );
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-black p-4">
+    <main className="flex flex-1 items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.92),rgba(255,255,255,0.62)_26%,transparent_52%),radial-gradient(circle_at_82%_12%,rgba(191,219,254,0.48),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)] p-4">
       <div className="w-full max-w-md space-y-6 text-center">
         <RevealHeader location={location} spyNames={spyNames} didSpy={didSpy} myRole={myRole} />
         <RevealPlayerList players={game.players} spyIds={spyIds} />

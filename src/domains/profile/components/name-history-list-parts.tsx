@@ -27,7 +27,7 @@ export const NameHistoryRow = memo(function NameHistoryRow({
   return (
     <li className="hover:bg-surface-2 flex items-center justify-between rounded-lg px-3 py-2 transition-colors">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-white">{item.name}</span>
+        <span className="text-sm font-medium text-slate-950">{item.name}</span>
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
           <Clock className="size-3" />
           {timeAgo}

@@ -28,13 +28,13 @@ export const RevealHeader = memo(function RevealHeader({
   return (
     <>
       <RevealGameOver />
-      <div className="bg-surface-1 space-y-5 rounded-2xl p-6">
+      <div className="space-y-5 rounded-2xl border border-white/80 bg-white/82 p-6 shadow-[0_18px_40px_rgba(148,163,184,0.12)] backdrop-blur-xl">
         <RevealLocation location={location} />
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-slate-200/80" />
         <RevealSpyNames spyNames={spyNames} />
         {myRole && (
           <>
-            <div className="h-px bg-white/5" />
+            <div className="h-px bg-slate-200/80" />
             <RevealRoleInfo didSpy={didSpy} myRole={myRole} />
           </>
         )}
@@ -52,7 +52,7 @@ export const RevealPlayerList = memo(function RevealPlayerList({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="bg-surface-1 rounded-2xl">
+    <div className="rounded-2xl border border-white/80 bg-white/82 shadow-[0_18px_40px_rgba(148,163,184,0.12)] backdrop-blur-xl">
       {players.map((p, index) => (
         <motion.div
           key={p.id}
@@ -60,14 +60,14 @@ export const RevealPlayerList = memo(function RevealPlayerList({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5 + index * 0.08, duration: 0.35 }}
         >
-          {index > 0 && <div className="mx-4 h-px bg-white/5" />}
+          {index > 0 && <div className="mx-4 h-px bg-slate-200/80" />}
           <div className="flex h-[56px] items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                   spyIds.includes(p.id)
                     ? "bg-spy-red/12 text-spy-red"
-                    : "text-muted-foreground bg-white/8"
+                    : "bg-slate-100 text-slate-500"
                 }`}
               >
                 {p.name.charAt(0).toUpperCase()}
@@ -102,7 +102,7 @@ export const RevealActions = memo(function RevealActions({
     <div className="space-y-3">
       {isHost ? (
         <Button
-          className="h-14 w-full gap-2 rounded-2xl bg-white text-lg font-semibold text-black hover:bg-white/90"
+          className="h-14 w-full gap-2 rounded-2xl border border-slate-950/5 bg-slate-950 text-lg font-semibold text-white hover:bg-slate-900"
           onClick={onRestart}
           disabled={isRestarting}
         >

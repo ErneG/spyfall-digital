@@ -19,7 +19,7 @@ export const RoundHeader = memo(function RoundHeader({
       className="flex flex-col items-center gap-1"
     >
       <span className={OVERLINE}>{label}</span>
-      <span className="text-7xl font-bold text-white">{roundNumber}</span>
+      <span className="text-7xl font-bold text-slate-950">{roundNumber}</span>
     </motion.div>
   );
 });
@@ -55,7 +55,7 @@ export const RulesCard = memo(function RulesCard({
   rules: string[];
 }) {
   return (
-    <div className="bg-surface-1 w-full rounded-2xl p-5">
+    <div className="w-full rounded-2xl border border-white/80 bg-white/82 p-5 shadow-[0_18px_40px_rgba(148,163,184,0.12)] backdrop-blur-xl">
       <span className={`${OVERLINE} mb-3 block`}>{title}</span>
       <div className="flex flex-col gap-3">
         {rules.map((rule, i) => (
@@ -66,7 +66,7 @@ export const RulesCard = memo(function RulesCard({
             transition={{ delay: 0.5 + i * 0.08 }}
             className="flex items-start gap-3"
           >
-            <div className="text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/8 text-xs font-semibold">
+            <div className="text-muted-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold">
               {i + 1}
             </div>
             <span className="text-muted-foreground text-sm">{rule}</span>

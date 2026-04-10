@@ -32,7 +32,7 @@ export const GameWaitingView = React.memo(function GameWaitingView({
   onLeave,
 }: WaitingViewProps) {
   return (
-    <main className="flex flex-1 items-center justify-center p-4">
+    <main className="flex flex-1 items-center justify-center bg-[linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)] p-4">
       <div className="w-full max-w-md space-y-4 text-center">
         <Clock className="text-muted-foreground mx-auto h-10 w-10" />
         <p className="text-lg font-medium">{gameInProgressLabel}</p>
@@ -43,7 +43,7 @@ export const GameWaitingView = React.memo(function GameWaitingView({
             currentPlayerId={currentPlayerId}
           />
         )}
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-slate-200/80" />
         <Button variant="ghost" className="text-muted-foreground w-full" onClick={onLeave}>
           {leaveLabel}
         </Button>
@@ -75,7 +75,7 @@ export const GamePlayingView = React.memo(function GamePlayingView(props: Playin
   const spyPlayerId = game.isSpy ? playerId : undefined;
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-28">
+    <main className="flex flex-1 flex-col items-center bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.92),rgba(255,255,255,0.62)_26%,transparent_52%),radial-gradient(circle_at_82%_12%,rgba(191,219,254,0.48),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)] p-4 pb-28">
       <div className="w-full max-w-md space-y-5">
         {/* Timer as hero element */}
         <TimerSection

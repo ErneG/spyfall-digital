@@ -47,11 +47,15 @@ const AgentRole = memo(function AgentRole({
       </div>
       <div className="flex items-center justify-center gap-2">
         <MapPin className="text-muted-foreground/60 h-4 w-4" />
-        <p className="text-lg font-bold">{location ? translateLocation(location) : location}</p>
+        <p className="text-lg font-bold text-slate-950">
+          {location ? translateLocation(location) : location}
+        </p>
       </div>
       <p className="text-muted-foreground text-[13px]">
         {t.game.yourRole}{" "}
-        <span className="font-semibold text-white">{myRole ? translateRole(myRole) : myRole}</span>
+        <span className="font-semibold text-slate-950">
+          {myRole ? translateRole(myRole) : myRole}
+        </span>
       </p>
     </div>
   );
@@ -73,7 +77,11 @@ export const RoleCard = memo(function RoleCard({
   const { t, translateLocation, translateRole } = useTranslation();
   return (
     <div
-      className={`rounded-2xl p-6 text-center ${isRoleRevealed && isSpy ? "bg-spy-red/12" : "bg-surface-1"}`}
+      className={`rounded-2xl border p-6 text-center shadow-[0_18px_40px_rgba(148,163,184,0.12)] ${
+        isRoleRevealed && isSpy
+          ? "border-[#e8b7bb]/60 bg-[#fff1f2]"
+          : "border-white/80 bg-white/82 backdrop-blur-xl"
+      }`}
     >
       <button onClick={onToggle} className="w-full cursor-pointer space-y-3">
         {isRoleRevealed ? (
@@ -124,7 +132,7 @@ export const PlayerList = memo(function PlayerList({
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                 p.id === currentPlayerId
                   ? "bg-spy-purple/12 text-spy-purple"
-                  : "text-muted-foreground bg-white/8"
+                  : "bg-slate-100 text-slate-500"
               }`}
             >
               {p.name.charAt(0).toUpperCase()}
@@ -162,7 +170,7 @@ export const TimerSection = memo(function TimerSection({
       {isHost && (
         <button
           onClick={onToggle}
-          className="bg-surface-1 hover:bg-surface-2 absolute right-2 bottom-2 flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+          className="absolute right-2 bottom-2 flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/88 transition-colors hover:bg-white"
         >
           {isTimerRunning ? (
             <Pause className="text-muted-foreground h-4 w-4" />
@@ -192,8 +200,8 @@ export const GameActions = memo(function GameActions({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="fixed right-0 bottom-0 left-0 bg-black/80 p-4 backdrop-blur-sm">
-      <div className="flex gap-2">
+    <div className="fixed right-0 bottom-0 left-0 border-t border-white/70 bg-[#eef3f8]/88 p-4 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-md gap-2">
         <VotePanel players={game.players} playerId={playerId} gameId={gameId} />
         {isHost && (
           <Button
