@@ -60,7 +60,7 @@ export const RulesCard = memo(function RulesCard({
       <div className="flex flex-col gap-3">
         {rules.map((rule, i) => (
           <motion.div
-            key={i}
+            key={rule}
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 + i * 0.08 }}

@@ -19,14 +19,19 @@ export const RoundPreparation = memo(function RoundPreparation({
   onStartRound: () => void;
 }) {
   const { t } = useTranslation();
-  const firstPlayer = useMemo(() => players[roundNumber % players.length], [roundNumber, players]);
   const rules = useMemo(() => [t.preparation.rule1, t.preparation.rule2, t.preparation.rule3], [t]);
   const handleStart = useCallback(() => onStartRound(), [onStartRound]);
+
+  if (players.length === 0) {
+    return null;
+  }
+
+  const firstPlayer = players[roundNumber % players.length];
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-8 px-4 py-10">
       <RoundHeader roundNumber={roundNumber} label={t.preparation.roundN} />
-      <FirstQuestioner name={firstPlayer?.name ?? ""} label={t.preparation.firstToAsk} />
+      <FirstQuestioner name={firstPlayer.name} label={t.preparation.firstToAsk} />
       <RulesCard title={t.preparation.roundRules} rules={rules} />
       <motion.div
         initial={{ opacity: 0 }}

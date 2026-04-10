@@ -20,11 +20,20 @@ export const NameSuggestions = memo(function NameSuggestions({ onSelect }: NameS
     if (!isAuthenticated) {
       return;
     }
-    void getNameSuggestions().then((result) => {
-      if (result.success) {
+    let cancelled = false;
+
+    async function loadNameSuggestions() {
+      const result = await getNameSuggestions();
+      if (!cancelled && result.success) {
         setNames(result.data);
       }
-    });
+    }
+
+    void loadNameSuggestions();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated]);
 
   if (!isAuthenticated || names.length === 0) {

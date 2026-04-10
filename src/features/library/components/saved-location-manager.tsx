@@ -12,6 +12,11 @@ import { Switch } from "@/shared/ui/switch";
 
 import type { SavedLocationItem, UpsertSavedLocationInput } from "../schema";
 
+interface RoleDraft {
+  id: string;
+  value: string;
+}
+
 interface SavedLocationManagerProps {
   locations: SavedLocationItem[];
   error?: string | null;
@@ -29,7 +34,18 @@ interface SavedLocationDraft {
   category: LocationCategory;
   id?: string;
   name: string;
-  roles: string[];
+  roles: RoleDraft[];
+}
+
+let roleDraftSeed = 0;
+
+function createRoleDraft(value = ""): RoleDraft {
+  roleDraftSeed += 1;
+
+  return {
+    id: `saved-location-role-draft-${roleDraftSeed}`,
+    value,
+  };
 }
 
 function createEmptyDraft(): SavedLocationDraft {
@@ -37,7 +53,7 @@ function createEmptyDraft(): SavedLocationDraft {
     name: "",
     category: LOCATION_CATEGORIES[0],
     allSpies: false,
-    roles: ["", ""],
+    roles: [createRoleDraft(), createRoleDraft()],
   };
 }
 
@@ -47,12 +63,13 @@ function createDraftFromLocation(location: SavedLocationItem): SavedLocationDraf
     name: location.name,
     category: location.category,
     allSpies: location.allSpies,
-    roles: location.roles.length > 0 ? location.roles.map((role) => role.name) : [],
+    roles:
+      location.roles.length > 0 ? location.roles.map((role) => createRoleDraft(role.name)) : [],
   };
 }
 
-function normalizeRoles(roles: string[]): string[] {
-  return roles.map((role) => role.trim()).filter(Boolean);
+function normalizeRoles(roles: RoleDraft[]): string[] {
+  return roles.map((role) => role.value.trim()).filter(Boolean);
 }
 
 function formatUpdatedAt(value: string): string {
@@ -92,15 +109,16 @@ export function SavedLocationManager({
   }
 
   function handleRoleChange(index: number, value: string) {
-    setDraft((previous) => {
-      const nextRoles = [...previous.roles];
-      nextRoles[index] = value;
-      return { ...previous, roles: nextRoles };
-    });
+    setDraft((previous) => ({
+      ...previous,
+      roles: previous.roles.map((role, currentIndex) =>
+        currentIndex === index ? { ...role, value } : role,
+      ),
+    }));
   }
 
   function handleAddRole() {
-    setDraft((previous) => ({ ...previous, roles: [...previous.roles, ""] }));
+    setDraft((previous) => ({ ...previous, roles: [...previous.roles, createRoleDraft()] }));
   }
 
   function handleRemoveRole(index: number) {
@@ -297,7 +315,11 @@ export function SavedLocationManager({
                   setDraft((previous) => ({
                     ...previous,
                     allSpies: checked,
-                    roles: checked ? [] : previous.roles.length > 0 ? previous.roles : ["", ""],
+                    roles: checked
+                      ? []
+                      : previous.roles.length > 0
+                        ? previous.roles
+                        : [createRoleDraft(), createRoleDraft()],
                   }))
                 }
               />
@@ -331,13 +353,13 @@ export function SavedLocationManager({
             ) : (
               <div className="mt-4 space-y-3">
                 {draft.roles.map((role, index) => (
-                  <div key={`${draft.id ?? "draft"}-role-${index}`} className="flex gap-3">
+                  <div key={role.id} className="flex gap-3">
                     <div className="flex-1 space-y-2">
                       <Label htmlFor={`saved-location-role-${index}`}>Role {index + 1}</Label>
                       <Input
                         id={`saved-location-role-${index}`}
                         placeholder={index === 0 ? "Scientist" : "Guard"}
-                        value={role}
+                        value={role.value}
                         className="border border-white/75 bg-white text-slate-950 placeholder:text-slate-400"
                         onChange={(event) => handleRoleChange(index, event.target.value)}
                       />
