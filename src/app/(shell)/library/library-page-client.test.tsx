@@ -66,7 +66,7 @@ describe("LibraryPageClient", () => {
 
     expect(screen.getByRole("link", { name: /open collections/i })).toHaveAttribute(
       "href",
-      "/collections",
+      "/library/collections",
     );
   });
 

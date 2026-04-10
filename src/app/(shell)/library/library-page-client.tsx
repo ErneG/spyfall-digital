@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
 import { SavedLocationManager } from "@/features/library/components/saved-location-manager";
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { useLibraryCollections } from "@/features/library/use-library-collections";
 import { useSavedLocations } from "@/features/library/use-saved-locations";
 import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
@@ -98,7 +99,7 @@ export function LibraryPageClient() {
                 and reuse them anywhere the app supports your library.
               </p>
               <Link
-                href="/collections"
+                href={LIBRARY_COLLECTIONS_ROUTE}
                 className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-950"
               >
                 <BookOpen className="size-4" />

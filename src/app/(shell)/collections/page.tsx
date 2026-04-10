@@ -1,5 +1,7 @@
-import { CollectionListView } from "@/domains/collection/components/collection-list";
+import { redirect } from "next/navigation";
+
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 
 export default function CollectionsPage() {
-  return <CollectionListView />;
+  redirect(LIBRARY_COLLECTIONS_ROUTE);
 }

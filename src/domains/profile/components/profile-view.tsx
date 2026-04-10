@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -143,7 +144,7 @@ export function ProfileView() {
         <Button
           variant="outline"
           className="w-full justify-start gap-3"
-          onClick={() => router.push("/collections")}
+          onClick={() => router.push(LIBRARY_COLLECTIONS_ROUTE)}
         >
           <BookOpen className="size-4" />
           My Collections

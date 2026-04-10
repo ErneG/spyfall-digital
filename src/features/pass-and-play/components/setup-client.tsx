@@ -10,6 +10,7 @@ import { useAuth } from "@/domains/auth/hooks";
 import { startGame } from "@/domains/game/actions";
 import { createPassAndPlayRoom } from "@/domains/room/actions";
 import { type ContentSourceInput } from "@/entities/library/content-source";
+import { LIBRARY_COLLECTIONS_ROUTE, LIBRARY_ROUTE } from "@/features/library/routes";
 import {
   addPlayerDraft,
   createInitialPlayerDrafts,
@@ -258,7 +259,7 @@ export function PassAndPlaySetupClient() {
                 </p>
               </div>
               <Link
-                href={source.kind === "collection" ? "/collections" : "/library"}
+                href={source.kind === "collection" ? LIBRARY_COLLECTIONS_ROUTE : LIBRARY_ROUTE}
                 className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-950"
               >
                 <BookOpen className="size-4" />

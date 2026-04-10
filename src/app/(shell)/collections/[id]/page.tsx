@@ -1,4 +1,6 @@
-import { CollectionEditor } from "@/domains/collection/components/collection-editor";
+import { redirect } from "next/navigation";
+
+import { getLibraryCollectionRoute } from "@/features/library/routes";
 
 interface CollectionPageProps {
   params: Promise<{
@@ -9,5 +11,5 @@ interface CollectionPageProps {
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const { id } = await params;
 
-  return <CollectionEditor collectionId={id} />;
+  redirect(getLibraryCollectionRoute(id));
 }

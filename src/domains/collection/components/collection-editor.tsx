@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Separator } from "@/shared/ui/separator";
@@ -72,7 +73,7 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
     };
   }, [collectionId, isAuthenticated, authLoading, router]);
 
-  const handleBack = useCallback(() => router.push("/collections"), [router]);
+  const handleBack = useCallback(() => router.push(LIBRARY_COLLECTIONS_ROUTE), [router]);
 
   const handleSaveName = useCallback(async () => {
     if (!nameValue.trim() || nameValue === collection?.name) {

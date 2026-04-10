@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
+import { getLibraryCollectionRoute, LIBRARY_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
@@ -55,7 +56,7 @@ export function CollectionListView() {
     setCreating(true);
     const result = await createCollection({ name: newName.trim() });
     if (result.success) {
-      router.push(`/collections/${result.data.id}`);
+      router.push(getLibraryCollectionRoute(result.data.id));
     }
     setCreating(false);
   }, [newName, router]);
@@ -72,7 +73,7 @@ export function CollectionListView() {
     [],
   );
 
-  const handleBack = useCallback(() => router.push("/library"), [router]);
+  const handleBack = useCallback(() => router.push(LIBRARY_ROUTE), [router]);
   const handleToggleCreate = useCallback(() => setShowCreate((previous) => !previous), []);
 
   if (authLoading || loading) {
@@ -104,6 +105,7 @@ export function CollectionListView() {
               <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                 Curated room packs
               </h1>
+              <p className="mt-2 text-xs font-medium text-slate-500">Library / Collections</p>
             </div>
             <Button
               variant="ghost"

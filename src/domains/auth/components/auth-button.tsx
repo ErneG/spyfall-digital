@@ -4,6 +4,7 @@ import { LogIn, LogOut, User, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { memo, useCallback, useState } from "react";
 
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
@@ -69,7 +70,7 @@ export const AuthButton = memo(function AuthButton() {
           <User className="size-4" />
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem className="gap-2" render={<Link href="/collections" />}>
+        <DropdownMenuItem className="gap-2" render={<Link href={LIBRARY_COLLECTIONS_ROUTE} />}>
           <BookOpen className="size-4" />
           Collections
         </DropdownMenuItem>

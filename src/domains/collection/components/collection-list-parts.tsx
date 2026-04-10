@@ -4,6 +4,7 @@ import { BookOpen, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 
+import { getLibraryCollectionRoute } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 
 import type { CollectionListItem } from "../schema";
@@ -20,7 +21,7 @@ export const CollectionCard = memo(function CollectionCard({
   const router = useRouter();
 
   const handleClick = useCallback(() => {
-    router.push(`/collections/${collection.id}`);
+    router.push(getLibraryCollectionRoute(collection.id));
   }, [router, collection.id]);
 
   const handleDelete = useCallback(
