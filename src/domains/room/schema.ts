@@ -10,6 +10,7 @@ import {
   type ContentSourceInput,
 } from "@/entities/library/content-source";
 import { roomEventSchema, roomStateSchema } from "@/entities/room/state";
+import { TIMER_PRESETS } from "@/shared/config/timer-presets";
 import { gamePhaseSchema, playerSchema } from "@/shared/types/common";
 
 // Re-export shared types for convenience
@@ -126,10 +127,4 @@ export const createPassAndPlayOutput = z.object({
 });
 export type CreatePassAndPlayOutput = z.infer<typeof createPassAndPlayOutput>;
 
-export const TIMER_PRESETS = [
-  { label: "6:00", value: 360 },
-  { label: "7:00", value: 420 },
-  { label: "8:00", value: 480 },
-  { label: "9:00", value: 540 },
-  { label: "10:00", value: 600 },
-] as const;
+export { TIMER_PRESETS };

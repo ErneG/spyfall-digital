@@ -4,7 +4,7 @@ import { BookOpen, ChevronLeft, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { DEFAULT_LOCATIONS } from "@/domains/location/data";
+import { DEFAULT_LOCATIONS } from "@/entities/library/default-locations";
 import { SavedLocationManager } from "@/features/library/components/saved-location-manager";
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { useLibraryCollections } from "@/features/library/use-library-collections";

@@ -4,13 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { getCollection, getCollections } from "@/domains/collection/actions";
-import { DEFAULT_LOCATIONS } from "@/domains/location/data";
 import { type CollectionDetail, type CollectionListItem } from "@/entities/library/collection";
 import {
   createBuiltInContentSource,
   createCollectionContentSource,
   type ContentSourceInput,
 } from "@/entities/library/content-source";
+import { DEFAULT_LOCATIONS } from "@/entities/library/default-locations";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { type LocationCatalogItem } from "@/shared/ui/location-catalog-preview";

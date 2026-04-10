@@ -3,7 +3,7 @@
 import { Clock, Eye, EyeOff } from "lucide-react";
 import React from "react";
 
-import { TIMER_PRESETS } from "@/domains/room/schema";
+import { TIMER_PRESETS } from "@/shared/config/timer-presets";
 import { useTranslation } from "@/shared/i18n/context";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
