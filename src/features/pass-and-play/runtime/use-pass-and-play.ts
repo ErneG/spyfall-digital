@@ -4,9 +4,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 
-import { restartGame, startGame } from "@/domains/game/actions";
 import { useExpiryBeep, useGameActions } from "@/domains/game/components/game-view-parts";
 import { useGameState, useTimer } from "@/domains/game/hooks";
+import { restartGame, startGame } from "@/entities/game/actions";
 import { useSession } from "@/shared/hooks/use-session";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 

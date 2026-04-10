@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookMarked } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 
-import { applyRoomContentSource } from "@/domains/room/actions";
 import { createCollectionContentSource } from "@/entities/library/content-source";
+import { applyRoomContentSource } from "@/entities/room/actions";
 import { roomKeys } from "@/entities/room/query";
 import { useLibraryCollections } from "@/features/library/use-library-collections";
 import { unwrapAction } from "@/shared/lib/unwrap-action";

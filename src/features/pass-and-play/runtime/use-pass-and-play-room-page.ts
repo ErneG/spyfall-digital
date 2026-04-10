@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { startGame } from "@/domains/game/actions";
+import { startGame } from "@/entities/game/actions";
 import { useRoomState } from "@/entities/room/query";
 import { getPassAndPlayAutoStartRequest } from "@/entities/room/runtime";
 import { useSession } from "@/shared/hooks/use-session";

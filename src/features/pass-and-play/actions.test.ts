@@ -7,7 +7,7 @@ vi.mock("@/entities/room/pass-and-play", () => ({
   createPassAndPlayRoom,
 }));
 
-vi.mock("@/domains/game/actions", () => ({
+vi.mock("@/entities/game/actions", () => ({
   startGame,
 }));
 

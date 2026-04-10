@@ -33,7 +33,7 @@ vi.mock("@/entities/room/query", () => ({
   useRoomState,
 }));
 
-vi.mock("@/domains/game/actions", () => ({
+vi.mock("@/entities/game/actions", () => ({
   startGame: vi.fn(),
 }));
 

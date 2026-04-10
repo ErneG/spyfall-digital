@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { updateRoomConfig } from "@/domains/room/actions";
+import { updateRoomConfig } from "@/entities/room/actions";
 import { roomKeys } from "@/entities/room/query";
 import { type RoomState } from "@/entities/room/state";
 

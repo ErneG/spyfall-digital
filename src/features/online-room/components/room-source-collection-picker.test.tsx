@@ -11,7 +11,7 @@ const { invalidateQueries, applyRoomContentSource, useLibraryCollections } = vi.
   useLibraryCollections: vi.fn(),
 }));
 
-vi.mock("@/domains/room/actions", () => ({
+vi.mock("@/entities/room/actions", () => ({
   applyRoomContentSource,
 }));
 

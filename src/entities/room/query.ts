@@ -2,9 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getRoomState } from "@/domains/room/actions";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
+import { getRoomState } from "./actions";
 import { type RoomState } from "./state";
 
 const ROOM_STATE_POLL_INTERVAL = 1500;

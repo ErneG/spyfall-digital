@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react";
 
-import { createRoom, joinRoom } from "@/domains/room/actions";
+import { createRoom, joinRoom } from "@/entities/room/actions";
 import { useSession } from "@/shared/hooks/use-session";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
