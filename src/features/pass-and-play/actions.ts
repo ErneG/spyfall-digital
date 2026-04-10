@@ -1,12 +1,12 @@
 "use server";
 
+import { startGame, type StartGameOutput } from "@/entities/game/actions";
+import { createPassAndPlayRoom } from "@/entities/room/pass-and-play";
 import {
   createPassAndPlayInput,
   type CreatePassAndPlayInput,
   type CreatePassAndPlayOutput,
-} from "@/domains/room/schema";
-import { startGame, type StartGameOutput } from "@/entities/game/actions";
-import { createPassAndPlayRoom } from "@/entities/room/pass-and-play";
+} from "@/entities/room/schema";
 import { fail, ok, type ActionResult } from "@/shared/types/action-result";
 
 interface PassAndPlaySessionStartResult {

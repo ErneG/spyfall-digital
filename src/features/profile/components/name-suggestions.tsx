@@ -2,8 +2,8 @@
 
 import { memo, useEffect, useState } from "react";
 
-import { getNameSuggestions } from "@/domains/profile/actions";
 import { useAuth } from "@/entities/auth/use-auth";
+import { getNameSuggestions } from "@/entities/profile/actions";
 
 import { NameChip } from "./name-suggestions-parts";
 

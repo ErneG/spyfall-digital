@@ -5,7 +5,7 @@ import { memo, useCallback } from "react";
 
 import { Button } from "@/shared/ui/button";
 
-import type { NameHistoryItem } from "@/domains/profile/schema";
+import type { NameHistoryItem } from "@/entities/profile/schema";
 
 interface NameHistoryRowProps {
   item: NameHistoryItem;

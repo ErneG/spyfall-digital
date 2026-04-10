@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import { NameHistoryRow } from "./name-history-list-parts";
 
-import type { NameHistoryItem } from "@/domains/profile/schema";
+import type { NameHistoryItem } from "@/entities/profile/schema";
 
 interface NameHistoryListProps {
   names: NameHistoryItem[];

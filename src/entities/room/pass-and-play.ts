@@ -16,7 +16,7 @@ import type {
   PassAndPlayPlayersInput,
   PassAndPlaySettingsInput,
   PassAndPlaySourceInput,
-} from "@/domains/room/schema";
+} from "./schema";
 
 export interface CreatePassAndPlayRoomInput {
   players: PassAndPlayPlayersInput;
