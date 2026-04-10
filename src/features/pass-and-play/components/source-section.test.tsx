@@ -77,4 +77,33 @@ describe("PassAndPlaySourceSection", () => {
       collectionId: "collection-2",
     });
   });
+
+  it("shows the selected collection size when collection mode is active", () => {
+    render(
+      <PassAndPlaySourceSection
+        collections={[
+          {
+            id: "collection-1",
+            name: "Starter Pack",
+            description: null,
+            locationCount: 3,
+            createdAt: "2026-04-10T10:00:00.000Z",
+          },
+          {
+            id: "collection-2",
+            name: "Night Shift",
+            description: null,
+            locationCount: 5,
+            createdAt: "2026-04-10T11:00:00.000Z",
+          },
+        ]}
+        isAuthenticated
+        isLoadingCollections={false}
+        source={{ kind: "collection", collectionId: "collection-2" }}
+        onSourceChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/5 locations ready for this round/i)).toBeInTheDocument();
+  });
 });

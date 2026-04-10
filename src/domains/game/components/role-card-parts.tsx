@@ -121,25 +121,28 @@ export const RoleCard = memo(function RoleCard({
     <div className="relative mx-auto w-full max-w-sm">
       <CardStack remaining={remaining} />
       <div className="perspective-1000 relative">
-        <motion.div
-          className="preserve-3d relative aspect-[5/7] w-full cursor-pointer"
+        <motion.button
+          type="button"
+          className="preserve-3d relative aspect-[5/7] w-full cursor-pointer border-0 bg-transparent p-0 text-left"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          disabled={isFlipped || isLoading}
+          aria-busy={isLoading || undefined}
           onClick={handleClick}
         >
           {/* Back face */}
-          <div className="absolute inset-0 backface-hidden">
+          <div aria-hidden={isFlipped} className="absolute inset-0 backface-hidden">
             <CardFaceDown playerName={playerName} />
           </div>
           {/* Front face (pre-rotated so it shows correctly when flipped) */}
-          <div className="absolute inset-0 rotate-y-180 backface-hidden">
+          <div aria-hidden={!isFlipped} className="absolute inset-0 rotate-y-180 backface-hidden">
             {role?.isSpy ? (
               <CardFaceSpy />
             ) : (
               <CardFaceAgent location={role?.location ?? null} myRole={role?.myRole ?? null} />
             )}
           </div>
-        </motion.div>
+        </motion.button>
       </div>
     </div>
   );

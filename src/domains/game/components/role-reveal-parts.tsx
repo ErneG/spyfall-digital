@@ -89,7 +89,21 @@ export const CardScreen = memo(function CardScreen({
         onFlip={handleFlip}
       />
 
-      {hasFetchError && <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>}
+      {hasFetchError && (
+        <div className="space-y-3">
+          <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>
+          {!isFlipped && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full rounded-2xl border-white/80 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+              onClick={handleFlip}
+            >
+              {t.passAndPlay.retry}
+            </Button>
+          )}
+        </div>
+      )}
 
       {isFlipped && role && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>

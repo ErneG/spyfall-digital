@@ -28,6 +28,10 @@ export function PassAndPlaySourceSection({
   onSourceChange,
 }: PassAndPlaySourceSectionProps) {
   const hasCollections = collections.length > 0;
+  const selectedCollection =
+    source.kind === "collection"
+      ? (collections.find((collection) => collection.id === source.collectionId) ?? null)
+      : null;
 
   return (
     <section className="space-y-4">
@@ -134,6 +138,11 @@ export function PassAndPlaySourceSection({
                 ? "Create a collection from the Library to use it here."
                 : "Sign in to use your saved collections in pass-and-play."}
           </p>
+          {selectedCollection ? (
+            <p className="text-xs font-medium text-slate-600">
+              {selectedCollection.locationCount} locations ready for this round
+            </p>
+          ) : null}
         </div>
       )}
     </section>
