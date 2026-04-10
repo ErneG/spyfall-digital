@@ -12,13 +12,19 @@ import { Separator } from "@/shared/ui/separator";
 import {
   addLocationToCollection,
   getCollection,
+  getSavedLocationImports,
+  importSavedLocationToCollection,
   removeLocationFromCollection,
   updateCollection,
 } from "../actions";
 
-import { AddLocationForm, CollectionLocationRow } from "./collection-editor-parts";
+import {
+  AddLocationForm,
+  CollectionLocationRow,
+  SavedLocationImportList,
+} from "./collection-editor-parts";
 
-import type { CollectionDetail } from "../schema";
+import type { CollectionDetail, SavedLocationImportItem } from "../schema";
 
 interface CollectionEditorProps {
   collectionId: string;
@@ -31,6 +37,8 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
   const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
+  const [savedLocations, setSavedLocations] = useState<SavedLocationImportItem[]>([]);
+  const [importingSavedLocationId, setImportingSavedLocationId] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) {
@@ -42,13 +50,19 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
     }
     let cancelled = false;
     const loadCollection = async () => {
-      const result = await getCollection(collectionId);
+      const [collectionResult, savedLocationsResult] = await Promise.all([
+        getCollection(collectionId),
+        getSavedLocationImports(),
+      ]);
       if (cancelled) {
         return;
       }
-      if (result.success) {
-        setCollection(result.data);
-        setNameValue(result.data.name);
+      if (collectionResult.success) {
+        setCollection(collectionResult.data);
+        setNameValue(collectionResult.data.name);
+      }
+      if (savedLocationsResult.success) {
+        setSavedLocations(savedLocationsResult.data);
       }
       setLoading(false);
     };
@@ -99,6 +113,20 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
       );
     }
   }, []);
+
+  const handleImportSavedLocation = useCallback(
+    async (savedLocationId: string) => {
+      setImportingSavedLocationId(savedLocationId);
+      const result = await importSavedLocationToCollection({ collectionId, savedLocationId });
+      if (result.success) {
+        setCollection((previous) =>
+          previous ? { ...previous, locations: [...previous.locations, result.data] } : previous,
+        );
+      }
+      setImportingSavedLocationId(null);
+    },
+    [collectionId],
+  );
 
   const handleNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => setNameValue(e.target.value),
@@ -157,6 +185,23 @@ export function CollectionEditor({ collectionId }: CollectionEditorProps) {
             {collection.locations.map((loc) => (
               <CollectionLocationRow key={loc.id} location={loc} onRemove={handleRemoveLocation} />
             ))}
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold text-white">Import from saved locations</h3>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Pull reusable saved locations into this collection as curated snapshots.
+              </p>
+            </div>
+            <SavedLocationImportList
+              existingLocationNames={collection.locations.map((location) => location.name)}
+              importingId={importingSavedLocationId}
+              onImport={handleImportSavedLocation}
+              savedLocations={savedLocations}
+            />
           </div>
 
           <Separator />

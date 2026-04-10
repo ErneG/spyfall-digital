@@ -9,7 +9,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 
-import type { CollectionLocationItem } from "../schema";
+import type { CollectionLocationItem, SavedLocationImportItem } from "../schema";
 
 interface CollectionLocationRowProps {
   location: CollectionLocationItem;
@@ -127,6 +127,70 @@ export const AddLocationForm = memo(function AddLocationForm({ onAdd }: AddLocat
           Add
         </Button>
       </div>
+    </div>
+  );
+});
+
+interface SavedLocationImportListProps {
+  existingLocationNames: string[];
+  importingId: string | null;
+  onImport: (savedLocationId: string) => void;
+  savedLocations: SavedLocationImportItem[];
+}
+
+export const SavedLocationImportList = memo(function SavedLocationImportList({
+  existingLocationNames,
+  importingId,
+  onImport,
+  savedLocations,
+}: SavedLocationImportListProps) {
+  if (savedLocations.length === 0) {
+    return (
+      <div className="bg-surface-1 rounded-xl border border-dashed border-white/10 px-4 py-6 text-center">
+        <p className="text-sm font-medium text-white">No saved locations yet</p>
+        <p className="text-muted-foreground mt-2 text-xs">
+          Create them from the Library first, then import them here as collection snapshots.
+        </p>
+      </div>
+    );
+  }
+
+  const existingNames = new Set(existingLocationNames.map((name) => name.toLowerCase()));
+
+  return (
+    <div className="space-y-2">
+      {savedLocations.map((location) => {
+        const alreadyAdded = existingNames.has(location.name.toLowerCase());
+        return (
+          <div key={location.id} className="bg-surface-1 flex items-center gap-3 rounded-xl p-3">
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-white">{location.name}</span>
+                <Badge variant="outline">{location.category}</Badge>
+                {location.allSpies ? <Badge variant="destructive">All Spies</Badge> : null}
+              </div>
+              <p className="text-muted-foreground mt-1 text-xs">
+                {location.allSpies
+                  ? "No shared location roles required"
+                  : location.roles.map((role) => role.name).join(", ")}
+              </p>
+            </div>
+            {alreadyAdded ? (
+              <span className="text-muted-foreground text-xs font-medium">Already added</span>
+            ) : (
+              <Button
+                aria-label={`Import ${location.name}`}
+                disabled={importingId === location.id}
+                size="sm"
+                variant="outline"
+                onClick={() => onImport(location.id)}
+              >
+                {importingId === location.id ? "Importing…" : "Import"}
+              </Button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 });

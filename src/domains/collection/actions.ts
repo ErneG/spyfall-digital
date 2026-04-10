@@ -10,6 +10,7 @@ import {
   addLocationInput,
   updateLocationInput,
   removeLocationInput,
+  importSavedLocationToCollectionInput,
   importCollectionInput,
   type CollectionListItem,
   type CollectionDetail,
@@ -18,6 +19,8 @@ import {
   type AddLocationInput,
   type UpdateLocationInput,
   type RemoveLocationInput,
+  type SavedLocationImportItem,
+  type ImportSavedLocationToCollectionInput,
   type ImportCollectionInput,
   type CollectionLocationItem,
 } from "./schema";
@@ -301,6 +304,99 @@ export async function removeLocationFromCollection(
   } catch (error) {
     console.error("removeLocationFromCollection failed:", error);
     return fail("Failed to remove location");
+  }
+}
+
+// ─── getSavedLocationImports ────────────────────────────────
+
+export async function getSavedLocationImports(): Promise<ActionResult<SavedLocationImportItem[]>> {
+  const user = await getAuthUser();
+  if (!user) {
+    return fail("Not authenticated");
+  }
+
+  try {
+    const savedLocations = await prisma.savedLocation.findMany({
+      where: { userId: user.id },
+      include: { roles: { orderBy: { order: "asc" } } },
+      orderBy: [{ updatedAt: "desc" }, { name: "asc" }],
+    });
+
+    return ok(
+      savedLocations.map((location) => ({
+        id: location.id,
+        name: location.name,
+        category: location.category,
+        allSpies: location.allSpies,
+        roles: location.roles.map((role) => ({
+          id: role.id,
+          name: role.name,
+        })),
+      })),
+    );
+  } catch (error) {
+    console.error("getSavedLocationImports failed:", error);
+    return fail("Failed to load saved locations");
+  }
+}
+
+// ─── importSavedLocationToCollection ────────────────────────
+
+export async function importSavedLocationToCollection(
+  input: ImportSavedLocationToCollectionInput,
+): Promise<ActionResult<CollectionLocationItem>> {
+  const user = await getAuthUser();
+  if (!user) {
+    return fail("Not authenticated");
+  }
+
+  const parsed = importSavedLocationToCollectionInput.safeParse(input);
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+  }
+
+  try {
+    const collection = await prisma.locationCollection.findFirst({
+      where: { id: parsed.data.collectionId, userId: user.id },
+    });
+    if (!collection) {
+      return fail("Collection not found");
+    }
+
+    const savedLocation = await prisma.savedLocation.findFirst({
+      where: { id: parsed.data.savedLocationId, userId: user.id },
+      include: { roles: { orderBy: { order: "asc" } } },
+    });
+    if (!savedLocation) {
+      return fail("Saved location not found");
+    }
+
+    const importedLocation = await prisma.collectionLocation.create({
+      data: {
+        collectionId: parsed.data.collectionId,
+        name: savedLocation.name,
+        allSpies: savedLocation.allSpies,
+        roles: {
+          create: savedLocation.roles.map((role) => ({
+            name: role.name,
+          })),
+        },
+      },
+      include: { roles: true },
+    });
+
+    return ok({
+      id: importedLocation.id,
+      name: importedLocation.name,
+      allSpies: importedLocation.allSpies,
+      roles: importedLocation.roles.map((role) => ({
+        id: role.id,
+        name: role.name,
+      })),
+    });
+  } catch (error) {
+    console.error("importSavedLocationToCollection failed:", error);
+    return fail("Failed to import saved location");
   }
 }
 

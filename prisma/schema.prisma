@@ -24,6 +24,7 @@ model User {
   players       Player[]
   nameHistory   NameHistory[]
   collections   LocationCollection[]
+  savedLocations SavedLocation[]
 }
 
 model AuthSession {
@@ -118,6 +119,36 @@ model CollectionLocationRole {
   collectionLocation CollectionLocation @relation(fields: [collectionLocationId], references: [id], onDelete: Cascade)
 
   @@index([collectionLocationId])
+}
+
+// ─── Saved Locations (per user) ──────────────────────────────
+
+model SavedLocation {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  category  String
+  allSpies  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roles SavedLocationRole[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+}
+
+model SavedLocationRole {
+  id              String @id @default(cuid())
+  savedLocationId String
+  name            String
+  order           Int
+
+  savedLocation SavedLocation @relation(fields: [savedLocationId], references: [id], onDelete: Cascade)
+
+  @@index([savedLocationId])
+  @@index([savedLocationId, order])
 }
 
 // ─── Game Room ───────────────────────────────────────────────

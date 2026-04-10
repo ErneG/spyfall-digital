@@ -1,11 +1,13 @@
 "use client";
 
-import { BookOpen, ChevronLeft, Search } from "lucide-react";
+import { BookOpen, ChevronLeft, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { CategoryPicker } from "@/app/category-picker";
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
+import { SavedLocationManager } from "@/features/library/components/saved-location-manager";
+import { useSavedLocations } from "@/features/library/use-saved-locations";
 import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";
 import { Input } from "@/shared/ui/input";
@@ -19,6 +21,8 @@ const shellClassName =
 export function LibraryPageClient() {
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
+  const { error, isAuthenticated, isDeleting, isLoading, isSaving, locations, onDelete, onSave } =
+    useSavedLocations();
 
   const filteredLocations = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -36,6 +40,11 @@ export function LibraryPageClient() {
       );
     });
   }, [categories, query]);
+
+  const savedRoleCount = useMemo(
+    () => locations.reduce((sum, location) => sum + location.roles.length, 0),
+    [locations],
+  );
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#06070a] text-white">
@@ -73,6 +82,52 @@ export function LibraryPageClient() {
         </header>
 
         <section className={cn(shellClassName, "space-y-5 p-6")}>
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-5">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-cyan-100 uppercase">
+                <Sparkles className="size-3.5" />
+                Authoring
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Save custom locations with proper role editing.
+              </h2>
+              <p className="max-w-3xl text-sm leading-6 text-white/60">
+                This is the first real content-management slice for v2: user-owned saved locations,
+                explicit role rows, and a reusable authoring surface instead of room-scoped
+                placeholders.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <StatCard label="Saved" value={String(locations.length)} />
+              <StatCard label="Saved roles" value={String(savedRoleCount)} />
+            </div>
+          </div>
+
+          {isLoading || isAuthenticated ? (
+            <SavedLocationManager
+              error={error}
+              isDeleting={isDeleting}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              locations={locations}
+              onDelete={onDelete}
+              onSave={onSave}
+            />
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-white/10 bg-white/[0.03] px-6 py-12 text-center">
+              <h3 className="text-xl font-semibold text-white">
+                Sign in to save your own locations
+              </h3>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/55">
+                The built-in catalog is open to everyone, but saved locations are tied to your
+                account so you can reuse them across pass-and-play and the upcoming collection
+                system.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className={cn(shellClassName, "space-y-5 p-6")}>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
             <label className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-white/35" />
@@ -93,6 +148,15 @@ export function LibraryPageClient() {
                 )}
               />
             </div>
+          </div>
+
+          <div className="space-y-2 border-t border-white/8 pt-5">
+            <p className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
+              Built-in catalog
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Preview every seeded location before the round starts.
+            </h2>
           </div>
 
           <div className="rounded-[28px] border border-white/8 bg-black/20 p-4">

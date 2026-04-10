@@ -27,6 +27,15 @@ export const collectionLocationItem = z.object({
 });
 export type CollectionLocationItem = z.infer<typeof collectionLocationItem>;
 
+export const savedLocationImportItem = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.string(),
+  allSpies: z.boolean(),
+  roles: z.array(collectionLocationRole),
+});
+export type SavedLocationImportItem = z.infer<typeof savedLocationImportItem>;
+
 export const collectionDetail = z.object({
   id: z.string(),
   name: z.string(),
@@ -69,6 +78,14 @@ export const removeLocationInput = z.object({
   locationId: z.string(),
 });
 export type RemoveLocationInput = z.infer<typeof removeLocationInput>;
+
+export const importSavedLocationToCollectionInput = z.object({
+  collectionId: z.string(),
+  savedLocationId: z.string(),
+});
+export type ImportSavedLocationToCollectionInput = z.infer<
+  typeof importSavedLocationToCollectionInput
+>;
 
 export const importCollectionInput = z.object({
   collectionId: z.string(),
