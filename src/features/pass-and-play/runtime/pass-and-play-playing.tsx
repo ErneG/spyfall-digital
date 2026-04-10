@@ -9,7 +9,7 @@ import { RolePeek } from "@/domains/game/components/pass-and-play-role-peek";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 
-import type { usePassAndPlay } from "@/domains/game/components/use-pass-and-play";
+import type { usePassAndPlay } from "./use-pass-and-play";
 import type { useTranslation } from "@/shared/i18n/context";
 
 type HookState = ReturnType<typeof usePassAndPlay>;
@@ -69,8 +69,6 @@ export const PlayingPhase = memo(function PlayingPhase({
     </main>
   );
 });
-
-// ─── Sub-components ────────────────────────────────────────
 
 const SpyCountBanner = memo(function SpyCountBanner({
   hide,

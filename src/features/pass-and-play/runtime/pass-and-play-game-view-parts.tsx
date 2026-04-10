@@ -1,13 +1,12 @@
 "use client";
 
-import { PlayingPhase } from "@/domains/game/components/pass-and-play-playing";
 import { RevealScreen } from "@/domains/game/components/reveal-screen";
 import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
 
-import type { usePassAndPlay } from "@/domains/game/components/use-pass-and-play";
-import type { useTranslation } from "@/shared/i18n/context";
+import { PlayingPhase } from "./pass-and-play-playing";
 
-// ─── Phase router ──────────────────────────────────────────
+import type { usePassAndPlay } from "./use-pass-and-play";
+import type { useTranslation } from "@/shared/i18n/context";
 
 interface PhaseRouterProps {
   state: ReturnType<typeof usePassAndPlay>;

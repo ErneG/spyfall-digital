@@ -1,9 +1,9 @@
 "use client";
 
-import { usePassAndPlay } from "@/domains/game/components/use-pass-and-play";
 import { useTranslation } from "@/shared/i18n/context";
 
 import { PhaseRouter } from "./pass-and-play-game-view-parts";
+import { usePassAndPlay } from "./use-pass-and-play";
 
 interface PassAndPlayGameViewProps {
   gameId: string;
