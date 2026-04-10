@@ -159,6 +159,6 @@ export interface LocationEntry {
   roles: string[];
 }
 
-export type LocationTranslations = Record<string, LocationEntry>;
+export type LocationTranslations = Partial<Record<string, LocationEntry>>;
 
-export type CategoryTranslations = Record<string, string>;
+export type CategoryTranslations = Partial<Record<string, string>>;

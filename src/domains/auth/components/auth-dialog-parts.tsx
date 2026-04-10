@@ -33,12 +33,12 @@ export const SignInForm = memo(function SignInForm({ onSuccess }: SignInFormProp
         { email: input.email, password: input.password },
         {
           onSuccess: () => onSuccess(),
-          onError: (ctx) => setError(ctx.error.message ?? "Sign in failed"),
+          onError: (ctx) => setError(ctx.error.message),
         },
       );
 
       if (authError) {
-        setError(authError.message ?? "Sign in failed");
+        setError(authError.message || "Sign in failed");
       }
       setLoading(false);
     },
@@ -115,12 +115,12 @@ export const SignUpForm = memo(function SignUpForm({ onSuccess }: SignUpFormProp
         { name: input.name, email: input.email, password: input.password },
         {
           onSuccess: () => onSuccess(),
-          onError: (ctx) => setError(ctx.error.message ?? "Sign up failed"),
+          onError: (ctx) => setError(ctx.error.message),
         },
       );
 
       if (authError) {
-        setError(authError.message ?? "Sign up failed");
+        setError(authError.message || "Sign up failed");
       }
       setLoading(false);
     },
