@@ -9,7 +9,10 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 
-import type { CollectionLocationItem, SavedLocationImportItem } from "../schema";
+import type {
+  CollectionLocationItem,
+  SavedLocationImportItem,
+} from "@/entities/library/collection";
 
 interface RoleDraft {
   id: string;

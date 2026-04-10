@@ -5,11 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
-import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Separator } from "@/shared/ui/separator";
-
 import {
   addLocationToCollection,
   getCollection,
@@ -17,15 +12,18 @@ import {
   importSavedLocationToCollection,
   removeLocationFromCollection,
   updateCollection,
-} from "../actions";
+} from "@/domains/collection/actions";
+import { type CollectionDetail, type SavedLocationImportItem } from "@/entities/library/collection";
+import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Separator } from "@/shared/ui/separator";
 
 import {
   AddLocationForm,
   CollectionLocationRow,
   SavedLocationImportList,
 } from "./collection-editor-parts";
-
-import type { CollectionDetail, SavedLocationImportItem } from "../schema";
 
 interface CollectionEditorProps {
   collectionId: string;

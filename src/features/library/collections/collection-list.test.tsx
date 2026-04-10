@@ -21,7 +21,7 @@ vi.mock("@/domains/auth/hooks", () => ({
   }),
 }));
 
-vi.mock("../actions", () => ({
+vi.mock("@/domains/collection/actions", () => ({
   createCollection: vi.fn(),
   deleteCollection: vi.fn(),
   getCollections: vi.fn(() =>

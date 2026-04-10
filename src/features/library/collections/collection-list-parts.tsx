@@ -7,7 +7,7 @@ import { memo, useCallback } from "react";
 import { getLibraryCollectionRoute } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 
-import type { CollectionListItem } from "../schema";
+import type { CollectionListItem } from "@/entities/library/collection";
 
 interface CollectionCardProps {
   collection: CollectionListItem;

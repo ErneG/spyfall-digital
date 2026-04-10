@@ -5,15 +5,13 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
+import { createCollection, deleteCollection, getCollections } from "@/domains/collection/actions";
+import { type CollectionListItem } from "@/entities/library/collection";
 import { getLibraryCollectionRoute, LIBRARY_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-import { createCollection, deleteCollection, getCollections } from "../actions";
-
 import { CollectionCard } from "./collection-list-parts";
-
-import type { CollectionListItem } from "../schema";
 
 export function CollectionListView() {
   const router = useRouter();

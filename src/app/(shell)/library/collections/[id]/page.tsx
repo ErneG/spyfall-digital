@@ -1,4 +1,4 @@
-import { CollectionEditor } from "@/domains/collection/components/collection-editor";
+import { CollectionEditor } from "@/features/library/collections/collection-editor";
 
 interface LibraryCollectionPageProps {
   params: Promise<{
