@@ -81,17 +81,53 @@ function useCustomLocationActions(
   playerId: string,
   setCustomLocations: React.Dispatch<React.SetStateAction<CustomLocationItem[]>>,
 ) {
-  const addCustomLocation = useCallback(async () => {
-    const result = await createCustomLocation({
-      code: roomCode,
-      playerId,
-      name: "New Location",
-      roles: ["Role 1", "Role 2", "Role 3"],
-    });
-    if (result.success) {
-      setCustomLocations((previous) => [...previous, result.data]);
-    }
-  }, [roomCode, playerId, setCustomLocations]);
+  const saveCustomLocation = useCallback(
+    async (input: { id?: string; name: string; roles: string[]; allSpies: boolean }) => {
+      if (input.id) {
+        const result = await updateCustomLocation({
+          code: roomCode,
+          playerId,
+          locationId: input.id,
+          name: input.name,
+          roles: input.roles,
+          allSpies: input.allSpies,
+        });
+        if (result.success) {
+          setCustomLocations((previous) =>
+            previous.map((location) =>
+              location.id === input.id
+                ? {
+                    ...location,
+                    name: input.name,
+                    allSpies: input.allSpies,
+                    roles: input.roles.map((role, index) => ({
+                      id: `${input.id}-role-${index}`,
+                      name: role,
+                    })),
+                  }
+                : location,
+            ),
+          );
+          return true;
+        }
+        return false;
+      }
+
+      const result = await createCustomLocation({
+        code: roomCode,
+        playerId,
+        name: input.name,
+        roles: input.roles,
+        allSpies: input.allSpies,
+      });
+      if (result.success) {
+        setCustomLocations((previous) => [...previous, result.data]);
+        return true;
+      }
+      return false;
+    },
+    [roomCode, playerId, setCustomLocations],
+  );
 
   const handleDeleteCustomLocation = useCallback(
     async (locationId: string) => {
@@ -110,14 +146,10 @@ function useCustomLocationActions(
     [setCustomLocations],
   );
 
-  const handleAddCustom = useCallback(() => {
-    void addCustomLocation();
-  }, [addCustomLocation]);
-
   return {
     toggleCustomLocation,
     deleteCustomLocation: handleDeleteCustomLocation,
-    handleAddCustom,
+    saveCustomLocation,
   };
 }
 

@@ -18,10 +18,8 @@ export const SpySection = memo(function SpySection({
   const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
-        {t.config.spies}
-      </p>
-      <div className="flex gap-1.5">
+      <p className="text-[11px] tracking-[0.16em] text-slate-500 uppercase">{t.config.spies}</p>
+      <div className="flex gap-2">
         {SPY_OPTIONS.map((count) => (
           <PresetButton
             key={count}
@@ -48,17 +46,15 @@ export const LocationSection = memo(function LocationSection({
   const { t } = useTranslation();
   return (
     <div className="space-y-2">
-      <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
-        {t.config.locations}
-      </p>
+      <p className="text-[11px] tracking-[0.16em] text-slate-500 uppercase">{t.config.locations}</p>
       <button
         onClick={onOpenLocations}
-        className="bg-surface-1 hover:bg-surface-2 flex h-[56px] w-full items-center justify-between rounded-2xl px-4 text-sm transition-colors"
+        className="flex min-h-[64px] w-full items-center justify-between rounded-[28px] border border-white/80 bg-white/78 px-5 text-sm text-slate-950 shadow-[0_18px_45px_rgba(148,163,184,0.12)] transition hover:bg-white"
       >
         <span>
           {selectedLocationCount} / {totalLocationCount} {t.config.locationsSelected}
         </span>
-        <span className="text-muted-foreground/60">{t.config.edit} &rarr;</span>
+        <span className="font-medium text-slate-500">{t.config.edit} &rarr;</span>
       </button>
     </div>
   );

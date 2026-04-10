@@ -41,7 +41,7 @@ export const GameConfig = memo(function GameConfig(props: GameConfigProps) {
 
   return (
     <div className="space-y-5">
-      <p className="text-muted-foreground/60 text-[11px] tracking-[0.08em] uppercase">
+      <p className="text-[11px] tracking-[0.16em] text-slate-500 uppercase">
         <Settings className="mr-1 inline h-3 w-3" /> {t.config.gameSettings}
       </p>
       <TimerSection timeLimit={props.timeLimit} onSelect={handlers.handleTimeSelect} />

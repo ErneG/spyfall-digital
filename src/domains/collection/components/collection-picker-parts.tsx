@@ -24,17 +24,19 @@ export const CollectionPickerRow = memo(function CollectionPickerRow({
     <button
       onClick={handleClick}
       disabled={isImporting}
-      className="bg-surface-1 hover:bg-surface-2 flex w-full items-center gap-3 rounded-xl p-3 text-left transition-colors disabled:opacity-50"
+      className="flex w-full items-center gap-3 rounded-[24px] border border-white/80 bg-white/80 p-4 text-left shadow-[0_18px_45px_rgba(148,163,184,0.12)] transition hover:-translate-y-0.5 hover:bg-white disabled:opacity-50"
     >
-      <BookOpen className="size-4 shrink-0 text-[#8B5CF6]" />
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-teal-700">
+        <BookOpen className="size-4" />
+      </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-white">{collection.name}</p>
-        <p className="text-muted-foreground text-xs">
+        <p className="text-sm font-semibold text-slate-950">{collection.name}</p>
+        <p className="mt-1 text-xs text-slate-500">
           {collection.locationCount} location{collection.locationCount !== 1 ? "s" : ""}
         </p>
       </div>
-      <span className="text-muted-foreground text-xs">
-        {isImporting ? "Importing..." : "Import"}
+      <span className="text-xs font-medium text-slate-500">
+        {isImporting ? "Importing…" : "Import"}
       </span>
     </button>
   );

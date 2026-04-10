@@ -74,23 +74,26 @@ export const CollectionPicker = memo(function CollectionPicker({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="border-white/80 bg-white/82 shadow-[0_32px_90px_rgba(148,163,184,0.22)] sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Import Collection</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-950">Import Collection</DialogTitle>
+          <DialogDescription className="text-slate-500">
             Choose a collection to import its locations into this room.
           </DialogDescription>
         </DialogHeader>
         {loading ? (
           <div className="flex justify-center py-8">
-            <div className="bg-surface-2 size-6 animate-pulse rounded-full" />
+            <div className="size-6 animate-pulse rounded-full bg-slate-200" />
           </div>
         ) : collections.length === 0 ? (
-          <p className="text-muted-foreground py-6 text-center text-sm">
-            No collections yet. Create one from your profile.
-          </p>
+          <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
+            <p className="text-sm font-medium text-slate-950">No collections yet</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Create one from the collections area, then import it here.
+            </p>
+          </div>
         ) : (
-          <div className="max-h-64 space-y-2 overflow-y-auto">
+          <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
             {collections.map((c) => (
               <CollectionPickerRow
                 key={c.id}

@@ -4,14 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react";
 
-import { startGame } from "@/domains/game/actions";
-import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
-import { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
+import { createRoom, joinRoom } from "@/domains/room/actions";
 import { useSession } from "@/shared/hooks/use-session";
-import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
-import { useInputHandlers, useConfigHandlers, useActionHandlers } from "./use-home-handlers";
+import { useActionHandlers, useInputHandlers } from "./use-home-handlers";
 
 /* ── Types ──────────────────────────────────────────── */
 
@@ -19,10 +16,6 @@ interface MutationParams {
   setSession: ReturnType<typeof useSession>["setSession"];
   router: ReturnType<typeof useRouter>;
   setError: Dispatch<SetStateAction<string>>;
-  pnpTimeLimit: number;
-  pnpSpyCount: number;
-  shouldPnpHideSpyCount: boolean;
-  pnpCategories: LocationCategory[];
 }
 
 export type HomeStateMutations = ReturnType<typeof useMutations>;
@@ -30,7 +23,7 @@ export type HomeStateMutations = ReturnType<typeof useMutations>;
 /* ── Internal: mutation wiring ───────────────────────── */
 
 function useMutations(params: MutationParams) {
-  const { setSession, router, setError, pnpTimeLimit, pnpSpyCount, shouldPnpHideSpyCount } = params;
+  const { setSession, router, setError } = params;
 
   const createRoomMutation = useMutation({
     mutationFn: async (hostName: string) => {
@@ -56,52 +49,9 @@ function useMutations(params: MutationParams) {
     onError: (caughtError) => setError(caughtError.message),
   });
 
-  const passAndPlayMutation = useMutation({
-    mutationFn: async (trimmedNames: string[]) => {
-      const createResult = await createPassAndPlayRoom({
-        players: {
-          names: trimmedNames,
-        },
-        settings: {
-          timeLimit: pnpTimeLimit,
-          spyCount: pnpSpyCount,
-          hideSpyCount: shouldPnpHideSpyCount,
-        },
-        source: {
-          kind: "built-in",
-          categories: params.pnpCategories,
-        },
-      });
-      const room = unwrapAction(createResult);
-      const startResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
-      const game = unwrapAction(startResult);
-      return { room, game };
-    },
-    onSuccess: ({ room, game }) => {
-      setSession({
-        mode: "pass-and-play",
-        playerId: room.hostPlayerId,
-        roomCode: room.code,
-        roomId: room.roomId,
-        isHost: true,
-        resume: {
-          players: room.players,
-          gameId: game.gameId,
-          gameStartedAt: game.startedAt,
-          timeLimit: pnpTimeLimit,
-          spyCount: pnpSpyCount,
-          hideSpyCount: shouldPnpHideSpyCount,
-        },
-      });
-      router.push(`/room/${room.code}`);
-    },
-    onError: (caughtError) => setError(caughtError.message),
-  });
+  const isLoading = createRoomMutation.isPending || joinRoomMutation.isPending;
 
-  const isLoading =
-    createRoomMutation.isPending || joinRoomMutation.isPending || passAndPlayMutation.isPending;
-
-  return { createRoomMutation, joinRoomMutation, passAndPlayMutation, isLoading };
+  return { createRoomMutation, joinRoomMutation, isLoading };
 }
 
 /* ── Main hook ───────────────────────────────────────── */
@@ -109,14 +59,9 @@ function useMutations(params: MutationParams) {
 export function useHomeState() {
   const router = useRouter();
   const { session, setSession } = useSession();
-  const [mode, setMode] = useState<"idle" | "create" | "join" | "pass-and-play">("idle");
+  const [mode, setMode] = useState<"idle" | "create" | "join">("idle");
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState("");
-  const [playerNames, setPlayerNames] = useState<string[]>(["", "", ""]);
-  const [pnpTimeLimit, setPnpTimeLimit] = useState(DEFAULT_TIME_LIMIT);
-  const [pnpSpyCount, setPnpSpyCount] = useState(1);
-  const [shouldPnpHideSpyCount, setPnpHideSpyCount] = useState(false);
-  const [pnpCategories, setPnpCategories] = useState<LocationCategory[]>([...LOCATION_CATEGORIES]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -125,32 +70,20 @@ export function useHomeState() {
     }
   }, [session, router]);
 
-  const { createRoomMutation, joinRoomMutation, passAndPlayMutation, isLoading } = useMutations({
+  const { createRoomMutation, joinRoomMutation, isLoading } = useMutations({
     setSession,
     router,
     setError,
-    pnpTimeLimit,
-    pnpSpyCount,
-    shouldPnpHideSpyCount,
-    pnpCategories,
   });
 
-  const inputHandlers = useInputHandlers({ setName, setJoinCode, setPlayerNames, setError });
-  const configHandlers = useConfigHandlers({
-    setPnpTimeLimit,
-    setPnpSpyCount,
-    setPnpHideSpyCount,
-    setPnpCategories,
-  });
+  const inputHandlers = useInputHandlers({ setName, setJoinCode, setError });
   const actionHandlers = useActionHandlers({
     name,
     joinCode,
-    playerNames,
     setMode,
     setError,
     createRoomMutation,
     joinRoomMutation,
-    passAndPlayMutation,
   });
   const handleOpenPassAndPlaySetup = useCallback(() => {
     router.push("/play/pass-and-play");
@@ -160,16 +93,10 @@ export function useHomeState() {
     mode,
     name,
     joinCode,
-    playerNames,
     isLoading,
     error,
-    pnpTimeLimit,
-    pnpSpyCount,
-    shouldPnpHideSpyCount,
-    pnpCategories,
     handleOpenPassAndPlaySetup,
     ...inputHandlers,
-    ...configHandlers,
     ...actionHandlers,
   };
 }

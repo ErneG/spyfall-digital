@@ -23,25 +23,25 @@ export const StartSection = React.memo(function StartSection({
   const { t } = useTranslation();
   return (
     <>
-      {error && <p className="text-spy-red text-center text-[13px]">{error}</p>}
+      {error ? <p className="text-center text-[13px] text-rose-600">{error}</p> : null}
 
       {isHost ? (
-        <div className="space-y-3">
+        <div className="space-y-3 rounded-[28px] border border-white/80 bg-white/78 p-5 shadow-[0_18px_45px_rgba(148,163,184,0.12)]">
           <Button
-            className="h-[52px] w-full rounded-2xl bg-white text-lg font-semibold text-black hover:bg-white/90"
+            className="h-[56px] w-full rounded-[22px] border border-slate-950/5 bg-slate-950 text-lg font-semibold text-white shadow-[0_18px_30px_rgba(15,23,42,0.18)] hover:bg-slate-900"
             onClick={onStart}
             disabled={isStarting || playerCount < 3}
           >
             {isStarting ? t.home.starting : t.home.startGame}
           </Button>
           {playerCount < 3 && (
-            <p className="text-muted-foreground/60 text-center text-xs">
-              {t.players.needMinPlayers}
-            </p>
+            <p className="text-center text-xs text-slate-500">{t.players.needMinPlayers}</p>
           )}
         </div>
       ) : (
-        <p className="text-muted-foreground text-center text-sm">{t.players.waitingForHost}</p>
+        <div className="rounded-[28px] border border-white/80 bg-white/78 p-5 text-center shadow-[0_18px_45px_rgba(148,163,184,0.12)]">
+          <p className="text-sm text-slate-500">{t.players.waitingForHost}</p>
+        </div>
       )}
     </>
   );

@@ -86,13 +86,15 @@ export const LocationSettings = memo(function LocationSettings({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[88vh] overflow-y-auto border-white/80 bg-white/82 shadow-[0_32px_90px_rgba(148,163,184,0.22)] sm:max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-slate-950">
             <MapPin className="h-4 w-4" /> {t.locationSettings.title} ({selectedCount}{" "}
             {t.config.locationsSelected})
           </DialogTitle>
-          <DialogDescription>{t.locationSettings.description}</DialogDescription>
+          <DialogDescription className="text-slate-500">
+            {t.locationSettings.description}
+          </DialogDescription>
         </DialogHeader>
         <LocationFilterInput
           filter={filter}
@@ -100,17 +102,29 @@ export const LocationSettings = memo(function LocationSettings({
           onClear={clearFilter}
         />
         {isAuthenticated && (
-          <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleOpenPicker}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+            onClick={handleOpenPicker}
+          >
             <BookOpen className="size-3.5" />
             Import from Collection
           </Button>
         )}
         <LocationSettingsBody data={data} categories={categories} filter={filter} />
         <div className="flex justify-end gap-2 pt-2">
-          <Button variant="ghost" onClick={handleClose}>
+          <Button
+            variant="ghost"
+            onClick={handleClose}
+            className="rounded-full text-slate-500 hover:bg-slate-900/5 hover:text-slate-950"
+          >
             {t.common.cancel}
           </Button>
-          <Button onClick={data.handleSave} className="gap-1">
+          <Button
+            onClick={data.handleSave}
+            className="gap-1 rounded-full border border-slate-950/5 bg-slate-950 text-white hover:bg-slate-900"
+          >
             <Check className="h-4 w-4" /> {t.common.save}
           </Button>
         </div>
