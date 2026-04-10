@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 
 const getCollectionsMock = vi.fn<() => Promise<ActionResult<CollectionListItem[]>>>();
 const applyRoomContentSourceMock =
-  vi.fn<() => Promise<ActionResult<ApplyRoomContentSourceOutput>>>();
+  vi.fn<(input: unknown) => Promise<ActionResult<ApplyRoomContentSourceOutput>>>();
 const invalidateQueriesMock = vi.fn();
 
 vi.mock("@tanstack/react-query", () => ({
