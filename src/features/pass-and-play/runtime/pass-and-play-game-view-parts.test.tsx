@@ -1,13 +1,11 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PhaseRouter } from "./pass-and-play-game-view-parts";
-
-vi.mock("@/domains/game/components/reveal-screen", () => ({
+vi.mock("@/entities/game/reveal-screen", () => ({
   RevealScreen: () => <div>Reveal screen</div>,
 }));
 
-vi.mock("@/domains/game/components/role-reveal-carousel", () => ({
+vi.mock("@/entities/game/role-reveal-carousel", () => ({
   RoleRevealCarousel: () => <div>Role reveal carousel</div>,
 }));
 
@@ -19,6 +17,11 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
+
+async function renderPhaseRouter(props: Record<string, unknown>) {
+  const { PhaseRouter } = await import("./pass-and-play-game-view-parts");
+  return render(<PhaseRouter {...(props as never)} />);
+}
 
 const baseState = {
   activeGameId: "game-1",
@@ -38,53 +41,45 @@ const translations = {
 };
 
 describe("PhaseRouter", () => {
-  it("shows the role-reveal carousel during the reveal phase", () => {
-    render(
-      <PhaseRouter
-        state={{ ...baseState, phase: "role-reveal" } as never}
-        hostPlayerId="player-1"
-        allPlayers={[{ id: "player-1", name: "Alice" }]}
-        shouldHideSpyCount={false}
-        spyCount={1}
-        t={translations as never}
-      />,
-    );
+  it("shows the role-reveal carousel during the reveal phase", async () => {
+    await renderPhaseRouter({
+      state: { ...baseState, phase: "role-reveal" } as never,
+      hostPlayerId: "player-1",
+      allPlayers: [{ id: "player-1", name: "Alice" }],
+      shouldHideSpyCount: false,
+      spyCount: 1,
+      t: translations as never,
+    });
 
     expect(screen.getByText("Role reveal carousel")).toBeInTheDocument();
   });
 
-  it("shows the reveal screen when the server is still in reveal", () => {
-    render(
-      <PhaseRouter
-        state={
-          {
-            ...baseState,
-            game: { id: "game-1" },
-            shouldShowReveal: true,
-          } as never
-        }
-        hostPlayerId="player-1"
-        allPlayers={[{ id: "player-1", name: "Alice" }]}
-        shouldHideSpyCount={false}
-        spyCount={1}
-        t={translations as never}
-      />,
-    );
+  it("shows the reveal screen when the server is still in reveal", async () => {
+    await renderPhaseRouter({
+      state: {
+        ...baseState,
+        game: { id: "game-1" },
+        shouldShowReveal: true,
+      } as never,
+      hostPlayerId: "player-1",
+      allPlayers: [{ id: "player-1", name: "Alice" }],
+      shouldHideSpyCount: false,
+      spyCount: 1,
+      t: translations as never,
+    });
 
     expect(screen.getByText("Reveal screen")).toBeInTheDocument();
   });
 
-  it("falls back to the playing phase otherwise", () => {
-    render(
-      <PhaseRouter
-        state={baseState as never}
-        hostPlayerId="player-1"
-        allPlayers={[{ id: "player-1", name: "Alice" }]}
-        shouldHideSpyCount={false}
-        spyCount={1}
-        t={translations as never}
-      />,
-    );
+  it("falls back to the playing phase otherwise", async () => {
+    await renderPhaseRouter({
+      state: baseState as never,
+      hostPlayerId: "player-1",
+      allPlayers: [{ id: "player-1", name: "Alice" }],
+      shouldHideSpyCount: false,
+      spyCount: 1,
+      t: translations as never,
+    });
 
     expect(screen.getByText("Playing phase")).toBeInTheDocument();
   });

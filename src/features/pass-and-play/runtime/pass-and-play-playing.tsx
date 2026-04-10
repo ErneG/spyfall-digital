@@ -3,9 +3,9 @@
 import { AlertTriangle, Eye, Flag } from "lucide-react";
 import { memo, useState, useCallback } from "react";
 
-import { TimerSection } from "@/domains/game/components/game-view-parts";
-import { PassAndPlayLocationGrid } from "@/domains/game/components/pass-and-play-location-grid";
-import { RolePeek } from "@/domains/game/components/pass-and-play-role-peek";
+import { TimerSection } from "@/entities/game/game-view-parts";
+import { PassAndPlayLocationGrid } from "@/entities/game/pass-and-play-location-grid";
+import { RolePeek } from "@/entities/game/pass-and-play-role-peek";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 

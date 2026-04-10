@@ -1,7 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { RoomPageClient } from "./room-page-client";
 import { useRoomPage } from "./use-room-page";
 
 const replace = vi.fn();
@@ -21,7 +20,7 @@ vi.mock("./room-page-parts", () => ({
   RoomLoadingSpinner: ({ label }: { label: string }) => <div>{label}</div>,
 }));
 
-vi.mock("@/domains/game/components/game-view", () => ({
+vi.mock("@/entities/game/game-view", () => ({
   GameView: ({ gameId }: { gameId: string }) => <div>Online Game {gameId}</div>,
 }));
 
@@ -35,6 +34,12 @@ afterEach(() => {
 });
 
 const useRoomPageMock = vi.mocked(useRoomPage);
+
+async function renderRoomPageClient(code = "ABCDE") {
+  const { RoomPageClient } = await import("./room-page-client");
+
+  return render(<RoomPageClient code={code} />);
+}
 
 const baseState = {
   error: "",
@@ -57,18 +62,18 @@ const baseState = {
 };
 
 describe("RoomPageClient", () => {
-  it("renders nothing until the session is ready", () => {
+  it("renders nothing until the session is ready", async () => {
     useRoomPageMock.mockReturnValue({
       ...baseState,
       isLoaded: false,
     } as never);
 
-    const { container } = render(<RoomPageClient code="ABCDE" />);
+    const { container } = await renderRoomPageClient();
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders the pass-and-play runtime for pass-and-play sessions", () => {
+  it("renders the pass-and-play runtime for pass-and-play sessions", async () => {
     useRoomPageMock.mockReturnValue({
       ...baseState,
       session: {
@@ -88,13 +93,13 @@ describe("RoomPageClient", () => {
       },
     } as never);
 
-    render(<RoomPageClient code="ABCDE" />);
+    await renderRoomPageClient();
 
     expect(replace).toHaveBeenCalledWith("/play/pass-and-play/ABCDE");
     expect(screen.getByText("Loading room")).toBeInTheDocument();
   });
 
-  it("renders the online runtime when the room is in an active round", () => {
+  it("renders the online runtime when the room is in an active round", async () => {
     useRoomPageMock.mockReturnValue({
       ...baseState,
       room: {
@@ -121,12 +126,12 @@ describe("RoomPageClient", () => {
       },
     } as never);
 
-    render(<RoomPageClient code="ABCDE" />);
+    await renderRoomPageClient();
 
     expect(screen.getByText("Online Game game-2")).toBeInTheDocument();
   });
 
-  it("falls back to the room loading state when room data is missing", () => {
+  it("falls back to the room loading state when room data is missing", async () => {
     useRoomPageMock.mockReturnValue({
       ...baseState,
       session: {
@@ -138,12 +143,12 @@ describe("RoomPageClient", () => {
       },
     } as never);
 
-    render(<RoomPageClient code="ABCDE" />);
+    await renderRoomPageClient();
 
     expect(screen.getByText("Loading room")).toBeInTheDocument();
   });
 
-  it("renders the room lobby when the room is back in the lobby", () => {
+  it("renders the room lobby when the room is back in the lobby", async () => {
     useRoomPageMock.mockReturnValue({
       ...baseState,
       room: {
@@ -170,7 +175,7 @@ describe("RoomPageClient", () => {
       },
     } as never);
 
-    render(<RoomPageClient code="ABCDE" />);
+    await renderRoomPageClient();
 
     expect(screen.getByText("Lobby ABCDE")).toBeInTheDocument();
   });

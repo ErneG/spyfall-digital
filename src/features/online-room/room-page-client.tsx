@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { GameView } from "@/domains/game/components/game-view";
+import { GameView } from "@/entities/game/game-view";
 import { getPassAndPlayRuntimeRoute } from "@/features/pass-and-play/routes";
 
 import { RoomLobby, RoomLoadingSpinner } from "./room-page-parts";

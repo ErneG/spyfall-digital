@@ -2,17 +2,15 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PlayingPhase } from "./pass-and-play-playing";
-
-vi.mock("@/domains/game/components/game-view-parts", () => ({
+vi.mock("@/entities/game/game-view-parts", () => ({
   TimerSection: () => <div>Timer section</div>,
 }));
 
-vi.mock("@/domains/game/components/pass-and-play-location-grid", () => ({
+vi.mock("@/entities/game/pass-and-play-location-grid", () => ({
   PassAndPlayLocationGrid: () => <div>Location grid</div>,
 }));
 
-vi.mock("@/domains/game/components/pass-and-play-role-peek", () => ({
+vi.mock("@/entities/game/pass-and-play-role-peek", () => ({
   RolePeek: () => <div>Role peek</div>,
 }));
 
@@ -20,6 +18,11 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
+
+async function renderPlayingPhase(props: Record<string, unknown>) {
+  const { PlayingPhase } = await import("./pass-and-play-playing");
+  return render(<PlayingPhase {...(props as never)} />);
+}
 
 const translations = {
   game: {
@@ -51,19 +54,17 @@ const baseState = {
 };
 
 describe("PlayingPhase", () => {
-  it("shows round number and spy banner when applicable", () => {
-    render(
-      <PlayingPhase
-        state={{ ...baseState, roundNumber: 2 } as never}
-        allPlayers={[
-          { id: "player-1", name: "Alice" },
-          { id: "player-2", name: "Bob" },
-        ]}
-        shouldHideSpyCount={false}
-        spyCount={2}
-        t={translations as never}
-      />,
-    );
+  it("shows round number and spy banner when applicable", async () => {
+    await renderPlayingPhase({
+      state: { ...baseState, roundNumber: 2 } as never,
+      allPlayers: [
+        { id: "player-1", name: "Alice" },
+        { id: "player-2", name: "Bob" },
+      ],
+      shouldHideSpyCount: false,
+      spyCount: 2,
+      t: translations as never,
+    });
 
     expect(screen.getByText("Round 2")).toBeInTheDocument();
     expect(screen.getByText("2 spies among you")).toBeInTheDocument();
@@ -73,31 +74,27 @@ describe("PlayingPhase", () => {
   it("switches into peek mode when the player asks to peek again", async () => {
     const user = userEvent.setup();
 
-    render(
-      <PlayingPhase
-        state={baseState as never}
-        allPlayers={[{ id: "player-1", name: "Alice" }]}
-        shouldHideSpyCount
-        spyCount={1}
-        t={translations as never}
-      />,
-    );
+    await renderPlayingPhase({
+      state: baseState as never,
+      allPlayers: [{ id: "player-1", name: "Alice" }],
+      shouldHideSpyCount: true,
+      spyCount: 1,
+      t: translations as never,
+    });
 
     await user.click(screen.getByRole("button", { name: /peek at role/i }));
 
     expect(screen.getByText("Role peek")).toBeInTheDocument();
   });
 
-  it("disables the end-game action while the end mutation is pending", () => {
-    render(
-      <PlayingPhase
-        state={{ ...baseState, endMutation: { isPending: true } } as never}
-        allPlayers={[{ id: "player-1", name: "Alice" }]}
-        shouldHideSpyCount
-        spyCount={1}
-        t={translations as never}
-      />,
-    );
+  it("disables the end-game action while the end mutation is pending", async () => {
+    await renderPlayingPhase({
+      state: { ...baseState, endMutation: { isPending: true } } as never,
+      allPlayers: [{ id: "player-1", name: "Alice" }],
+      shouldHideSpyCount: true,
+      spyCount: 1,
+      t: translations as never,
+    });
 
     expect(screen.getByRole("button", { name: /ending/i })).toBeDisabled();
   });

@@ -1,7 +1,7 @@
 "use client";
 
-import { RevealScreen } from "@/domains/game/components/reveal-screen";
-import { RoleRevealCarousel } from "@/domains/game/components/role-reveal-carousel";
+import { RevealScreen } from "@/entities/game/reveal-screen";
+import { RoleRevealCarousel } from "@/entities/game/role-reveal-carousel";
 
 import { PlayingPhase } from "./pass-and-play-playing";
 
