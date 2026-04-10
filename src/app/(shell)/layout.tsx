@@ -1,5 +1,5 @@
 import { LanguageToggle } from "@/components/language-toggle";
-import { AuthButton } from "@/domains/auth/components/auth-button";
+import { AuthButton } from "@/features/auth/components/auth-button";
 
 export default function ShellLayout({
   children,

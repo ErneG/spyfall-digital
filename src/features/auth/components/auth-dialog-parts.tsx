@@ -7,7 +7,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 
-import type { SignInInput, SignUpInput } from "../schema";
+import type { SignInInput, SignUpInput } from "@/domains/auth/schema";
 
 // ─── Sign In Form ────────────────────────────────────────────
 

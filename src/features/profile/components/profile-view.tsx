@@ -4,18 +4,22 @@ import { BookOpen, LogOut, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
+import {
+  deleteNameFromHistory,
+  getNameHistory,
+  getProfile,
+  updateProfile,
+} from "@/domains/profile/actions";
+import { useAuth } from "@/entities/auth/use-auth";
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Separator } from "@/shared/ui/separator";
 
-import { getProfile, getNameHistory, updateProfile, deleteNameFromHistory } from "../actions";
-
 import { NameHistoryList } from "./name-history-list";
 
-import type { ProfileOutput, NameHistoryItem } from "../schema";
+import type { NameHistoryItem, ProfileOutput } from "@/domains/profile/schema";
 
 export function ProfileView() {
   const router = useRouter();

@@ -4,6 +4,7 @@ import { LogIn, LogOut, User, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { memo, useCallback, useState } from "react";
 
+import { useAuth } from "@/entities/auth/use-auth";
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { Button } from "@/shared/ui/button";
 import {
@@ -13,8 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-
-import { useAuth } from "../hooks";
 
 import { AuthDialog } from "./auth-dialog";
 

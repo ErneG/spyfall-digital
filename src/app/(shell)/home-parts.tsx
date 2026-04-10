@@ -4,7 +4,7 @@ import { Users, Crosshair, Smartphone, ChevronRight, Sparkles, BookOpen } from "
 import Link from "next/link";
 import React from "react";
 
-import { NameSuggestions } from "@/domains/profile/components/name-suggestions";
+import { NameSuggestions } from "@/features/profile/components/name-suggestions";
 import { useTranslation } from "@/shared/i18n/context";
 import { cn } from "@/shared/lib/utils";
 import { Button, buttonVariants } from "@/shared/ui/button";

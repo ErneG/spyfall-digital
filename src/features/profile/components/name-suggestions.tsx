@@ -2,9 +2,8 @@
 
 import { memo, useEffect, useState } from "react";
 
-import { useAuth } from "@/domains/auth/hooks";
-
-import { getNameSuggestions } from "../actions";
+import { getNameSuggestions } from "@/domains/profile/actions";
+import { useAuth } from "@/entities/auth/use-auth";
 
 import { NameChip } from "./name-suggestions-parts";
 

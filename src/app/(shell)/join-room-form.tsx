@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { NameSuggestions } from "@/domains/profile/components/name-suggestions";
+import { NameSuggestions } from "@/features/profile/components/name-suggestions";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
