@@ -1,7 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import { GameView } from "@/domains/game/components/game-view";
-import { PassAndPlayGameView } from "@/features/pass-and-play/runtime/pass-and-play-game-view";
+import { getPassAndPlayRuntimeRoute } from "@/features/pass-and-play/routes";
 
 import { RoomLobby, RoomLoadingSpinner } from "./room-page-parts";
 import { useRoomPage } from "./use-room-page";
@@ -11,28 +14,22 @@ interface RoomPageClientProps {
 }
 
 export function RoomPageClient({ code }: RoomPageClientProps) {
+  const router = useRouter();
   const state = useRoomPage(code);
   const { t, session, isLoaded, room } = state;
+
+  useEffect(() => {
+    if (session?.mode === "pass-and-play") {
+      router.replace(getPassAndPlayRuntimeRoute(code));
+    }
+  }, [code, router, session]);
 
   if (!isLoaded || !session) {
     return null;
   }
 
   if (session.mode === "pass-and-play") {
-    return (
-      <PassAndPlayGameView
-        gameId={session.resume.gameId}
-        hostPlayerId={session.playerId}
-        roomId={session.roomId}
-        allPlayers={session.resume.players}
-        roomCode={code}
-        timeLimit={session.resume.timeLimit}
-        gameStartedAt={session.resume.gameStartedAt}
-        shouldHideSpyCount={session.resume.hideSpyCount}
-        spyCount={session.resume.spyCount}
-        isTimerRunning={false}
-      />
-    );
+    return <RoomLoadingSpinner label={t.common.loading} />;
   }
 
   if (room && room.state !== "LOBBY" && room.currentGameId) {

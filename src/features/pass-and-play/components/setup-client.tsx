@@ -17,6 +17,7 @@ import {
   updatePlayerDraftName,
   type PlayerDraft,
 } from "@/features/pass-and-play/player-drafts";
+import { getPassAndPlayRuntimeRoute } from "@/features/pass-and-play/routes";
 import { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
@@ -50,7 +51,11 @@ export function PassAndPlaySetupClient() {
 
   useEffect(() => {
     if (session?.roomCode) {
-      router.replace(`/room/${session.roomCode}`);
+      router.replace(
+        session.mode === "pass-and-play"
+          ? getPassAndPlayRuntimeRoute(session.roomCode)
+          : `/room/${session.roomCode}`,
+      );
     }
   }, [router, session]);
 
@@ -100,7 +105,7 @@ export function PassAndPlaySetupClient() {
           hideSpyCount,
         },
       });
-      router.push(`/room/${room.code}`);
+      router.push(getPassAndPlayRuntimeRoute(room.code));
     },
     onError: (caughtError) => {
       setError(caughtError.message);

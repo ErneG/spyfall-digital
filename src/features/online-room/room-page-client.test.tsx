@@ -4,6 +4,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { RoomPageClient } from "./room-page-client";
 import { useRoomPage } from "./use-room-page";
 
+const replace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace,
+  }),
+}));
+
 vi.mock("./use-room-page", () => ({
   useRoomPage: vi.fn(),
 }));
@@ -82,7 +90,8 @@ describe("RoomPageClient", () => {
 
     render(<RoomPageClient code="ABCDE" />);
 
-    expect(screen.getByText("Pass and Play game-1")).toBeInTheDocument();
+    expect(replace).toHaveBeenCalledWith("/play/pass-and-play/ABCDE");
+    expect(screen.getByText("Loading room")).toBeInTheDocument();
   });
 
   it("renders the online runtime when the room is in an active round", () => {
