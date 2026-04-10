@@ -48,4 +48,13 @@ describe("LibraryPageClient", () => {
     expect(screen.queryByText(/upcoming collection system/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/first real content-management slice/i)).not.toBeInTheDocument();
   });
+
+  it("offers a direct link into collections from the library authoring area", () => {
+    render(<LibraryPageClient />);
+
+    expect(screen.getByRole("link", { name: /open collections/i })).toHaveAttribute(
+      "href",
+      "/collections",
+    );
+  });
 });

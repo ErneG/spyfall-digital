@@ -95,6 +95,13 @@ export function LibraryPageClient() {
                 Create saved locations with explicit role rows, keep your custom role lists tidy,
                 and reuse them anywhere the app supports your library.
               </p>
+              <Link
+                href="/collections"
+                className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-950"
+              >
+                <BookOpen className="size-4" />
+                Open collections
+              </Link>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <StatCard label="Saved" value={String(locations.length)} />
