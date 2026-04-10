@@ -3,7 +3,7 @@
 import React from "react";
 
 import { LocationSettings } from "@/domains/location/components/location-settings";
-import { GameConfig, RoomCodeHeader, PlayerList, StartSection } from "@/domains/room/components";
+import { GameConfig, PlayerList, RoomCodeHeader, StartSection } from "@/domains/room/components";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 
@@ -40,7 +40,7 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
   session,
 }: RoomLobbyContentProps) {
   const { t, room, isConnected, isCopied, error, isLocationsOpen } = state;
-  const { setIsLocationsOpen, startGameMutation, players, handleCopy, handleLeave } = state;
+  const { handleCopy, handleLeave, players, setIsLocationsOpen, startGameMutation } = state;
 
   return (
     <div className="mx-auto w-full max-w-4xl">
