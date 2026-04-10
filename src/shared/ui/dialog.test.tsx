@@ -20,10 +20,10 @@ describe("Dialog", () => {
     );
 
     expect(document.body.querySelector("[data-slot='dialog-content']")?.className).toContain(
-      "bg-white/88",
+      "bg-white/82",
     );
     expect(document.body.querySelector("[data-slot='dialog-footer']")?.className).toContain(
-      "bg-slate-50/80",
+      "bg-white/72",
     );
   });
 });
