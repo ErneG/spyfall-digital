@@ -86,11 +86,14 @@ export function usePassAndPlay({
       setActiveGameId(newGame.gameId);
       setRoundNumber((n) => n + 1);
       setPhase(INITIAL_PHASE);
-      if (session) {
+      if (session?.mode === "pass-and-play") {
         setSession({
           ...session,
-          gameId: newGame.gameId,
-          gameStartedAt: newGame.startedAt,
+          resume: {
+            ...session.resume,
+            gameId: newGame.gameId,
+            gameStartedAt: newGame.startedAt,
+          },
         });
       }
     },

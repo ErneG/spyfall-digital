@@ -138,18 +138,18 @@ export function SavedLocationManager({
 
   return (
     <section className="grid gap-6 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
-      <div className="rounded-[28px] border border-white/10 bg-black/20 p-4">
-        <div className="flex items-center justify-between gap-3 border-b border-white/8 pb-4">
+      <div className="rounded-[28px] border border-white/80 bg-white/74 p-4">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200/90 pb-4">
           <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
+            <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
               Saved locations
             </p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">
+            <h2 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
               Build your own role packs
             </h2>
           </div>
           <Button
-            className="rounded-full bg-white/90 text-black hover:bg-white"
+            className="rounded-full border border-slate-950/5 bg-slate-950 text-white hover:bg-slate-900"
             size="sm"
             onClick={handleCreateNew}
           >
@@ -159,16 +159,16 @@ export function SavedLocationManager({
         </div>
 
         {isLoading ? (
-          <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-5 py-10 text-center text-sm text-white/55">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
             Loading your saved locations…
           </div>
         ) : locations.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-5 py-10 text-center">
-            <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white/60">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center">
+            <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500">
               <MapPinned className="size-5" />
             </div>
-            <h3 className="text-lg font-semibold text-white">No saved locations yet</h3>
-            <p className="mt-2 text-sm leading-6 text-white/55">
+            <h3 className="text-lg font-semibold text-slate-950">No saved locations yet</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
               Start with one clean custom location, then reuse it in future rounds and collections.
             </p>
           </div>
@@ -183,28 +183,28 @@ export function SavedLocationManager({
                   className={cn(
                     "w-full rounded-[24px] border px-4 py-4 text-left transition",
                     isSelected
-                      ? "border-cyan-300/40 bg-cyan-300/10 shadow-[0_20px_50px_rgba(34,211,238,0.08)]"
-                      : "border-white/8 bg-white/[0.03] hover:border-white/15 hover:bg-white/[0.05]",
+                      ? "border-sky-200 bg-sky-50 shadow-[0_20px_50px_rgba(186,230,253,0.35)]"
+                      : "border-white/80 bg-white hover:bg-slate-50",
                   )}
                   onClick={() => handleSelectLocation(location)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-white">{location.name}</p>
-                      <p className="mt-1 text-xs text-white/45">{location.category}</p>
+                      <p className="text-sm font-semibold text-slate-950">{location.name}</p>
+                      <p className="mt-1 text-xs text-slate-500">{location.category}</p>
                     </div>
-                    <p className="text-xs text-white/35">{formatUpdatedAt(location.updatedAt)}</p>
+                    <p className="text-xs text-slate-400">{formatUpdatedAt(location.updatedAt)}</p>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {location.allSpies ? (
-                      <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-1 text-xs font-medium text-amber-100">
+                      <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
                         All spies
                       </span>
                     ) : (
                       location.roles.map((role) => (
                         <span
                           key={role.id}
-                          className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-xs text-white/65"
+                          className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600"
                         >
                           {role.name}
                         </span>
@@ -218,16 +218,16 @@ export function SavedLocationManager({
         )}
       </div>
 
-      <div className="rounded-[28px] border border-white/10 bg-black/20 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-5">
+      <div className="rounded-[28px] border border-white/80 bg-white/74 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200/90 pb-5">
           <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
+            <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
               Editor
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
               {selectedLocation ? "Edit saved location" : "Create a saved location"}
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
               Roles are now edited explicitly, not hidden behind a room-only placeholder flow.
             </p>
           </div>
@@ -253,6 +253,7 @@ export function SavedLocationManager({
                 id="saved-location-name"
                 placeholder="Secret Lab"
                 value={draft.name}
+                className="border border-white/75 bg-white text-slate-950 placeholder:text-slate-400"
                 onChange={(event) =>
                   setDraft((previous) => ({ ...previous, name: event.target.value }))
                 }
@@ -263,7 +264,7 @@ export function SavedLocationManager({
               <Label htmlFor="saved-location-category">Category</Label>
               <select
                 id="saved-location-category"
-                className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] px-4 text-sm text-white transition outline-none focus:border-cyan-300/40 focus:ring-3 focus:ring-cyan-300/15"
+                className="h-12 w-full rounded-2xl border border-white/75 bg-white px-4 text-sm text-slate-950 transition outline-none focus:border-sky-300 focus:ring-3 focus:ring-sky-200"
                 value={draft.category}
                 onChange={(event) =>
                   setDraft((previous) => ({
@@ -281,11 +282,11 @@ export function SavedLocationManager({
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+          <div className="rounded-[24px] border border-white/80 bg-white p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <Label htmlFor="saved-location-all-spies">All spies</Label>
-                <p className="mt-2 text-sm leading-6 text-white/55">
+                <p className="mt-2 text-sm leading-6 text-slate-500">
                   Use this when the round has no shared location and every player is a spy.
                 </p>
               </div>
@@ -303,16 +304,16 @@ export function SavedLocationManager({
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+          <div className="rounded-[24px] border border-white/80 bg-white p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-white">Roles</p>
-                <p className="mt-2 text-sm leading-6 text-white/55">
+                <p className="text-sm font-semibold text-slate-950">Roles</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
                   Add the role list players can receive at this location.
                 </p>
               </div>
               <Button
-                className="rounded-full"
+                className="rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                 disabled={draft.allSpies}
                 size="sm"
                 variant="outline"
@@ -324,7 +325,7 @@ export function SavedLocationManager({
             </div>
 
             {draft.allSpies ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-amber-300/20 bg-amber-300/8 px-4 py-5 text-sm text-amber-100/90">
+              <div className="mt-4 rounded-2xl border border-dashed border-amber-200 bg-amber-50 px-4 py-5 text-sm text-amber-800">
                 All-spies locations skip role assignment, so no roles are required here.
               </div>
             ) : (
@@ -337,12 +338,13 @@ export function SavedLocationManager({
                         id={`saved-location-role-${index}`}
                         placeholder={index === 0 ? "Scientist" : "Guard"}
                         value={role}
+                        className="border border-white/75 bg-white text-slate-950 placeholder:text-slate-400"
                         onChange={(event) => handleRoleChange(index, event.target.value)}
                       />
                     </div>
                     <Button
                       aria-label={`Remove saved location row ${index + 1}`}
-                      className="mt-8 rounded-full"
+                      className="mt-8 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                       disabled={draft.roles.length <= 1}
                       size="icon"
                       variant="outline"
@@ -357,16 +359,20 @@ export function SavedLocationManager({
           </div>
 
           {error ? (
-            <div className="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}
             </div>
           ) : null}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-5">
-            <p className="text-sm text-white/45">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/90 pt-5">
+            <p className="text-sm text-slate-500">
               Saved locations are user-owned, reusable, and ready for future collection import.
             </p>
-            <Button className="rounded-full px-6" disabled={isSaving} onClick={handleSubmit}>
+            <Button
+              className="rounded-full border border-slate-950/5 bg-slate-950 px-6 text-white hover:bg-slate-900"
+              disabled={isSaving}
+              onClick={handleSubmit}
+            >
               {isSaving ? "Saving…" : "Save location"}
             </Button>
           </div>

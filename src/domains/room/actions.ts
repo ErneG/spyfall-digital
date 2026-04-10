@@ -5,8 +5,10 @@ import {
   joinRoomInput,
   updateRoomConfigInput,
   createPassAndPlayInput,
+  getRoomStateInput,
   type CollectionPassAndPlaySourceInput,
   type PassAndPlaySourceInput,
+  type RoomState,
   type CreateRoomInput,
   type CreateRoomOutput,
   type JoinRoomInput,
@@ -16,7 +18,7 @@ import {
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
 import { getAuthUser } from "@/shared/lib/auth-session";
-import { DEFAULT_TIME_LIMIT, MAX_PLAYERS } from "@/shared/lib/constants";
+import { MAX_PLAYERS } from "@/shared/lib/constants";
 import { prisma } from "@/shared/lib/prisma";
 import { generateRoomCode } from "@/shared/lib/room-code";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
@@ -162,6 +164,51 @@ async function savePassAndPlayNames(hostId: string, playerNames: string[]) {
   ]);
 }
 
+async function readRoomStateByCode(code: string): Promise<RoomState | null> {
+  const room = await prisma.room.findUnique({
+    where: { code: code.toUpperCase() },
+    include: {
+      players: {
+        orderBy: { createdAt: "asc" },
+        select: { id: true, name: true, isHost: true, isOnline: true, moderatorRole: true },
+      },
+      games: {
+        orderBy: { startedAt: "desc" },
+        take: 1,
+        select: { id: true, state: true, startedAt: true, timerRunning: true },
+      },
+      selectedLocations: { select: { locationId: true } },
+      _count: { select: { customLocations: { where: { selected: true } } } },
+    },
+  });
+  if (!room) {
+    return null;
+  }
+
+  const latestGame = room.games[0];
+  const totalLocations = await prisma.location.count();
+  const hasLatestGame = latestGame !== undefined;
+  const currentGameId = hasLatestGame ? latestGame.id : null;
+  const gameStartedAt = hasLatestGame ? latestGame.startedAt.toISOString() : null;
+  const timerRunning = hasLatestGame ? latestGame.timerRunning : true;
+
+  return {
+    state: room.state,
+    players: room.players,
+    timeLimit: room.timeLimit,
+    spyCount: room.spyCount,
+    autoStartTimer: room.autoStartTimer,
+    hideSpyCount: room.hideSpyCount,
+    moderatorMode: room.moderatorMode,
+    moderatorLocationId: room.moderatorLocationId,
+    selectedLocationCount: room.selectedLocations.length + room._count.customLocations,
+    totalLocationCount: totalLocations,
+    currentGameId,
+    gameStartedAt,
+    timerRunning,
+  };
+}
+
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms
 
@@ -187,8 +234,8 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
     const room = await prisma.room.create({
       data: {
         code,
-        timeLimit: timeLimit ?? DEFAULT_TIME_LIMIT,
-        spyCount: spyCount ?? 1,
+        timeLimit,
+        spyCount,
         hostId: "",
         players: {
           create: { name: hostName, isHost: true },
@@ -327,6 +374,25 @@ export async function updateRoomConfig(
   } catch (error) {
     console.error("updateRoomConfig failed:", error);
     return fail("Failed to update config");
+  }
+}
+
+export async function getRoomState(input: unknown): Promise<ActionResult<RoomState>> {
+  const parsed = getRoomStateInput.safeParse(input);
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+  }
+
+  try {
+    const room = await readRoomStateByCode(parsed.data.roomCode);
+    if (!room) {
+      return fail("Room not found");
+    }
+
+    return ok(room);
+  } catch (error) {
+    console.error("getRoomState failed:", error);
+    return fail("Failed to load room");
   }
 }
 

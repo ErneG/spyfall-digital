@@ -18,7 +18,7 @@ interface PassAndPlaySourceSectionProps {
 }
 
 const tabClassName =
-  "flex-1 rounded-[22px] border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/30";
+  "flex-1 rounded-[24px] border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200";
 
 export function PassAndPlaySourceSection({
   collections,
@@ -32,8 +32,8 @@ export function PassAndPlaySourceSection({
   return (
     <section className="space-y-4">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold text-white">Source</h3>
-        <p className="text-sm leading-6 text-white/55">
+        <h3 className="text-sm font-semibold text-slate-950">Source</h3>
+        <p className="text-sm leading-6 text-slate-500">
           Choose whether this round should draw from the built-in catalog or one of your saved
           collections.
         </p>
@@ -45,8 +45,8 @@ export function PassAndPlaySourceSection({
           className={cn(
             tabClassName,
             source.kind === "built-in"
-              ? "border-cyan-300/35 bg-cyan-300/10"
-              : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]",
+              ? "border-sky-200 bg-sky-50"
+              : "border-white/70 bg-white/72 hover:bg-white",
           )}
           onClick={() =>
             onSourceChange({
@@ -55,11 +55,11 @@ export function PassAndPlaySourceSection({
             })
           }
         >
-          <div className="flex items-center gap-2 text-sm font-semibold text-white">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
             <Layers3 className="size-4" />
             Built-in catalog
           </div>
-          <p className="mt-2 text-xs leading-5 text-white/55">
+          <p className="mt-2 text-xs leading-5 text-slate-500">
             Start from the seeded catalog and filter by category before the round begins.
           </p>
         </button>
@@ -70,8 +70,8 @@ export function PassAndPlaySourceSection({
           className={cn(
             tabClassName,
             source.kind === "collection"
-              ? "border-cyan-300/35 bg-cyan-300/10"
-              : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]",
+              ? "border-sky-200 bg-sky-50"
+              : "border-white/70 bg-white/72 hover:bg-white",
             "disabled:cursor-not-allowed disabled:opacity-45",
           )}
           onClick={() => {
@@ -84,11 +84,11 @@ export function PassAndPlaySourceSection({
             });
           }}
         >
-          <div className="flex items-center gap-2 text-sm font-semibold text-white">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
             <BookMarked className="size-4" />
             Saved collection
           </div>
-          <p className="mt-2 text-xs leading-5 text-white/55">
+          <p className="mt-2 text-xs leading-5 text-slate-500">
             Reuse one of your curated collections so custom locations and roles are playable in
             pass-and-play.
           </p>
@@ -96,7 +96,7 @@ export function PassAndPlaySourceSection({
       </div>
 
       {source.kind === "built-in" ? (
-        <div className="rounded-[24px] border border-white/8 bg-black/20 p-4">
+        <div className="rounded-[28px] border border-white/70 bg-white/72 p-4">
           <CategoryPicker
             categories={source.categories}
             onChange={(categories) =>
@@ -108,11 +108,11 @@ export function PassAndPlaySourceSection({
           />
         </div>
       ) : (
-        <div className="space-y-2 rounded-[24px] border border-white/8 bg-black/20 p-4">
+        <div className="space-y-2 rounded-[28px] border border-white/70 bg-white/72 p-4">
           <Label htmlFor="pass-and-play-collection">Collection</Label>
           <select
             id="pass-and-play-collection"
-            className="h-12 w-full rounded-xl border border-white/10 bg-[#141414] px-4 text-sm text-white transition outline-none focus:border-cyan-300/40 focus:ring-3 focus:ring-cyan-300/15"
+            className="h-12 w-full rounded-2xl border border-white/75 bg-white px-4 text-sm text-slate-950 transition outline-none focus:border-sky-300 focus:ring-3 focus:ring-sky-200"
             value={source.collectionId}
             onChange={(event) =>
               onSourceChange({
@@ -127,7 +127,7 @@ export function PassAndPlaySourceSection({
               </option>
             ))}
           </select>
-          <p className="text-xs leading-5 text-white/50">
+          <p className="text-xs leading-5 text-slate-500">
             {hasCollections
               ? "Collections are imported as curated snapshots, so your saved role lists stay intact."
               : isAuthenticated

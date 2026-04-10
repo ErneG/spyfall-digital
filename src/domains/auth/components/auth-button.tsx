@@ -30,13 +30,19 @@ export const AuthButton = memo(function AuthButton() {
   }, [signOut]);
 
   if (isLoading) {
-    return <div className="bg-surface-2 size-8 animate-pulse rounded-full" />;
+    return <div className="size-8 animate-pulse rounded-full bg-slate-200" />;
   }
 
   if (!isAuthenticated) {
     return (
       <>
-        <Button variant="ghost" size="icon-sm" onClick={handleSignInClick} aria-label="Sign in">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={handleSignInClick}
+          aria-label="Sign in"
+          className="text-slate-600 hover:bg-slate-900/5 hover:text-slate-950"
+        >
           <LogIn className="size-4" />
         </Button>
         <AuthDialog open={dialogOpen} onOpenChange={setDialogOpen} />
@@ -44,12 +50,16 @@ export const AuthButton = memo(function AuthButton() {
     );
   }
 
-  const initial = user?.name?.charAt(0).toUpperCase() ?? "?";
+  if (!user) {
+    return null;
+  }
+
+  const initial = user.name.charAt(0).toUpperCase();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="flex size-8 items-center justify-center rounded-full bg-[#8B5CF6] text-sm font-semibold text-white transition-opacity outline-none hover:opacity-80"
+        className="flex size-8 items-center justify-center rounded-full border border-white/80 bg-white text-sm font-semibold text-slate-900 shadow-[0_10px_24px_rgba(148,163,184,0.16)] transition-opacity outline-none hover:opacity-80"
         aria-label="Account menu"
       >
         {initial}

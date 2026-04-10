@@ -18,25 +18,21 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }
 
   // Pass-and-play: render directly from session data, no SSE needed
-  if (session.passAndPlay && session.allPlayers && session.gameId) {
+  if (session.mode === "pass-and-play") {
     return (
       <PassAndPlayGameView
-        gameId={session.gameId}
+        gameId={session.resume.gameId}
         hostPlayerId={session.playerId}
         roomId={session.roomId}
-        allPlayers={session.allPlayers}
+        allPlayers={session.resume.players}
         roomCode={code}
-        timeLimit={session.timeLimit ?? 480}
-        gameStartedAt={session.gameStartedAt ?? null}
-        shouldHideSpyCount={session.hideSpyCount ?? false}
-        spyCount={session.spyCount ?? 1}
+        timeLimit={session.resume.timeLimit}
+        gameStartedAt={session.resume.gameStartedAt}
+        shouldHideSpyCount={session.resume.hideSpyCount}
+        spyCount={session.resume.spyCount}
         isTimerRunning={false}
       />
     );
-  }
-
-  if (session.passAndPlay && !room) {
-    return <RoomLoadingSpinner label={t.common.loading} />;
   }
 
   if (room && room.state !== "LOBBY" && room.currentGameId) {
@@ -54,6 +50,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         players={room.players}
       />
     );
+  }
+
+  if (!room) {
+    return <RoomLoadingSpinner label={t.common.loading} />;
   }
 
   return <RoomLobby code={code} state={state} />;

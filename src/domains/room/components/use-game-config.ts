@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { updateRoomConfig } from "@/domains/room/actions";
 import { roomKeys } from "@/domains/room/hooks";
 
-import type { RoomEvent } from "@/domains/room/schema";
+import type { RoomState } from "@/domains/room/schema";
 
 interface ConfigPatch {
   timeLimit?: number;
@@ -16,13 +16,13 @@ interface ConfigPatch {
 
 export function useGameConfig(roomCode: string, playerId: string) {
   const queryClient = useQueryClient();
-  const cacheKey = roomKeys.events(roomCode);
+  const cacheKey = roomKeys.state(roomCode);
 
   const configMutation = useMutation({
     mutationFn: (patch: ConfigPatch) => updateRoomConfig({ roomCode, playerId, ...patch }),
     onMutate: async (patch) => {
       await queryClient.cancelQueries({ queryKey: cacheKey });
-      const previous = queryClient.getQueryData<RoomEvent>(cacheKey);
+      const previous = queryClient.getQueryData<RoomState>(cacheKey);
       if (previous) {
         queryClient.setQueryData(cacheKey, { ...previous, ...patch });
       }

@@ -63,7 +63,12 @@ export const joinRoomOutput = z.object({
 });
 export type JoinRoomOutput = z.infer<typeof joinRoomOutput>;
 
-export const roomEventSchema = z.object({
+export const getRoomStateInput = z.object({
+  roomCode: z.string().length(5).toUpperCase(),
+});
+export type GetRoomStateInput = z.infer<typeof getRoomStateInput>;
+
+export const roomStateSchema = z.object({
   state: gamePhaseSchema,
   players: z.array(playerSchema),
   timeLimit: z.number(),
@@ -77,6 +82,10 @@ export const roomEventSchema = z.object({
   currentGameId: z.string().nullable(),
   gameStartedAt: z.string().nullable(),
   timerRunning: z.boolean(),
+});
+export type RoomState = z.infer<typeof roomStateSchema>;
+
+export const roomEventSchema = roomStateSchema.extend({
   error: z.string().optional(),
 });
 export type RoomEvent = z.infer<typeof roomEventSchema>;

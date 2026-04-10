@@ -41,10 +41,13 @@ export const PlayingPhase = memo(function PlayingPhase({
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-black p-4 pb-28">
-      <div className="w-full max-w-md space-y-5">
+    <main className="relative flex flex-1 flex-col items-center overflow-hidden bg-[#eef3f8] p-4 pb-28">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.96),rgba(255,255,255,0.58)_32%,transparent_54%),radial-gradient(circle_at_82%_18%,rgba(191,219,254,0.52),transparent_28%),radial-gradient(circle_at_78%_78%,rgba(207,250,254,0.4),transparent_22%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)]" />
+      <div className="relative w-full max-w-md space-y-5">
         {state.roundNumber > 1 && (
-          <p className="text-muted-foreground text-center text-xs">Round {state.roundNumber}</p>
+          <p className="text-center text-xs font-medium tracking-[0.16em] text-slate-500 uppercase">
+            Round {state.roundNumber}
+          </p>
         )}
         <TimerSection
           display={state.display}
@@ -80,7 +83,7 @@ const SpyCountBanner = memo(function SpyCountBanner({
     return null;
   }
   return (
-    <p className="text-muted-foreground text-center text-xs">
+    <p className="text-center text-xs text-slate-500">
       <AlertTriangle className="text-spy-red mr-1 inline h-3 w-3" />
       {count === 1 ? "1 spy among you" : `${count} spies among you`}
     </p>
@@ -95,13 +98,13 @@ const PlayerListCard = memo(function PlayerListCard({
   t: Translations;
 }) {
   return (
-    <div className="bg-surface-1 rounded-2xl p-4">
-      <p className="text-muted-foreground/60 mb-2 text-[11px] font-semibold tracking-[0.08em] uppercase">
+    <div className="rounded-[28px] border border-white/80 bg-white/76 p-4 shadow-[0_18px_40px_rgba(148,163,184,0.16)] backdrop-blur-xl">
+      <p className="mb-2 text-[11px] font-semibold tracking-[0.08em] text-slate-500 uppercase">
         {t.players.title} ({allPlayers.length})
       </p>
       <div className="flex flex-wrap gap-1.5">
         {allPlayers.map((p) => (
-          <Badge key={p.id} variant="secondary">
+          <Badge key={p.id} variant="secondary" className="border-white/80 bg-white text-slate-700">
             {p.name}
           </Badge>
         ))}
@@ -120,9 +123,13 @@ const StickyActions = memo(function StickyActions({
   t: Translations;
 }) {
   return (
-    <div className="fixed right-0 bottom-0 left-0 border-t border-white/5 bg-black/90 p-4 backdrop-blur-sm">
+    <div className="fixed right-0 bottom-0 left-0 border-t border-white/80 bg-white/78 p-4 backdrop-blur-xl">
       <div className="mx-auto flex max-w-md gap-2">
-        <Button variant="outline" className="h-14 flex-1 gap-2 rounded-2xl" onClick={onPeek}>
+        <Button
+          variant="outline"
+          className="h-14 flex-1 gap-2 rounded-2xl border border-white/80 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+          onClick={onPeek}
+        >
           <Eye className="h-4 w-4" /> {t.passAndPlay.peekAtRole}
         </Button>
         <Button

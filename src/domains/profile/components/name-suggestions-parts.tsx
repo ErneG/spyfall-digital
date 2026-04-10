@@ -16,7 +16,7 @@ export const NameChip = memo(function NameChip({ name, onSelect }: NameChipProps
     <button
       type="button"
       onClick={handleClick}
-      className="bg-surface-2 text-muted-foreground hover:bg-surface-3 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors hover:text-white"
+      className="rounded-full border border-white/70 bg-white/72 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-950"
     >
       {name}
     </button>

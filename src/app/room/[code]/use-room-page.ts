@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 import { startGame } from "@/domains/game/actions";
-import { useRoomEvents } from "@/domains/room/hooks";
+import { useRoomState } from "@/domains/room/hooks";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
@@ -16,7 +16,7 @@ export function useRoomPage(code: string) {
   const { t } = useTranslation();
   const router = useRouter();
   const { session, clearSession, isLoaded } = useSession();
-  const { data: room, isConnected } = useRoomEvents(code);
+  const { data: room, isConnected } = useRoomState(code);
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState("");
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
@@ -39,7 +39,12 @@ export function useRoomPage(code: string) {
 
   // Auto-start new game for pass-and-play when room returns to LOBBY (after "Play Again")
   useEffect(() => {
-    if (!session?.passAndPlay || !room || room.state !== "LOBBY" || autoStartRef.current) {
+    if (
+      session?.mode !== "pass-and-play" ||
+      !room ||
+      room.state !== "LOBBY" ||
+      autoStartRef.current
+    ) {
       return;
     }
     autoStartRef.current = true;

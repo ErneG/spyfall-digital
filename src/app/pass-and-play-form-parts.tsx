@@ -78,7 +78,7 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
       <button
         type="button"
         onPointerDown={handlePointerDown}
-        className="text-muted-foreground/40 hover:text-muted-foreground shrink-0 cursor-grab touch-none active:cursor-grabbing"
+        className="shrink-0 cursor-grab touch-none text-slate-400 hover:text-slate-600 active:cursor-grabbing"
         aria-label="Drag to reorder"
       >
         <GripVertical className="h-4 w-4" />
@@ -90,13 +90,13 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         maxLength={20}
-        className="bg-surface-1 placeholder:text-muted-foreground/60 h-[48px] rounded-xl border-transparent text-[15px] focus:border-transparent"
+        className="h-[48px] rounded-2xl border border-white/70 bg-white/76 text-[15px] text-slate-950 placeholder:text-slate-400 focus:border-sky-300 focus-visible:ring-sky-200"
       />
       {canRemove && (
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground shrink-0"
+          className="shrink-0 text-slate-500 hover:bg-slate-900/5"
           onClick={handleRemove}
         >
           <X className="h-4 w-4" />
@@ -159,7 +159,7 @@ export const PlayerListSection = React.memo(function PlayerListSection({
         <Button
           variant="ghost"
           size="sm"
-          className="text-muted-foreground w-full gap-1"
+          className="w-full gap-1 rounded-2xl border border-dashed border-slate-300/90 bg-white/60 text-slate-600 hover:bg-white hover:text-slate-950"
           onClick={onAddPlayer}
         >
           <Plus className="h-4 w-4" /> {t.home.addPlayer}

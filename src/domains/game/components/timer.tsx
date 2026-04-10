@@ -26,9 +26,9 @@ export const Timer = memo(function Timer({
         return `${base} ${size} text-spy-red animate-pulse`;
       }
       if (isPaused) {
-        return `${base} ${size} text-muted-foreground`;
+        return `${base} ${size} text-slate-400`;
       }
-      return `${base} ${size} text-white`;
+      return `${base} ${size} text-slate-950`;
     }
 
     const base =
@@ -37,9 +37,9 @@ export const Timer = memo(function Timer({
       return `${base} text-spy-red animate-pulse`;
     }
     if (isPaused) {
-      return `${base} text-muted-foreground`;
+      return `${base} text-slate-400`;
     }
-    return `${base} text-white`;
+    return `${base} text-slate-950`;
   }, [isExpired, isPaused, variant]);
 
   return (

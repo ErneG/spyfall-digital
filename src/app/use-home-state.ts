@@ -6,7 +6,7 @@ import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } 
 
 import { startGame } from "@/domains/game/actions";
 import { createRoom, joinRoom, createPassAndPlayRoom } from "@/domains/room/actions";
-import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
+import { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
@@ -22,7 +22,7 @@ interface MutationParams {
   pnpTimeLimit: number;
   pnpSpyCount: number;
   shouldPnpHideSpyCount: boolean;
-  pnpCategories: string[];
+  pnpCategories: LocationCategory[];
 }
 
 export type HomeStateMutations = ReturnType<typeof useMutations>;
@@ -38,7 +38,7 @@ function useMutations(params: MutationParams) {
       return unwrapAction(result);
     },
     onSuccess: ({ playerId, code: roomCode, roomId }) => {
-      setSession({ playerId, roomCode, roomId, isHost: true });
+      setSession({ mode: "online", playerId, roomCode, roomId, isHost: true });
       router.push(`/room/${roomCode}`);
     },
     onError: (caughtError) => setError(caughtError.message),
@@ -50,7 +50,7 @@ function useMutations(params: MutationParams) {
       return unwrapAction(result);
     },
     onSuccess: ({ playerId, code: joinedCode, roomId }) => {
-      setSession({ playerId, roomCode: joinedCode, roomId, isHost: false });
+      setSession({ mode: "online", playerId, roomCode: joinedCode, roomId, isHost: false });
       router.push(`/room/${joinedCode}`);
     },
     onError: (caughtError) => setError(caughtError.message),
@@ -59,11 +59,18 @@ function useMutations(params: MutationParams) {
   const passAndPlayMutation = useMutation({
     mutationFn: async (trimmedNames: string[]) => {
       const createResult = await createPassAndPlayRoom({
-        playerNames: trimmedNames,
-        timeLimit: pnpTimeLimit,
-        spyCount: pnpSpyCount,
-        hideSpyCount: shouldPnpHideSpyCount,
-        categories: params.pnpCategories,
+        players: {
+          names: trimmedNames,
+        },
+        settings: {
+          timeLimit: pnpTimeLimit,
+          spyCount: pnpSpyCount,
+          hideSpyCount: shouldPnpHideSpyCount,
+        },
+        source: {
+          kind: "built-in",
+          categories: params.pnpCategories,
+        },
       });
       const room = unwrapAction(createResult);
       const startResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
@@ -72,17 +79,19 @@ function useMutations(params: MutationParams) {
     },
     onSuccess: ({ room, game }) => {
       setSession({
+        mode: "pass-and-play",
         playerId: room.hostPlayerId,
         roomCode: room.code,
         roomId: room.roomId,
         isHost: true,
-        passAndPlay: true,
-        allPlayers: room.players,
-        gameId: game.gameId,
-        gameStartedAt: game.startedAt,
-        timeLimit: pnpTimeLimit,
-        spyCount: pnpSpyCount,
-        hideSpyCount: shouldPnpHideSpyCount,
+        resume: {
+          players: room.players,
+          gameId: game.gameId,
+          gameStartedAt: game.startedAt,
+          timeLimit: pnpTimeLimit,
+          spyCount: pnpSpyCount,
+          hideSpyCount: shouldPnpHideSpyCount,
+        },
       });
       router.push(`/room/${room.code}`);
     },
@@ -107,7 +116,7 @@ export function useHomeState() {
   const [pnpTimeLimit, setPnpTimeLimit] = useState(DEFAULT_TIME_LIMIT);
   const [pnpSpyCount, setPnpSpyCount] = useState(1);
   const [shouldPnpHideSpyCount, setPnpHideSpyCount] = useState(false);
-  const [pnpCategories, setPnpCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
+  const [pnpCategories, setPnpCategories] = useState<LocationCategory[]>([...LOCATION_CATEGORIES]);
   const [error, setError] = useState("");
 
   useEffect(() => {

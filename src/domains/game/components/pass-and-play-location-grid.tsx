@@ -20,8 +20,8 @@ export const PassAndPlayLocationGrid = memo(function PassAndPlayLocationGrid({
   const { t, translateLocation } = useTranslation();
 
   return (
-    <div className="bg-surface-1 rounded-2xl p-4">
-      <p className="text-muted-foreground/60 mb-3 text-[11px] tracking-[0.08em] uppercase">
+    <div className="rounded-[28px] border border-white/80 bg-white/76 p-4 shadow-[0_18px_40px_rgba(148,163,184,0.16)] backdrop-blur-xl">
+      <p className="mb-3 text-[11px] tracking-[0.08em] text-slate-500 uppercase">
         <MapPin className="mr-1 inline h-3 w-3" />
         {t.locationGrid.title} ({locations.length})
       </p>
@@ -33,8 +33,8 @@ export const PassAndPlayLocationGrid = memo(function PassAndPlayLocationGrid({
               key={loc.id}
               className={`rounded-xl px-3 py-2 text-left text-xs ${
                 isPrevious
-                  ? "bg-surface-2 text-muted-foreground/60 line-through opacity-50"
-                  : "bg-surface-2 text-muted-foreground"
+                  ? "bg-slate-100 text-slate-400 line-through opacity-60"
+                  : "bg-white text-slate-600"
               }`}
             >
               {translateLocation(loc.name)}

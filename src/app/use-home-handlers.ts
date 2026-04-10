@@ -8,6 +8,8 @@ import {
   useCallback,
 } from "react";
 
+import { type LocationCategory } from "@/shared/config/location-catalog";
+
 import type { HomeStateMutations } from "./use-home-state";
 
 /* ── Types ──────────────────────────────────────────── */
@@ -23,7 +25,7 @@ interface ConfigHandlerParams {
   setPnpTimeLimit: Dispatch<SetStateAction<number>>;
   setPnpSpyCount: Dispatch<SetStateAction<number>>;
   setPnpHideSpyCount: Dispatch<SetStateAction<boolean>>;
-  setPnpCategories: Dispatch<SetStateAction<string[]>>;
+  setPnpCategories: Dispatch<SetStateAction<LocationCategory[]>>;
 }
 
 interface ActionHandlerParams {
@@ -107,7 +109,7 @@ export function useConfigHandlers(params: ConfigHandlerParams) {
   );
 
   const handlePnpCategoriesChange = useCallback(
-    (categories: string[]) => setPnpCategories(categories),
+    (categories: LocationCategory[]) => setPnpCategories(categories),
     [setPnpCategories],
   );
 

@@ -4,6 +4,7 @@ const getAuthUser = vi.fn();
 const generateRoomCode = vi.fn();
 const roomFindUnique = vi.fn();
 const locationFindMany = vi.fn();
+const locationCount = vi.fn();
 const collectionFindFirst = vi.fn();
 const playerUpdate = vi.fn();
 const nameHistoryUpsert = vi.fn();
@@ -27,6 +28,7 @@ vi.mock("@/shared/lib/prisma", () => ({
     },
     location: {
       findMany: locationFindMany,
+      count: locationCount,
     },
     locationCollection: {
       findFirst: collectionFindFirst,
@@ -62,6 +64,7 @@ describe("createPassAndPlayRoom", () => {
     });
     playerUpdate.mockResolvedValue({});
     nameHistoryUpsert.mockResolvedValue({});
+    locationCount.mockResolvedValue(54);
   });
 
   it("creates a collection-backed pass-and-play room using collection locations as custom locations", async () => {
@@ -184,5 +187,87 @@ describe("createPassAndPlayRoom", () => {
       error: "Sign in to use saved collections",
     });
     expect(collectionFindFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe("getRoomState", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.clearAllMocks();
+    locationCount.mockResolvedValue(54);
+  });
+
+  it("returns normalized room state with ISO timestamps", async () => {
+    roomFindUnique.mockResolvedValue({
+      id: "room-1",
+      state: "PLAYING",
+      timeLimit: 480,
+      spyCount: 2,
+      autoStartTimer: false,
+      hideSpyCount: true,
+      moderatorMode: false,
+      moderatorLocationId: null,
+      players: [{ id: "p1", name: "Alice", isHost: true, isOnline: true, moderatorRole: null }],
+      games: [
+        {
+          id: "game-1",
+          state: "PLAYING",
+          startedAt: new Date("2026-04-10T09:30:00.000Z"),
+          timerRunning: true,
+        },
+      ],
+      selectedLocations: [{ locationId: "seed-1" }, { locationId: "seed-2" }],
+      _count: { customLocations: 1 },
+    });
+
+    const { getRoomState } = await import("./actions");
+    const result = await getRoomState({ roomCode: "abcde" });
+
+    expect(roomFindUnique).toHaveBeenCalledWith({
+      where: { code: "ABCDE" },
+      include: {
+        players: {
+          orderBy: { createdAt: "asc" },
+          select: { id: true, name: true, isHost: true, isOnline: true, moderatorRole: true },
+        },
+        games: {
+          orderBy: { startedAt: "desc" },
+          take: 1,
+          select: { id: true, state: true, startedAt: true, timerRunning: true },
+        },
+        selectedLocations: { select: { locationId: true } },
+        _count: { select: { customLocations: { where: { selected: true } } } },
+      },
+    });
+    expect(result).toEqual({
+      success: true,
+      data: {
+        state: "PLAYING",
+        players: [{ id: "p1", name: "Alice", isHost: true, isOnline: true, moderatorRole: null }],
+        timeLimit: 480,
+        spyCount: 2,
+        autoStartTimer: false,
+        hideSpyCount: true,
+        moderatorMode: false,
+        moderatorLocationId: null,
+        selectedLocationCount: 3,
+        totalLocationCount: 54,
+        currentGameId: "game-1",
+        gameStartedAt: "2026-04-10T09:30:00.000Z",
+        timerRunning: true,
+      },
+    });
+  });
+
+  it("fails when the room cannot be found", async () => {
+    roomFindUnique.mockResolvedValue(null);
+
+    const { getRoomState } = await import("./actions");
+    const result = await getRoomState({ roomCode: "abcde" });
+
+    expect(result).toEqual({
+      success: false,
+      error: "Room not found",
+    });
   });
 });

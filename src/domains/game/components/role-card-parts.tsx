@@ -17,10 +17,10 @@ const CardStack = memo(function CardStack({ remaining }: { remaining: number }) 
   return (
     <>
       {remaining >= 2 && (
-        <div className="bg-surface-1/60 absolute inset-0 translate-x-2 translate-y-2 rotate-3 rounded-3xl border border-white/5" />
+        <div className="absolute inset-0 translate-x-2 translate-y-2 rotate-3 rounded-3xl border border-white/80 bg-white/60" />
       )}
       {remaining >= 1 && (
-        <div className="bg-surface-1/80 absolute inset-0 translate-x-1 translate-y-1 rotate-1 rounded-3xl border border-white/5" />
+        <div className="absolute inset-0 translate-x-1 translate-y-1 rotate-1 rounded-3xl border border-white/80 bg-white/72" />
       )}
     </>
   );
@@ -31,21 +31,19 @@ const CardStack = memo(function CardStack({ remaining }: { remaining: number }) 
 const CardFaceDown = memo(function CardFaceDown({ playerName }: { playerName: string }) {
   const { t } = useTranslation();
   return (
-    <div className="bg-surface-1 flex h-full flex-col items-center justify-center gap-8 rounded-3xl border border-white/10 p-8">
+    <div className="flex h-full flex-col items-center justify-center gap-8 rounded-3xl border border-white/85 bg-white/78 p-8 shadow-[0_22px_60px_rgba(148,163,184,0.18)] backdrop-blur-xl">
       <div className="relative flex h-28 w-28 items-center justify-center">
-        <div className="bg-muted-foreground/15 absolute h-full w-px" />
-        <div className="bg-muted-foreground/15 absolute h-px w-full" />
-        <div className="border-muted-foreground/15 absolute h-20 w-20 rounded-full border" />
-        <div className="border-muted-foreground/20 absolute h-10 w-10 rounded-full border" />
-        <Eye className="text-muted-foreground relative h-8 w-8" />
+        <div className="absolute h-full w-px bg-slate-200" />
+        <div className="absolute h-px w-full bg-slate-200" />
+        <div className="absolute h-20 w-20 rounded-full border border-slate-200" />
+        <div className="absolute h-10 w-10 rounded-full border border-slate-300" />
+        <Eye className="relative h-8 w-8 text-slate-500" />
       </div>
       <div className="space-y-3 text-center">
-        <p className="text-3xl font-bold">{playerName}</p>
-        <p className="text-muted-foreground">{t.passAndPlay.tapToReveal}</p>
+        <p className="text-3xl font-bold text-slate-950">{playerName}</p>
+        <p className="text-slate-500">{t.passAndPlay.tapToReveal}</p>
       </div>
-      <p className="text-muted-foreground/30 text-xs font-semibold tracking-[0.2em] uppercase">
-        classified
-      </p>
+      <p className="text-xs font-semibold tracking-[0.2em] text-slate-300 uppercase">classified</p>
     </div>
   );
 });
@@ -55,14 +53,14 @@ const CardFaceDown = memo(function CardFaceDown({ playerName }: { playerName: st
 const CardFaceSpy = memo(function CardFaceSpy() {
   const { t } = useTranslation();
   return (
-    <div className="border-spy-red/30 bg-spy-red/8 flex h-full flex-col items-center justify-center gap-6 rounded-3xl border-2 p-8">
-      <div className="bg-spy-red/12 flex h-20 w-20 items-center justify-center rounded-full">
+    <div className="flex h-full flex-col items-center justify-center gap-6 rounded-3xl border-2 border-rose-200 bg-rose-50 p-8">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-rose-100">
         <AlertTriangle className="text-spy-red h-10 w-10" />
       </div>
       <p className="text-spy-red text-center text-4xl leading-tight font-extrabold">
         {t.game.youAreTheSpy}
       </p>
-      <p className="text-muted-foreground text-center text-base">{t.game.spyHint}</p>
+      <p className="text-center text-base text-slate-500">{t.game.spyHint}</p>
     </div>
   );
 });
@@ -78,19 +76,19 @@ const CardFaceAgent = memo(function CardFaceAgent({
 }) {
   const { t, translateLocation, translateRole } = useTranslation();
   return (
-    <div className="border-spy-purple/30 bg-spy-purple/8 flex h-full flex-col items-center justify-center gap-6 rounded-3xl border-2 p-8">
-      <div className="bg-spy-purple/12 flex h-20 w-20 items-center justify-center rounded-full">
-        <Shield className="text-spy-purple h-10 w-10" />
+    <div className="flex h-full flex-col items-center justify-center gap-6 rounded-3xl border-2 border-teal-200 bg-teal-50 p-8">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-teal-100">
+        <Shield className="h-10 w-10 text-teal-700" />
       </div>
       <div className="flex items-center gap-2">
-        <MapPin className="text-muted-foreground/60 h-6 w-6 shrink-0" />
-        <p className="text-center text-3xl font-extrabold">
+        <MapPin className="h-6 w-6 shrink-0 text-slate-400" />
+        <p className="text-center text-3xl font-extrabold text-slate-950">
           {location ? translateLocation(location) : location}
         </p>
       </div>
-      <p className="text-muted-foreground text-center text-lg">
+      <p className="text-center text-lg text-slate-500">
         {t.game.yourRole}{" "}
-        <span className="font-bold text-white">{myRole ? translateRole(myRole) : myRole}</span>
+        <span className="font-bold text-slate-950">{myRole ? translateRole(myRole) : myRole}</span>
       </p>
     </div>
   );
@@ -178,7 +176,7 @@ export const MiniCardStack = memo(function MiniCardStack({ count }: { count: num
       {Array.from({ length: Math.min(count, 3) }, (_, i) => (
         <div
           key={i}
-          className="bg-surface-1 absolute rounded-lg border border-white/10"
+          className="absolute rounded-lg border border-white/80 bg-white"
           style={{
             width: "100%",
             height: "100%",

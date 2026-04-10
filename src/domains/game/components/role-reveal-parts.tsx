@@ -29,14 +29,14 @@ export const HandoffScreen = memo(function HandoffScreen({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8 pt-8 text-center"
+      className="space-y-8 rounded-[32px] border border-white/80 bg-white/72 p-6 pt-8 text-center shadow-[0_24px_70px_rgba(148,163,184,0.18)] backdrop-blur-xl"
     >
       <MiniCardStack count={remaining + 1} />
       <div className="space-y-2">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-slate-500">
           {isFirst ? t.passAndPlay.startingWith : t.passAndPlay.handDeviceTo}
         </p>
-        <p className="text-4xl font-bold">{playerName}</p>
+        <p className="text-4xl font-bold text-slate-950">{playerName}</p>
       </div>
       <Button size="lg" className="h-14 w-full gap-2 text-lg" onClick={onReady}>
         {t.passAndPlay.imReady} {playerName} <ChevronRight className="h-5 w-5" />
@@ -75,7 +75,11 @@ export const CardScreen = memo(function CardScreen({
   }, [onFlip]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 text-center">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="space-y-6 rounded-[32px] border border-white/80 bg-white/72 p-6 text-center shadow-[0_24px_70px_rgba(148,163,184,0.18)] backdrop-blur-xl"
+    >
       <RoleCard
         playerName={playerName}
         role={role}
@@ -85,9 +89,7 @@ export const CardScreen = memo(function CardScreen({
         onFlip={handleFlip}
       />
 
-      {hasFetchError && (
-        <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>
-      )}
+      {hasFetchError && <p className="text-spy-red text-sm">{t.passAndPlay.fetchError}</p>}
 
       {isFlipped && role && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -116,14 +118,14 @@ export const AllReadyScreen = memo(function AllReadyScreen({ onStart }: { onStar
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="space-y-6 pt-8 text-center"
+      className="space-y-6 rounded-[32px] border border-white/80 bg-white/72 p-6 pt-8 text-center shadow-[0_24px_70px_rgba(148,163,184,0.18)] backdrop-blur-xl"
     >
-      <div className="bg-success/12 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
-        <Check className="text-success h-8 w-8" />
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+        <Check className="h-8 w-8 text-emerald-600" />
       </div>
       <div className="space-y-2">
-        <p className="text-2xl font-bold">{t.passAndPlay.everyonesReady}</p>
-        <p className="text-muted-foreground">{t.passAndPlay.allPlayersReady}</p>
+        <p className="text-2xl font-bold text-slate-950">{t.passAndPlay.everyonesReady}</p>
+        <p className="text-slate-500">{t.passAndPlay.allPlayersReady}</p>
       </div>
       <Button size="lg" className="h-14 w-full text-lg" onClick={onStart}>
         {t.passAndPlay.startPlaying}

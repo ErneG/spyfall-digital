@@ -49,6 +49,7 @@ describe("useSession", () => {
     const { result } = renderHook(() => useSession());
 
     const newSession: Session = {
+      mode: "online",
       playerId: "p1",
       roomCode: "ABCDE",
       roomId: "room-1",
@@ -70,6 +71,7 @@ describe("useSession", () => {
     const { result } = renderHook(() => useSession());
 
     const session: Session = {
+      mode: "online",
       playerId: "p1",
       roomCode: "ABCDE",
       roomId: "room-1",
@@ -91,15 +93,13 @@ describe("useSession", () => {
 
   it("reads existing session from localStorage on mount", () => {
     const existingSession: Session = {
+      mode: "online",
       playerId: "p2",
       roomCode: "FGHKL",
       roomId: "room-2",
       isHost: true,
     };
-    localStorageMock.setItem(
-      "spyfall-session",
-      JSON.stringify(existingSession),
-    );
+    localStorageMock.setItem("spyfall-session", JSON.stringify(existingSession));
 
     const { result } = renderHook(() => useSession());
     expect(result.current.session).toEqual(existingSession);
@@ -118,22 +118,94 @@ describe("useSession", () => {
     const { result } = renderHook(() => useSession());
 
     const passAndPlaySession: Session = {
+      mode: "pass-and-play",
       playerId: "p1",
       roomCode: "ABCDE",
       roomId: "room-1",
       isHost: true,
-      passAndPlay: true,
-      allPlayers: [
-        { id: "p1", name: "Alice" },
-        { id: "p2", name: "Bob" },
-      ],
+      resume: {
+        players: [
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+        ],
+        gameId: "game-1",
+        gameStartedAt: "2026-04-10T09:00:00.000Z",
+        timeLimit: 480,
+        spyCount: 1,
+        hideSpyCount: false,
+      },
     };
 
     act(() => {
       result.current.setSession(passAndPlaySession);
     });
 
-    expect(result.current.session?.passAndPlay).toBe(true);
-    expect(result.current.session?.allPlayers).toHaveLength(2);
+    expect(result.current.session?.mode).toBe("pass-and-play");
+    if (result.current.session?.mode === "pass-and-play") {
+      expect(result.current.session.resume.players).toHaveLength(2);
+    }
+  });
+
+  it("migrates a legacy online session from localStorage", () => {
+    localStorageMock.setItem(
+      "spyfall-session",
+      JSON.stringify({
+        playerId: "p2",
+        roomCode: "FGHKL",
+        roomId: "room-2",
+        isHost: true,
+      }),
+    );
+
+    const { result } = renderHook(() => useSession());
+    expect(result.current.session).toEqual({
+      mode: "online",
+      playerId: "p2",
+      roomCode: "FGHKL",
+      roomId: "room-2",
+      isHost: true,
+    });
+  });
+
+  it("migrates a legacy pass-and-play session from localStorage", () => {
+    localStorageMock.setItem(
+      "spyfall-session",
+      JSON.stringify({
+        playerId: "p1",
+        roomCode: "ABCDE",
+        roomId: "room-1",
+        isHost: true,
+        passAndPlay: true,
+        allPlayers: [
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+        ],
+        gameId: "game-1",
+        gameStartedAt: "2026-04-10T09:00:00.000Z",
+        timeLimit: 480,
+        spyCount: 1,
+        hideSpyCount: false,
+      }),
+    );
+
+    const { result } = renderHook(() => useSession());
+    expect(result.current.session).toEqual({
+      mode: "pass-and-play",
+      playerId: "p1",
+      roomCode: "ABCDE",
+      roomId: "room-1",
+      isHost: true,
+      resume: {
+        players: [
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+        ],
+        gameId: "game-1",
+        gameStartedAt: "2026-04-10T09:00:00.000Z",
+        timeLimit: 480,
+        spyCount: 1,
+        hideSpyCount: false,
+      },
+    });
   });
 });

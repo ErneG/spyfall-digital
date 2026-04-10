@@ -16,7 +16,7 @@ import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
 import { StatCard } from "./library-page-parts";
 
 const shellClassName =
-  "rounded-[32px] border border-white/10 bg-white/[0.05] shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl";
+  "rounded-[34px] border border-white/80 bg-white/66 shadow-[0_35px_100px_rgba(148,163,184,0.2)] backdrop-blur-2xl";
 
 export function LibraryPageClient() {
   const [query, setQuery] = useState("");
@@ -47,34 +47,34 @@ export function LibraryPageClient() {
   );
 
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-[#06070a] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.14),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(148,163,184,0.16),transparent_32%),linear-gradient(180deg,#080b12_0%,#050608_100%)]" />
+    <main className="relative min-h-dvh overflow-hidden bg-[#eef3f8] text-slate-950">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(255,255,255,0.6)_30%,transparent_54%),radial-gradient(circle_at_85%_14%,rgba(191,219,254,0.55),transparent_28%),radial-gradient(circle_at_78%_78%,rgba(207,250,254,0.42),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)]" />
       <div className="relative mx-auto flex min-h-dvh max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <header className={cn(shellClassName, "space-y-5 p-6")}>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-white/55">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.03]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 transition hover:bg-white"
             >
               <ChevronLeft className="size-3.5" />
               Home
             </Link>
             <Link
               href="/play/pass-and-play"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.03]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 transition hover:bg-white"
             >
               <BookOpen className="size-3.5" />
               Pass &amp; Play setup
             </Link>
           </div>
           <div className="space-y-2">
-            <p className="text-xs font-semibold tracking-[0.24em] text-white/45 uppercase">
+            <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
               Built-in catalog
             </p>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
               Browse every location before the game starts.
             </h1>
-            <p className="max-w-3xl text-sm leading-6 text-white/60 sm:text-base">
+            <p className="max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
               The library is now a first-class surface. Search the built-in catalog, filter by
               category, and inspect every role list without having to open a room first.
             </p>
@@ -84,14 +84,14 @@ export function LibraryPageClient() {
         <section className={cn(shellClassName, "space-y-5 p-6")}>
           <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-5">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-cyan-100 uppercase">
+              <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-900 uppercase">
                 <Sparkles className="size-3.5" />
                 Authoring
               </div>
               <h2 className="text-2xl font-semibold tracking-tight">
                 Save custom locations with proper role editing.
               </h2>
-              <p className="max-w-3xl text-sm leading-6 text-white/60">
+              <p className="max-w-3xl text-sm leading-6 text-slate-600">
                 This is the first real content-management slice for v2: user-owned saved locations,
                 explicit role rows, and a reusable authoring surface instead of room-scoped
                 placeholders.
@@ -114,11 +114,11 @@ export function LibraryPageClient() {
               onSave={onSave}
             />
           ) : (
-            <div className="rounded-[28px] border border-dashed border-white/10 bg-white/[0.03] px-6 py-12 text-center">
-              <h3 className="text-xl font-semibold text-white">
+            <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/68 px-6 py-12 text-center">
+              <h3 className="text-xl font-semibold text-slate-950">
                 Sign in to save your own locations
               </h3>
-              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/55">
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-500">
                 The built-in catalog is open to everyone, but saved locations are tied to your
                 account so you can reuse them across pass-and-play and the upcoming collection
                 system.
@@ -135,7 +135,7 @@ export function LibraryPageClient() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search locations, categories, or roles"
-                className="h-12 rounded-2xl border-white/10 bg-black/20 pl-11 text-white placeholder:text-white/35"
+                className="h-12 rounded-2xl border border-white/75 bg-white/78 pl-11 text-slate-950 placeholder:text-slate-400"
               />
             </label>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -151,7 +151,7 @@ export function LibraryPageClient() {
           </div>
 
           <div className="space-y-2 border-t border-white/8 pt-5">
-            <p className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">
+            <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
               Built-in catalog
             </p>
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -159,7 +159,7 @@ export function LibraryPageClient() {
             </h2>
           </div>
 
-          <div className="rounded-[28px] border border-white/8 bg-black/20 p-4">
+          <div className="rounded-[28px] border border-white/80 bg-white/72 p-4">
             <CategoryPicker categories={categories} onChange={setCategories} />
           </div>
 

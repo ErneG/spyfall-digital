@@ -23,7 +23,7 @@ import { PassAndPlaySourceSection } from "./pass-and-play-source-section";
 import { usePassAndPlaySources } from "./use-pass-and-play-sources";
 
 const shellClassName =
-  "rounded-[32px] border border-white/10 bg-white/[0.05] shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl";
+  "rounded-[34px] border border-white/80 bg-white/66 shadow-[0_35px_100px_rgba(148,163,184,0.2)] backdrop-blur-2xl";
 
 export function PassAndPlaySetupClient() {
   const router = useRouter();
@@ -78,17 +78,19 @@ export function PassAndPlaySetupClient() {
     },
     onSuccess: ({ room, game }) => {
       setSession({
-        allPlayers: room.players,
-        gameId: game.gameId,
-        gameStartedAt: game.startedAt,
-        hideSpyCount,
+        mode: "pass-and-play",
         isHost: true,
-        passAndPlay: true,
         playerId: room.hostPlayerId,
         roomCode: room.code,
         roomId: room.roomId,
-        spyCount,
-        timeLimit,
+        resume: {
+          players: room.players,
+          gameId: game.gameId,
+          gameStartedAt: game.startedAt,
+          timeLimit,
+          spyCount,
+          hideSpyCount,
+        },
       });
       router.push(`/room/${room.code}`);
     },
@@ -147,55 +149,57 @@ export function PassAndPlaySetupClient() {
   }, [passAndPlayMutation, playerNames]);
 
   return (
-    <main className="relative min-h-dvh overflow-hidden bg-[#06070a] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.16),transparent_42%),radial-gradient(circle_at_80%_20%,rgba(56,189,248,0.14),transparent_28%),linear-gradient(180deg,#0a0d14_0%,#050608_100%)]" />
+    <main className="relative min-h-dvh overflow-hidden bg-[#eef3f8] text-slate-950">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(255,255,255,0.55)_30%,transparent_54%),radial-gradient(circle_at_85%_18%,rgba(191,219,254,0.55),transparent_28%),radial-gradient(circle_at_78%_78%,rgba(207,250,254,0.44),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)]" />
       <div className="relative mx-auto flex min-h-dvh max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <header className={cn(shellClassName, "flex flex-col gap-4 p-6 lg:flex-row lg:items-end")}>
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-3 text-sm text-white/55">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.03]"
+                className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/70 px-3 py-1.5 transition hover:bg-white"
               >
                 <ArrowLeft className="size-3.5" />
                 Home
               </Link>
-              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-cyan-100">
+              <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-sky-900">
                 <Sparkles className="size-3.5" />
                 Pass &amp; Play V2
               </span>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold tracking-[0.24em] text-white/45 uppercase">
+              <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
                 Private setup, one shared device
               </p>
               <h1 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
                 Build the round before anyone starts peeking.
               </h1>
-              <p className="max-w-2xl text-sm leading-6 text-white/60 sm:text-base">
+              <p className="max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
                 This setup flow keeps pass-and-play self-contained: players, round settings, source
                 filtering, and a full preview of the included location list before the game starts.
               </p>
             </div>
           </div>
           <div className="grid flex-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-3xl border border-white/8 bg-black/20 p-4">
-              <p className="text-xs font-semibold tracking-[0.16em] text-white/40 uppercase">
+            <div className="rounded-3xl border border-white/75 bg-white/72 p-4">
+              <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
                 Players
               </p>
-              <p className="mt-3 text-2xl font-semibold">{playerNames.length}</p>
+              <p className="mt-3 text-2xl font-semibold text-slate-950">{playerNames.length}</p>
             </div>
-            <div className="rounded-3xl border border-white/8 bg-black/20 p-4">
-              <p className="text-xs font-semibold tracking-[0.16em] text-white/40 uppercase">
+            <div className="rounded-3xl border border-white/75 bg-white/72 p-4">
+              <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
                 Locations
               </p>
-              <p className="mt-3 text-2xl font-semibold">{previewLocations.length}</p>
+              <p className="mt-3 text-2xl font-semibold text-slate-950">
+                {previewLocations.length}
+              </p>
             </div>
-            <div className="rounded-3xl border border-white/8 bg-black/20 p-4">
-              <p className="text-xs font-semibold tracking-[0.16em] text-white/40 uppercase">
+            <div className="rounded-3xl border border-white/75 bg-white/72 p-4">
+              <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
                 Roles
               </p>
-              <p className="mt-3 text-2xl font-semibold">{totalRoles}</p>
+              <p className="mt-3 text-2xl font-semibold text-slate-950">{totalRoles}</p>
             </div>
           </div>
         </header>
@@ -233,14 +237,14 @@ export function PassAndPlaySetupClient() {
           <section className={cn(shellClassName, "p-6")}>
             <div className="flex flex-col gap-4 border-b border-white/8 pb-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-white/50 uppercase">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
                   <Compass className="size-3.5" />
                   Included Locations
                 </div>
                 <h2 className="text-2xl font-semibold tracking-tight">
                   See exactly what can appear
                 </h2>
-                <p className="max-w-2xl text-sm leading-6 text-white/60">
+                <p className="max-w-2xl text-sm leading-6 text-slate-600">
                   {source.kind === "collection"
                     ? "This preview mirrors the selected collection snapshot, so saved locations and custom role lists are visible before the round starts."
                     : "This preview updates instantly as categories change, so pass-and-play no longer hides the actual location pool behind a blind start button."}
@@ -248,7 +252,7 @@ export function PassAndPlaySetupClient() {
               </div>
               <Link
                 href={source.kind === "collection" ? "/collections" : "/library"}
-                className="inline-flex items-center gap-2 self-start rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white/70 transition hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
+                className="inline-flex items-center gap-2 self-start rounded-full border border-white/80 bg-white/72 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white hover:text-slate-950"
               >
                 <BookOpen className="size-4" />
                 {source.kind === "collection" ? "Open collections" : "Browse full library"}
@@ -257,9 +261,11 @@ export function PassAndPlaySetupClient() {
 
             <div className="mt-5">
               {source.kind === "collection" && collectionDetailQuery.isLoading ? (
-                <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-6 py-10 text-center">
-                  <h3 className="text-lg font-semibold text-white">Loading collection preview</h3>
-                  <p className="mt-2 text-sm text-white/55">
+                <div className="rounded-3xl border border-dashed border-slate-300 bg-white/68 px-6 py-10 text-center">
+                  <h3 className="text-lg font-semibold text-slate-950">
+                    Loading collection preview
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-500">
                     Pulling the saved collection into the pass-and-play preview.
                   </p>
                 </div>

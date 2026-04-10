@@ -19,9 +19,9 @@ export function LocationCatalogPreview({
 }: LocationCatalogPreviewProps) {
   if (locations.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-6 py-10 text-center">
-        <h3 className="text-lg font-semibold text-white">{emptyTitle}</h3>
-        <p className="mt-2 text-sm text-white/55">{emptyDescription}</p>
+      <div className="rounded-3xl border border-dashed border-slate-300 bg-white/68 px-6 py-10 text-center">
+        <h3 className="text-lg font-semibold text-slate-950">{emptyTitle}</h3>
+        <p className="mt-2 text-sm text-slate-500">{emptyDescription}</p>
       </div>
     );
   }
