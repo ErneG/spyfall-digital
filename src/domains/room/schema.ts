@@ -47,6 +47,13 @@ export const updateRoomConfigInput = z.object({
 });
 export type UpdateRoomConfigInput = z.infer<typeof updateRoomConfigInput>;
 
+export const applyRoomContentSourceInput = z.object({
+  roomCode: z.string().length(5).toUpperCase(),
+  playerId: z.string().min(1),
+  source: contentSourceInput,
+});
+export type ApplyRoomContentSourceInput = z.infer<typeof applyRoomContentSourceInput>;
+
 export const updateRoomConfigOutput = z.object({
   timeLimit: z.number(),
   spyCount: z.number(),
@@ -56,6 +63,12 @@ export const updateRoomConfigOutput = z.object({
   moderatorLocationId: z.string().nullable(),
 });
 export type UpdateRoomConfigOutput = z.infer<typeof updateRoomConfigOutput>;
+
+export const applyRoomContentSourceOutput = z.object({
+  selectedLocationCount: z.number().int().min(0),
+  sourceKind: z.enum(["built-in", "collection"]),
+});
+export type ApplyRoomContentSourceOutput = z.infer<typeof applyRoomContentSourceOutput>;
 
 // ─── Output schemas (for responses) ─────────────────────────
 

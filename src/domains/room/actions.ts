@@ -4,6 +4,7 @@ import {
   createRoomInput,
   joinRoomInput,
   updateRoomConfigInput,
+  applyRoomContentSourceInput,
   createPassAndPlayInput,
   getRoomStateInput,
   type CreateRoomInput,
@@ -12,8 +13,11 @@ import {
   type JoinRoomOutput,
   type UpdateRoomConfigInput,
   type UpdateRoomConfigOutput,
+  type ApplyRoomContentSourceInput,
+  type ApplyRoomContentSourceOutput,
   type CreatePassAndPlayOutput,
 } from "@/domains/room/schema";
+import { applyRoomContentSource as applyRoomContentSourceUseCase } from "@/entities/room/apply-content-source";
 import { generateUniqueRoomCode } from "@/entities/room/code";
 import { createPassAndPlayRoom as createPassAndPlayRoomUseCase } from "@/entities/room/pass-and-play";
 import { type RoomState } from "@/entities/room/state";
@@ -254,6 +258,17 @@ export async function updateRoomConfig(
     console.error("updateRoomConfig failed:", error);
     return fail("Failed to update config");
   }
+}
+
+export async function applyRoomContentSource(
+  input: ApplyRoomContentSourceInput,
+): Promise<ActionResult<ApplyRoomContentSourceOutput>> {
+  const parsed = applyRoomContentSourceInput.safeParse(input);
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
+  }
+
+  return applyRoomContentSourceUseCase(parsed.data);
 }
 
 export async function getRoomState(input: unknown): Promise<ActionResult<RoomState>> {
