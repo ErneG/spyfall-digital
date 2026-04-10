@@ -20,6 +20,7 @@ export function useRoomPage(code: string) {
   const { data: room, isConnected } = useRoomState(code);
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState("");
+  const [isCollectionPickerOpen, setIsCollectionPickerOpen] = useState(false);
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoStartRef = useRef(false);
@@ -66,6 +67,7 @@ export function useRoomPage(code: string) {
     router.push("/");
   }, [clearSession, router]);
 
+  const handleOpenCollectionPicker = useCallback(() => setIsCollectionPickerOpen(true), []);
   const handleOpenLocations = useCallback(() => setIsLocationsOpen(true), []);
 
   const handleStartClick = useCallback(() => {
@@ -86,12 +88,15 @@ export function useRoomPage(code: string) {
     isConnected,
     isCopied,
     error,
+    isCollectionPickerOpen,
     isLocationsOpen,
+    setIsCollectionPickerOpen,
     setIsLocationsOpen,
     startGameMutation,
     players,
     handleCopy,
     handleLeave,
+    handleOpenCollectionPicker,
     handleOpenLocations,
     handleStartClick,
   };

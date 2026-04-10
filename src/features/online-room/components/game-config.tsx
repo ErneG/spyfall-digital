@@ -3,10 +3,11 @@
 import { Settings } from "lucide-react";
 import { memo } from "react";
 
+import { useAuth } from "@/domains/auth/hooks";
 import { useTranslation } from "@/shared/i18n/context";
 
 import { ConfigToggles, GameConfigSummary, TimerSection } from "./game-config-parts";
-import { LocationSection, SpySection } from "./game-config-sections";
+import { SourceSection, SpySection } from "./game-config-sections";
 import { useGameConfig } from "./use-game-config";
 
 export interface GameConfigProps {
@@ -20,10 +21,12 @@ export interface GameConfigProps {
   moderatorMode: boolean;
   selectedLocationCount: number;
   totalLocationCount: number;
+  onOpenCollectionPicker: () => void;
   onOpenLocations: () => void;
 }
 
 export const GameConfig = memo(function GameConfig(props: GameConfigProps) {
+  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const handlers = useGameConfig(props.roomCode, props.playerId);
 
@@ -46,10 +49,12 @@ export const GameConfig = memo(function GameConfig(props: GameConfigProps) {
       </p>
       <TimerSection timeLimit={props.timeLimit} onSelect={handlers.handleTimeSelect} />
       <SpySection spyCount={props.spyCount} onSelect={handlers.handleSpySelect} />
-      <LocationSection
+      <SourceSection
+        canImportCollections={isAuthenticated}
         selectedLocationCount={props.selectedLocationCount}
         totalLocationCount={props.totalLocationCount}
-        onOpenLocations={props.onOpenLocations}
+        onOpenBuiltIn={props.onOpenLocations}
+        onOpenCollection={props.onOpenCollectionPicker}
       />
       <ConfigToggles
         autoStartTimer={props.autoStartTimer}

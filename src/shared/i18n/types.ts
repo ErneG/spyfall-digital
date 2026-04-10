@@ -36,9 +36,16 @@ export interface Translations {
     spies: string;
     spy: string;
     spiesPlural: string;
+    source: string;
     locations: string;
     locationsSelected: string; // "{n} of {total} locations selected"
     edit: string;
+    builtInCatalog: string;
+    collection: string;
+    advancedRoomCustomization: string;
+    importCollection: string;
+    collectionImportHint: string;
+    signInForCollections: string;
     autoStartTimer: string;
     hideSpyCount: string;
     moderatorMode: string;

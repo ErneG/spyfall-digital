@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import { CollectionPicker } from "@/domains/collection/components/collection-picker";
 import { LocationSettings } from "@/domains/location/components/location-settings";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
@@ -43,8 +44,15 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
   state,
   session,
 }: RoomLobbyContentProps) {
-  const { t, room, isConnected, isCopied, error, isLocationsOpen } = state;
-  const { setIsLocationsOpen, startGameMutation, players, handleCopy, handleLeave } = state;
+  const { t, room, isConnected, isCopied, error, isCollectionPickerOpen, isLocationsOpen } = state;
+  const {
+    setIsCollectionPickerOpen,
+    setIsLocationsOpen,
+    startGameMutation,
+    players,
+    handleCopy,
+    handleLeave,
+  } = state;
 
   return (
     <div className="mx-auto w-full max-w-4xl">
@@ -83,6 +91,7 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
                   moderatorMode={room.moderatorMode}
                   selectedLocationCount={room.selectedLocationCount}
                   totalLocationCount={room.totalLocationCount}
+                  onOpenCollectionPicker={state.handleOpenCollectionPicker}
                   onOpenLocations={state.handleOpenLocations}
                 />
               ) : null}
@@ -113,6 +122,13 @@ const RoomLobbyContent = React.memo(function RoomLobbyContent({
         onOpenChange={setIsLocationsOpen}
         roomCode={code}
         playerId={session.playerId}
+      />
+      <CollectionPicker
+        open={isCollectionPickerOpen}
+        onOpenChange={setIsCollectionPickerOpen}
+        roomCode={code}
+        playerId={session.playerId}
+        onImported={() => {}}
       />
     </div>
   );
