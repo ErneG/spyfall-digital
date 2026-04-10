@@ -17,7 +17,7 @@ import { LocationSettingsBody } from "./location-settings-body";
 import { LocationFilterInput } from "./location-settings-parts";
 import { useLocationData } from "./use-location-data";
 
-import type { LocationItem } from "@/domains/location/schema";
+import type { LocationItem } from "@/entities/location/schema";
 
 function useLocationFilter(locations: LocationItem[]) {
   const [filter, setFilter] = useState("");

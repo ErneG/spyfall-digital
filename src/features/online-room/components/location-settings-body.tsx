@@ -14,7 +14,7 @@ import {
 } from "./location-settings-parts";
 
 import type { LocationDataReturn } from "./use-location-data";
-import type { LocationItem } from "@/domains/location/schema";
+import type { LocationItem } from "@/entities/location/schema";
 
 interface CategoryGroup {
   category: string;

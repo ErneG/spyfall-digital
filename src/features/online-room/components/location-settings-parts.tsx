@@ -10,7 +10,7 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 
-import type { CustomLocationItem, LocationItem } from "@/domains/location/schema";
+import type { CustomLocationItem, LocationItem } from "@/entities/location/schema";
 
 interface RoleDraft {
   id: string;

@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 
 import {
-  updateLocationSelections,
   createCustomLocation,
-  updateCustomLocation,
   deleteCustomLocation,
-} from "@/domains/location/actions";
-import { fetchLocations } from "@/domains/location/hooks";
+  updateCustomLocation,
+  updateLocationSelections,
+} from "@/entities/location/actions";
+import { fetchLocations } from "@/entities/location/query";
 
-import type { LocationItem, CustomLocationItem } from "@/domains/location/schema";
+import type { CustomLocationItem, LocationItem } from "@/entities/location/schema";
 
 function useLocationState(roomCode: string, isOpen: boolean) {
   const [locations, setLocations] = useState<LocationItem[]>([]);
