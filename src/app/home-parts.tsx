@@ -250,5 +250,4 @@ export const FooterInfo = React.memo(function FooterInfo() {
 /* ── Re-exports ──────────────────────────────────────── */
 
 export { JoinRoomForm } from "./join-room-form";
-export { PassAndPlayForm } from "./pass-and-play-form";
 export { useHomeState } from "./use-home-state";

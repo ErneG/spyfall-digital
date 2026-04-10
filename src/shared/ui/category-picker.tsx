@@ -22,9 +22,9 @@ export const CategoryPicker = memo(function CategoryPicker({
   const toggle = useCallback(
     (category: string) => {
       const next = categories.includes(category)
-        ? categories.filter((c) => c !== category)
+        ? categories.filter((item) => item !== category)
         : [...categories, category];
-      // Must have at least one category selected
+
       if (next.length > 0) {
         onChange(next);
       }
@@ -38,8 +38,13 @@ export const CategoryPicker = memo(function CategoryPicker({
         <MapPin className="mr-1 inline h-3 w-3" /> {t.locationSettings.title}
       </p>
       <div className="flex flex-wrap gap-1.5">
-        {LOCATION_CATEGORIES.map((cat) => (
-          <CategoryChip key={cat} label={cat} active={categories.includes(cat)} onToggle={toggle} />
+        {LOCATION_CATEGORIES.map((category) => (
+          <CategoryChip
+            key={category}
+            label={category}
+            active={categories.includes(category)}
+            onToggle={toggle}
+          />
         ))}
       </div>
     </div>

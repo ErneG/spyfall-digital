@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, Clock } from "lucide-react";
+import { Clock, Eye, EyeOff } from "lucide-react";
 import React from "react";
 
 import { TIMER_PRESETS } from "@/domains/room/schema";
@@ -11,8 +11,6 @@ import { Switch } from "@/shared/ui/switch";
 import { PnPPresetButton } from "./game-config-section-parts";
 
 const SPY_OPTIONS = [1, 2] as const;
-
-/* ── Config section ──────────────────────────────────── */
 
 export interface GameConfigSectionProps {
   timeLimit: number;
@@ -32,6 +30,7 @@ export const GameConfigSection = React.memo(function GameConfigSection({
   onHideSpyCountChange,
 }: GameConfigSectionProps) {
   const { t } = useTranslation();
+
   return (
     <>
       <div className="space-y-2">

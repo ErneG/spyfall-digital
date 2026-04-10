@@ -6,10 +6,8 @@ import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
+import { PlayerListSection } from "./form-parts";
 import { GameConfigSection } from "./game-config-section";
-import { PlayerListSection } from "./pass-and-play-form-parts";
-
-/* ── Exported form component ─────────────────────────── */
 
 export interface PassAndPlayFormProps {
   players: PlayerDraft[];

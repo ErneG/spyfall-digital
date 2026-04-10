@@ -2,11 +2,11 @@
 
 import { BookMarked, Layers3 } from "lucide-react";
 
-import { CategoryPicker } from "@/app/category-picker";
 import { type CollectionListItem } from "@/domains/collection/schema";
 import { type PassAndPlaySourceInput } from "@/domains/room/schema";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";
+import { CategoryPicker } from "@/shared/ui/category-picker";
 import { Label } from "@/shared/ui/label";
 
 interface PassAndPlaySourceSectionProps {

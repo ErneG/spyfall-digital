@@ -25,10 +25,10 @@ import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { cn } from "@/shared/lib/utils";
 import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
 
-import { PassAndPlayForm } from "../../pass-and-play-form";
+import { usePassAndPlaySources } from "../hooks/use-pass-and-play-sources";
 
-import { PassAndPlaySourceSection } from "./pass-and-play-source-section";
-import { usePassAndPlaySources } from "./use-pass-and-play-sources";
+import { PassAndPlayForm } from "./form";
+import { PassAndPlaySourceSection } from "./source-section";
 
 const shellClassName =
   "rounded-[34px] border border-white/80 bg-white/66 shadow-[0_35px_100px_rgba(148,163,184,0.2)] backdrop-blur-2xl";
@@ -53,6 +53,7 @@ export function PassAndPlaySetupClient() {
       router.replace(`/room/${session.roomCode}`);
     }
   }, [router, session]);
+
   const {
     availableCollections,
     collectionDetailQuery,
@@ -258,38 +259,27 @@ export function PassAndPlaySetupClient() {
               </div>
               <Link
                 href={source.kind === "collection" ? "/collections" : "/library"}
-                className="inline-flex items-center gap-2 self-start rounded-full border border-white/80 bg-white/72 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white hover:text-slate-950"
+                className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/72 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-950"
               >
                 <BookOpen className="size-4" />
-                {source.kind === "collection" ? "Open collections" : "Browse full library"}
+                {source.kind === "collection" ? "Open collection" : "Open library"}
               </Link>
             </div>
 
             <div className="mt-5">
-              {source.kind === "collection" && collectionDetailQuery.isLoading ? (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-white/68 px-6 py-10 text-center">
-                  <h3 className="text-lg font-semibold text-slate-950">
-                    Loading collection preview
-                  </h3>
-                  <p className="mt-2 text-sm text-slate-500">
-                    Pulling the saved collection into the pass-and-play preview.
-                  </p>
-                </div>
-              ) : (
-                <LocationCatalogPreview
-                  locations={previewLocations}
-                  emptyTitle={
-                    source.kind === "collection"
-                      ? "No collection locations available"
-                      : "No locations selected"
-                  }
-                  emptyDescription={
-                    source.kind === "collection"
-                      ? "Choose a collection with saved locations to build this round."
-                      : "Choose at least one category to start building the round."
-                  }
-                />
-              )}
+              <LocationCatalogPreview
+                locations={previewLocations}
+                emptyTitle={
+                  collectionDetailQuery.isLoading
+                    ? "Loading collection preview"
+                    : "No locations are available yet"
+                }
+                emptyDescription={
+                  source.kind === "collection"
+                    ? "Pick another collection or create one from the Library."
+                    : "Choose at least one category to include locations in this round."
+                }
+              />
             </div>
           </section>
         </div>

@@ -16,7 +16,7 @@ export const CategoryChip = memo(function CategoryChip({
   const { translateCategory } = useTranslation();
   const handleClick = useCallback(() => {
     onToggle(label);
-  }, [onToggle, label]);
+  }, [label, onToggle]);
 
   return (
     <button

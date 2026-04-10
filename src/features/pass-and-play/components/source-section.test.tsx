@@ -2,9 +2,9 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PassAndPlaySourceSection } from "./pass-and-play-source-section";
+import { PassAndPlaySourceSection } from "./source-section";
 
-vi.mock("@/app/category-picker", () => ({
+vi.mock("@/shared/ui/category-picker", () => ({
   CategoryPicker: () => <div>Category picker</div>,
 }));
 

@@ -2,8 +2,6 @@
 
 import React, { useCallback } from "react";
 
-/* ── Preset button ───────────────────────────────────── */
-
 export const PnPPresetButton = React.memo(function PnPPresetButton({
   label,
   value,
@@ -16,6 +14,7 @@ export const PnPPresetButton = React.memo(function PnPPresetButton({
   onClick: (value: number) => void;
 }) {
   const handleClick = useCallback(() => onClick(value), [onClick, value]);
+
   return (
     <button
       onClick={handleClick}

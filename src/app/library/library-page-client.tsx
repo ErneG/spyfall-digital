@@ -4,12 +4,12 @@ import { BookOpen, ChevronLeft, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { CategoryPicker } from "@/app/category-picker";
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
 import { SavedLocationManager } from "@/features/library/components/saved-location-manager";
 import { useSavedLocations } from "@/features/library/use-saved-locations";
 import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";
+import { CategoryPicker } from "@/shared/ui/category-picker";
 import { Input } from "@/shared/ui/input";
 import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
 

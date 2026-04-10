@@ -6,13 +6,11 @@ import React, { useCallback } from "react";
 
 import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { useTranslation } from "@/shared/i18n/context";
-import { MIN_PLAYERS, MAX_PLAYERS } from "@/shared/lib/constants";
+import { MAX_PLAYERS, MIN_PLAYERS } from "@/shared/lib/constants";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-import { usePlayerList } from "./use-player-list";
-
-/* ── Hooks ──────────────────────────────────────────── */
+import { usePlayerList } from "../hooks/use-player-list";
 
 function usePlayerRowHandlers(
   entryId: string,
@@ -29,10 +27,9 @@ function usePlayerRowHandlers(
     (event: React.PointerEvent) => controls.start(event),
     [controls],
   );
+
   return { controls, handleChange, handleRemove, handlePointerDown };
 }
-
-/* ── Player name row ─────────────────────────────────── */
 
 const PlayerNameRow = React.memo(function PlayerNameRow({
   entry,
@@ -106,8 +103,6 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
     </Reorder.Item>
   );
 });
-
-/* ── Player list section ─────────────────────────────── */
 
 export interface PlayerListSectionProps {
   players: PlayerDraft[];

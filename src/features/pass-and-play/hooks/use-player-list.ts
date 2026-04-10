@@ -18,14 +18,13 @@ export function usePlayerList({
   onRemovePlayer,
   onReorderPlayers,
 }: UsePlayerListOptions) {
-  // ── Input focus management ──────────────────────────
   const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());
 
   const makeInputRef = useCallback(
     (index: number): RefCallback<HTMLInputElement> =>
-      (el) => {
-        if (el) {
-          inputRefs.current.set(index, el);
+      (element) => {
+        if (element) {
+          inputRefs.current.set(index, element);
         } else {
           inputRefs.current.delete(index);
         }
@@ -48,7 +47,6 @@ export function usePlayerList({
     [onAddPlayer],
   );
 
-  // ── Stable IDs for Motion Reorder tracking ──────────
   const handleReorder = useCallback(
     (reordered: PlayerDraft[]) => {
       onReorderPlayers(reordered);
