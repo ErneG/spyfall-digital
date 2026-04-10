@@ -3,7 +3,7 @@
 import { BookMarked, Layers3 } from "lucide-react";
 
 import { type CollectionListItem } from "@/domains/collection/schema";
-import { type PassAndPlaySourceInput } from "@/domains/room/schema";
+import { type ContentSourceInput } from "@/entities/library/content-source";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";
 import { CategoryPicker } from "@/shared/ui/category-picker";
@@ -13,8 +13,8 @@ interface PassAndPlaySourceSectionProps {
   collections: CollectionListItem[];
   isAuthenticated: boolean;
   isLoadingCollections: boolean;
-  source: PassAndPlaySourceInput;
-  onSourceChange: (source: PassAndPlaySourceInput) => void;
+  source: ContentSourceInput;
+  onSourceChange: (source: ContentSourceInput) => void;
 }
 
 const tabClassName =

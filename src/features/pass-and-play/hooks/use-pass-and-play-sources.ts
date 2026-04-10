@@ -6,7 +6,11 @@ import { useMemo } from "react";
 import { getCollection, getCollections } from "@/domains/collection/actions";
 import { type CollectionDetail, type CollectionListItem } from "@/domains/collection/schema";
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
-import { type PassAndPlaySourceInput } from "@/domains/room/schema";
+import {
+  createBuiltInContentSource,
+  createCollectionContentSource,
+  type ContentSourceInput,
+} from "@/entities/library/content-source";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 import { type LocationCatalogItem } from "@/shared/ui/location-catalog-preview";
@@ -36,16 +40,16 @@ function buildPassAndPlaySource(
   sourceMode: "built-in" | "collection",
   categories: LocationCategory[],
   activeCollectionId: string | null,
-): PassAndPlaySourceInput {
+): ContentSourceInput {
   if (sourceMode === "collection" && activeCollectionId) {
-    return { kind: "collection", collectionId: activeCollectionId };
+    return createCollectionContentSource(activeCollectionId);
   }
 
-  return { kind: "built-in", categories };
+  return createBuiltInContentSource(categories);
 }
 
 function buildPreviewLocations(
-  source: PassAndPlaySourceInput,
+  source: ContentSourceInput,
   categories: LocationCategory[],
   collection: CollectionDetail | undefined,
 ): LocationCatalogItem[] {
@@ -69,7 +73,7 @@ function buildPreviewLocations(
 }
 
 function calculateTotalRoles(
-  source: PassAndPlaySourceInput,
+  source: ContentSourceInput,
   previewLocations: LocationCatalogItem[],
   collection: CollectionDetail | undefined,
 ): number {

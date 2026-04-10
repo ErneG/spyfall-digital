@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/domains/auth/hooks";
 import { startGame } from "@/domains/game/actions";
 import { createPassAndPlayRoom } from "@/domains/room/actions";
-import { type PassAndPlaySourceInput } from "@/domains/room/schema";
+import { type ContentSourceInput } from "@/entities/library/content-source";
 import {
   addPlayerDraft,
   createInitialPlayerDrafts,
@@ -110,7 +110,7 @@ export function PassAndPlaySetupClient() {
     },
   });
 
-  const handleSourceChange = useCallback((nextSource: PassAndPlaySourceInput) => {
+  const handleSourceChange = useCallback((nextSource: ContentSourceInput) => {
     setError("");
     if (nextSource.kind === "collection") {
       setSourceMode("collection");

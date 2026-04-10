@@ -1,6 +1,14 @@
 import { z } from "zod/v4";
 
-import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
+import {
+  builtInContentSourceInput,
+  collectionContentSourceInput,
+  contentSourceInput,
+  createBuiltInContentSource,
+  type BuiltInContentSourceInput,
+  type CollectionContentSourceInput,
+  type ContentSourceInput,
+} from "@/entities/library/content-source";
 import { gamePhaseSchema, playerSchema } from "@/shared/types/common";
 
 // Re-export shared types for convenience
@@ -92,26 +100,14 @@ export type RoomEvent = z.infer<typeof roomEventSchema>;
 
 // ─── Pass & Play schemas ────────────────────────────────────
 
-export const builtInPassAndPlaySourceInput = z.object({
-  kind: z.literal("built-in"),
-  categories: z
-    .array(z.enum(LOCATION_CATEGORIES))
-    .min(1)
-    .default([...LOCATION_CATEGORIES]),
-});
-export type BuiltInPassAndPlaySourceInput = z.infer<typeof builtInPassAndPlaySourceInput>;
+export const builtInPassAndPlaySourceInput = builtInContentSourceInput;
+export type BuiltInPassAndPlaySourceInput = BuiltInContentSourceInput;
 
-export const collectionPassAndPlaySourceInput = z.object({
-  kind: z.literal("collection"),
-  collectionId: z.string().min(1, "Collection is required"),
-});
-export type CollectionPassAndPlaySourceInput = z.infer<typeof collectionPassAndPlaySourceInput>;
+export const collectionPassAndPlaySourceInput = collectionContentSourceInput;
+export type CollectionPassAndPlaySourceInput = CollectionContentSourceInput;
 
-export const passAndPlaySourceInput = z.discriminatedUnion("kind", [
-  builtInPassAndPlaySourceInput,
-  collectionPassAndPlaySourceInput,
-]);
-export type PassAndPlaySourceInput = z.infer<typeof passAndPlaySourceInput>;
+export const passAndPlaySourceInput = contentSourceInput;
+export type PassAndPlaySourceInput = ContentSourceInput;
 
 export const passAndPlayPlayersInput = z.object({
   names: z
@@ -137,12 +133,7 @@ export const createPassAndPlayInput = z
   .transform((input) => ({
     players: input.players,
     settings: passAndPlaySettingsInput.parse(input.settings ?? {}),
-    source: passAndPlaySourceInput.parse(
-      input.source ?? {
-        kind: "built-in",
-        categories: [...LOCATION_CATEGORIES],
-      },
-    ),
+    source: passAndPlaySourceInput.parse(input.source ?? createBuiltInContentSource()),
   }));
 export type CreatePassAndPlayInput = z.input<typeof createPassAndPlayInput>;
 
