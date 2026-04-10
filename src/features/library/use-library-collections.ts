@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCollections } from "@/domains/collection/actions";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
-import type { CollectionListItem } from "@/domains/collection/schema";
+import type { CollectionListItem } from "@/entities/library/collection";
 
 const NOT_AUTHENTICATED_ERROR = "Not authenticated";
 

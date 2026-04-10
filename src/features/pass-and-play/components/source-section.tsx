@@ -2,7 +2,7 @@
 
 import { BookMarked, Layers3 } from "lucide-react";
 
-import { type CollectionListItem } from "@/domains/collection/schema";
+import { type CollectionListItem } from "@/entities/library/collection";
 import { type ContentSourceInput } from "@/entities/library/content-source";
 import { type LocationCategory } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";

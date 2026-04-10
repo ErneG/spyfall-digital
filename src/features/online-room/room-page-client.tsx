@@ -1,7 +1,7 @@
 "use client";
 
 import { GameView } from "@/domains/game/components/game-view";
-import { PassAndPlayGameView } from "@/domains/game/components/pass-and-play-game-view";
+import { PassAndPlayGameView } from "@/features/pass-and-play/runtime/pass-and-play-game-view";
 
 import { RoomLobby, RoomLoadingSpinner } from "./room-page-parts";
 import { useRoomPage } from "./use-room-page";

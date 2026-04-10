@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { getCollection, getCollections } from "@/domains/collection/actions";
-import { type CollectionDetail, type CollectionListItem } from "@/domains/collection/schema";
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
+import { type CollectionDetail, type CollectionListItem } from "@/entities/library/collection";
 import {
   createBuiltInContentSource,
   createCollectionContentSource,
