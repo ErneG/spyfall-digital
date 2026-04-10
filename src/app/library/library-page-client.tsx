@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 
 import { DEFAULT_LOCATIONS } from "@/domains/location/data";
 import { SavedLocationManager } from "@/features/library/components/saved-location-manager";
+import { useLibraryCollections } from "@/features/library/use-library-collections";
 import { useSavedLocations } from "@/features/library/use-saved-locations";
 import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
 import { cn } from "@/shared/lib/utils";
@@ -21,6 +22,7 @@ const shellClassName =
 export function LibraryPageClient() {
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
+  const { collections } = useLibraryCollections();
   const { error, isAuthenticated, isDeleting, isLoading, isSaving, locations, onDelete, onSave } =
     useSavedLocations();
 
@@ -103,9 +105,10 @@ export function LibraryPageClient() {
                 Open collections
               </Link>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <StatCard label="Saved" value={String(locations.length)} />
               <StatCard label="Saved roles" value={String(savedRoleCount)} />
+              <StatCard label="Collections" value={String(collections.length)} />
             </div>
           </div>
 

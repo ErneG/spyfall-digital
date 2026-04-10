@@ -24,6 +24,18 @@ vi.mock("@/features/library/use-saved-locations", () => ({
   }),
 }));
 
+vi.mock("@/features/library/use-library-collections", () => ({
+  useLibraryCollections: () => ({
+    collections: [
+      { id: "collection-1", name: "Starter Pack", description: null, locationCount: 3 },
+      { id: "collection-2", name: "Night Shift", description: null, locationCount: 5 },
+    ],
+    error: null,
+    isAuthenticated: true,
+    isLoading: false,
+  }),
+}));
+
 vi.mock("@/shared/ui/category-picker", () => ({
   CategoryPicker: () => <div>Category picker</div>,
 }));
@@ -56,5 +68,12 @@ describe("LibraryPageClient", () => {
       "href",
       "/collections",
     );
+  });
+
+  it("surfaces collection count alongside saved-location stats", () => {
+    render(<LibraryPageClient />);
+
+    expect(screen.getByText("Collections")).toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
   });
 });
