@@ -5,7 +5,7 @@ import React from "react";
 
 import { useTranslation } from "@/shared/i18n/context";
 
-import type { PlayerInfo } from "@/domains/room/schema";
+import type { PlayerInfo } from "@/shared/types/common";
 
 interface PlayerListProps {
   players: PlayerInfo[];

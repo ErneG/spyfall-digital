@@ -3,8 +3,7 @@ import { useCallback } from "react";
 
 import { updateRoomConfig } from "@/domains/room/actions";
 import { roomKeys } from "@/domains/room/hooks";
-
-import type { RoomState } from "@/domains/room/schema";
+import { type RoomState } from "@/entities/room/state";
 
 interface ConfigPatch {
   timeLimit?: number;

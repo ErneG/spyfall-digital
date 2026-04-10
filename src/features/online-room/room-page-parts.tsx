@@ -3,9 +3,13 @@
 import React from "react";
 
 import { LocationSettings } from "@/domains/location/components/location-settings";
-import { GameConfig, PlayerList, RoomCodeHeader, StartSection } from "@/domains/room/components";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
+
+import { GameConfig } from "./components/game-config";
+import { PlayerList } from "./components/player-list";
+import { RoomCodeHeader } from "./components/room-code-header";
+import { StartSection } from "./components/start-section";
 
 import type { useRoomPage } from "./use-room-page";
 
