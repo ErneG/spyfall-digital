@@ -13,12 +13,14 @@ import {
   type DeleteNameInput,
 } from "./schema";
 
+const NOT_AUTHENTICATED_ERROR = "Not authenticated";
+
 // ─── getProfile ──────────────────────────────────────────────
 
 export async function getProfile(): Promise<ActionResult<ProfileOutput>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -47,7 +49,7 @@ export async function updateProfile(
 ): Promise<ActionResult<{ displayName: string }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = updateProfileInput.safeParse(input);
@@ -73,7 +75,7 @@ export async function updateProfile(
 export async function getNameHistory(): Promise<ActionResult<NameHistoryItem[]>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -103,7 +105,7 @@ export async function deleteNameFromHistory(
 ): Promise<ActionResult<{ deleted: boolean }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = deleteNameInput.safeParse(input);
@@ -129,7 +131,7 @@ export async function deleteNameFromHistory(
 export async function getNameSuggestions(): Promise<ActionResult<string[]>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {

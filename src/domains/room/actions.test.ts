@@ -12,6 +12,17 @@ const roomCreate = vi.fn();
 const roomUpdate = vi.fn();
 const transaction = vi.fn();
 
+type MockTransactionClient = {
+  room: {
+    create: typeof roomCreate;
+    update: typeof roomUpdate;
+  };
+};
+
+type MockTransactionInput =
+  | ((client: MockTransactionClient) => Promise<unknown>)
+  | Promise<unknown>[];
+
 vi.mock("@/shared/lib/auth-session", () => ({
   getAuthUser,
 }));
@@ -50,17 +61,17 @@ describe("createPassAndPlayRoom", () => {
 
     generateRoomCode.mockReturnValue("ABCDE");
     roomFindUnique.mockResolvedValue(null);
-    transaction.mockImplementation(async (input: unknown) => {
-      if (typeof input === "function") {
-        return input({
-          room: {
-            create: roomCreate,
-            update: roomUpdate,
-          },
-        });
+    transaction.mockImplementation(async (input: MockTransactionInput) => {
+      if (Array.isArray(input)) {
+        return Promise.all(input);
       }
 
-      return Promise.all(input as Promise<unknown>[]);
+      return input({
+        room: {
+          create: roomCreate,
+          update: roomUpdate,
+        },
+      });
     });
     playerUpdate.mockResolvedValue({});
     nameHistoryUpsert.mockResolvedValue({});

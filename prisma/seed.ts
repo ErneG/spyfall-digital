@@ -9,8 +9,12 @@ import { getServerEnv } from "../src/shared/config/env";
 const adapter = new PrismaPg({ connectionString: getServerEnv().DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+function logSeedProgress(message: string) {
+  process.stdout.write(`${message}\n`);
+}
+
 async function main() {
-  console.log("Seeding locations and roles...");
+  logSeedProgress("Seeding locations and roles...");
 
   for (const loc of DEFAULT_LOCATIONS) {
     await prisma.location.upsert({
@@ -26,7 +30,7 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${DEFAULT_LOCATIONS.length} locations.`);
+  logSeedProgress(`Seeded ${DEFAULT_LOCATIONS.length} locations.`);
 }
 
 main()

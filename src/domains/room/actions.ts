@@ -23,6 +23,8 @@ import { prisma } from "@/shared/lib/prisma";
 import { generateRoomCode } from "@/shared/lib/room-code";
 import { ok, fail, type ActionResult } from "@/shared/types/action-result";
 
+const INVALID_INPUT_ERROR = "Invalid input";
+
 /** Link player to authenticated user and save name to history. */
 async function linkPlayerToUser(playerId: string, playerName: string) {
   const user = await getAuthUser();
@@ -185,12 +187,11 @@ async function readRoomStateByCode(code: string): Promise<RoomState | null> {
     return null;
   }
 
-  const latestGame = room.games[0];
+  const latestGame = room.games.at(0);
   const totalLocations = await prisma.location.count();
-  const hasLatestGame = latestGame !== undefined;
-  const currentGameId = hasLatestGame ? latestGame.id : null;
-  const gameStartedAt = hasLatestGame ? latestGame.startedAt.toISOString() : null;
-  const timerRunning = hasLatestGame ? latestGame.timerRunning : true;
+  const currentGameId = latestGame ? latestGame.id : null;
+  const gameStartedAt = latestGame ? latestGame.startedAt.toISOString() : null;
+  const timerRunning = latestGame ? latestGame.timerRunning : true;
 
   return {
     state: room.state,
@@ -215,7 +216,7 @@ async function readRoomStateByCode(code: string): Promise<RoomState | null> {
 export async function createRoom(input: CreateRoomInput): Promise<ActionResult<CreateRoomOutput>> {
   const parsed = createRoomInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   const { hostName, timeLimit, spyCount } = parsed.data;
@@ -275,7 +276,7 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
 export async function joinRoom(input: JoinRoomInput): Promise<ActionResult<JoinRoomOutput>> {
   const parsed = joinRoomInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   const { playerName, roomCode } = parsed.data;
@@ -327,7 +328,7 @@ export async function updateRoomConfig(
 ): Promise<ActionResult<UpdateRoomConfigOutput>> {
   const parsed = updateRoomConfigInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   const { roomCode, playerId, ...config } = parsed.data;
@@ -380,7 +381,7 @@ export async function updateRoomConfig(
 export async function getRoomState(input: unknown): Promise<ActionResult<RoomState>> {
   const parsed = getRoomStateInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -405,7 +406,7 @@ export async function createPassAndPlayRoom(
 ): Promise<ActionResult<CreatePassAndPlayOutput>> {
   const parsed = createPassAndPlayInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   const { players, settings, source } = parsed.data;

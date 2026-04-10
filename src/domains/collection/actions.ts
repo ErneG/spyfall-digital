@@ -25,12 +25,16 @@ import {
   type CollectionLocationItem,
 } from "./schema";
 
+const NOT_AUTHENTICATED_ERROR = "Not authenticated";
+const COLLECTION_NOT_FOUND_ERROR = "Collection not found";
+const INVALID_INPUT_ERROR = "Invalid input";
+
 // ─── getCollections ──────────────────────────────────────────
 
 export async function getCollections(): Promise<ActionResult<CollectionListItem[]>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -60,7 +64,7 @@ export async function getCollections(): Promise<ActionResult<CollectionListItem[
 export async function getCollection(id: string): Promise<ActionResult<CollectionDetail>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -75,7 +79,7 @@ export async function getCollection(id: string): Promise<ActionResult<Collection
     });
 
     if (!collection) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     return ok({
@@ -102,12 +106,12 @@ export async function createCollection(
 ): Promise<ActionResult<{ id: string }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = createCollectionInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -133,12 +137,12 @@ export async function updateCollection(
 ): Promise<ActionResult<{ updated: boolean }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = updateCollectionInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -146,7 +150,7 @@ export async function updateCollection(
       where: { id: parsed.data.id, userId: user.id },
     });
     if (!existing) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     await prisma.locationCollection.update({
@@ -169,7 +173,7 @@ export async function updateCollection(
 export async function deleteCollection(id: string): Promise<ActionResult<{ deleted: boolean }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -177,7 +181,7 @@ export async function deleteCollection(id: string): Promise<ActionResult<{ delet
       where: { id, userId: user.id },
     });
     if (!existing) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     await prisma.locationCollection.delete({ where: { id } });
@@ -195,12 +199,12 @@ export async function addLocationToCollection(
 ): Promise<ActionResult<CollectionLocationItem>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = addLocationInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -208,7 +212,7 @@ export async function addLocationToCollection(
       where: { id: parsed.data.collectionId, userId: user.id },
     });
     if (!collection) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     const location = await prisma.collectionLocation.create({
@@ -242,12 +246,12 @@ export async function updateCollectionLocation(
 ): Promise<ActionResult<{ updated: boolean }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = updateLocationInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -282,12 +286,12 @@ export async function removeLocationFromCollection(
 ): Promise<ActionResult<{ deleted: boolean }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = removeLocationInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -312,7 +316,7 @@ export async function removeLocationFromCollection(
 export async function getSavedLocationImports(): Promise<ActionResult<SavedLocationImportItem[]>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   try {
@@ -347,12 +351,12 @@ export async function importSavedLocationToCollection(
 ): Promise<ActionResult<CollectionLocationItem>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = importSavedLocationToCollectionInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -360,7 +364,7 @@ export async function importSavedLocationToCollection(
       where: { id: parsed.data.collectionId, userId: user.id },
     });
     if (!collection) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     const savedLocation = await prisma.savedLocation.findFirst({
@@ -408,12 +412,12 @@ export async function importCollectionToRoom(
 ): Promise<ActionResult<{ imported: number }>> {
   const user = await getAuthUser();
   if (!user) {
-    return fail("Not authenticated");
+    return fail(NOT_AUTHENTICATED_ERROR);
   }
 
   const parsed = importCollectionInput.safeParse(input);
   if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Invalid input");
+    return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT_ERROR);
   }
 
   try {
@@ -436,7 +440,7 @@ export async function importCollectionToRoom(
       },
     });
     if (!collection) {
-      return fail("Collection not found");
+      return fail(COLLECTION_NOT_FOUND_ERROR);
     }
 
     // Copy each collection location as a CustomLocation on the room

@@ -19,6 +19,7 @@ const updateLocationsWithCode = updateLocationsInput.extend(codeField.shape);
 const createCustomLocationWithCode = createCustomLocationInput.extend(codeField.shape);
 const updateCustomLocationWithCode = updateCustomLocationInput.extend(codeField.shape);
 const deleteCustomLocationWithCode = deleteCustomLocationInput.extend(codeField.shape);
+const ROOM_NOT_FOUND_ERROR = "Room not found";
 
 // ─── updateLocationSelections ──────────────────────────────────
 // Replaces PUT /api/rooms/[code]/locations
@@ -38,7 +39,7 @@ export async function updateLocationSelections(
       where: { code: code.toUpperCase() },
     });
     if (!room) {
-      return fail("Room not found");
+      return fail(ROOM_NOT_FOUND_ERROR);
     }
     if (room.hostId !== playerId) {
       return fail("Host only");
@@ -82,7 +83,7 @@ export async function createCustomLocation(
       where: { code: code.toUpperCase() },
     });
     if (!room) {
-      return fail("Room not found");
+      return fail(ROOM_NOT_FOUND_ERROR);
     }
     if (room.hostId !== playerId) {
       return fail("Host only");
@@ -139,7 +140,7 @@ export async function updateCustomLocation(
       where: { code: code.toUpperCase() },
     });
     if (!room) {
-      return fail("Room not found");
+      return fail(ROOM_NOT_FOUND_ERROR);
     }
     if (room.hostId !== playerId) {
       return fail("Host only");
@@ -202,7 +203,7 @@ export async function getLocations(roomCode: string): Promise<ActionResult<Locat
     });
 
     if (!room) {
-      return fail("Room not found");
+      return fail(ROOM_NOT_FOUND_ERROR);
     }
 
     const allLocations = await prisma.location.findMany({
@@ -249,7 +250,7 @@ export async function deleteCustomLocation(
       where: { code: code.toUpperCase() },
     });
     if (!room) {
-      return fail("Room not found");
+      return fail(ROOM_NOT_FOUND_ERROR);
     }
     if (room.hostId !== playerId) {
       return fail("Host only");
