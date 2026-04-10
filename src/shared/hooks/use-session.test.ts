@@ -167,6 +167,67 @@ describe("useSession", () => {
     });
   });
 
+  it("keeps multiple hook consumers in sync", () => {
+    const firstHook = renderHook(() => useSession());
+    const secondHook = renderHook(() => useSession());
+
+    const nextSession: Session = {
+      mode: "online",
+      playerId: "p-sync",
+      roomCode: "SYNC1",
+      roomId: "room-sync",
+      isHost: false,
+    };
+
+    act(() => {
+      firstHook.result.current.setSession(nextSession);
+    });
+
+    expect(secondHook.result.current.session).toEqual(nextSession);
+
+    act(() => {
+      secondHook.result.current.clearSession();
+    });
+
+    expect(firstHook.result.current.session).toBeNull();
+  });
+
+  it("reacts to storage events from another tab", () => {
+    const { result } = renderHook(() => useSession());
+
+    const nextSession: Session = {
+      mode: "online",
+      playerId: "p-storage",
+      roomCode: "SYNC2",
+      roomId: "room-storage",
+      isHost: true,
+    };
+
+    act(() => {
+      localStorageMock.setItem("spyfall-session", JSON.stringify(nextSession));
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "spyfall-session",
+          newValue: JSON.stringify(nextSession),
+        }),
+      );
+    });
+
+    expect(result.current.session).toEqual(nextSession);
+
+    act(() => {
+      localStorageMock.removeItem("spyfall-session");
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "spyfall-session",
+          newValue: null,
+        }),
+      );
+    });
+
+    expect(result.current.session).toBeNull();
+  });
+
   it("migrates a legacy pass-and-play session from localStorage", () => {
     localStorageMock.setItem(
       "spyfall-session",

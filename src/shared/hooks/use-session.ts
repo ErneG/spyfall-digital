@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { z } from "zod/v4";
 
 const sessionPlayerSchema = z.object({
@@ -41,6 +41,16 @@ export const sessionSchema = z.discriminatedUnion("mode", [
 export type Session = z.infer<typeof sessionSchema>;
 
 const STORAGE_KEY = "spyfall-session";
+const isClient = typeof window !== "undefined";
+const sessionListeners = new Set<() => void>();
+let cachedSerializedSession: string | null = null;
+let cachedSessionSnapshot: Session | null = null;
+
+function emitSessionChange() {
+  for (const listener of sessionListeners) {
+    listener();
+  }
+}
 
 function normalizeLegacySession(raw: unknown): Session | null {
   const parsedSession = sessionSchema.safeParse(raw);
@@ -92,9 +102,15 @@ function readSession(): Session | null {
   }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === cachedSerializedSession) {
+      return cachedSessionSnapshot;
+    }
+
     if (raw) {
       const normalized = normalizeLegacySession(JSON.parse(raw));
       if (normalized) {
+        cachedSerializedSession = raw;
+        cachedSessionSnapshot = normalized;
         return normalized;
       }
       // Corrupted session data — clear it
@@ -103,22 +119,60 @@ function readSession(): Session | null {
   } catch {
     // ignore
   }
+
+  cachedSerializedSession = null;
+  cachedSessionSnapshot = null;
   return null;
 }
 
-const isClient = typeof window !== "undefined";
+function handleStorageChange(event: StorageEvent) {
+  if (event.key !== null && event.key !== STORAGE_KEY) {
+    return;
+  }
+
+  emitSessionChange();
+}
+
+function subscribeToSession(listener: () => void) {
+  sessionListeners.add(listener);
+
+  if (sessionListeners.size === 1 && isClient) {
+    window.addEventListener("storage", handleStorageChange);
+  }
+
+  return () => {
+    sessionListeners.delete(listener);
+
+    if (sessionListeners.size === 0 && isClient) {
+      window.removeEventListener("storage", handleStorageChange);
+    }
+  };
+}
+
+function writeSession(session: Session) {
+  const serializedSession = JSON.stringify(session);
+  cachedSerializedSession = serializedSession;
+  cachedSessionSnapshot = session;
+  localStorage.setItem(STORAGE_KEY, serializedSession);
+  emitSessionChange();
+}
+
+function removeSession() {
+  cachedSerializedSession = null;
+  cachedSessionSnapshot = null;
+  localStorage.removeItem(STORAGE_KEY);
+  emitSessionChange();
+}
 
 export function useSession() {
-  const [session, setSessionState] = useState<Session | null>(() => readSession());
+  const session = useSyncExternalStore(subscribeToSession, readSession, () => null);
 
   const setSession = useCallback((newSession: Session) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
-    setSessionState(newSession);
+    writeSession(newSession);
   }, []);
 
   const clearSession = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setSessionState(null);
+    removeSession();
   }, []);
 
   return { session, setSession, clearSession, isLoaded: isClient };
