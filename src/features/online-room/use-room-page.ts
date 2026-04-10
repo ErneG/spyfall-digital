@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 
 import { startGame } from "@/domains/game/actions";
-import { useRoomState } from "@/domains/room/hooks";
+import { useRoomState } from "@/entities/room/query";
 import { getPassAndPlayAutoStartRequest } from "@/entities/room/runtime";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
