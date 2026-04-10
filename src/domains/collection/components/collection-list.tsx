@@ -72,7 +72,7 @@ export function CollectionListView() {
     [],
   );
 
-  const handleBack = useCallback(() => router.push("/"), [router]);
+  const handleBack = useCallback(() => router.push("/library"), [router]);
   const handleToggleCreate = useCallback(() => setShowCreate((previous) => !previous), []);
 
   if (authLoading || loading) {
