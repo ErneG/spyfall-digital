@@ -5,6 +5,8 @@ import {
   joinRoomInput,
   updateRoomConfigInput,
   createPassAndPlayInput,
+  type CollectionPassAndPlaySourceInput,
+  type PassAndPlaySourceInput,
   type CreateRoomInput,
   type CreateRoomOutput,
   type JoinRoomInput,
@@ -39,6 +41,127 @@ async function linkPlayerToUser(playerId: string, playerName: string) {
   ]);
 }
 
+async function generateUniqueRoomCode(): Promise<string | null> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = generateRoomCode();
+    const existing = await prisma.room.findUnique({ where: { code } });
+    if (!existing) {
+      return code;
+    }
+  }
+
+  return null;
+}
+
+async function getCollectionPassAndPlayLocations(
+  source: CollectionPassAndPlaySourceInput,
+): Promise<
+  | { success: true; customLocations: Array<{ allSpies: boolean; name: string; roles: string[] }> }
+  | { success: false; error: string }
+> {
+  const user = await getAuthUser();
+  if (!user) {
+    return { success: false, error: "Sign in to use saved collections" };
+  }
+
+  const collection = await prisma.locationCollection.findFirst({
+    where: { id: source.collectionId, userId: user.id },
+    include: {
+      locations: {
+        include: { roles: true },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+  if (!collection) {
+    return { success: false, error: "Collection not found" };
+  }
+  if (collection.locations.length === 0) {
+    return { success: false, error: "Selected collection has no locations" };
+  }
+
+  return {
+    success: true,
+    customLocations: collection.locations.map((location) => ({
+      name: location.name,
+      allSpies: location.allSpies,
+      roles: location.roles.map((role) => role.name),
+    })),
+  };
+}
+
+function buildPassAndPlayRoomCreateData({
+  builtInLocations,
+  code,
+  collectionLocations,
+  playerNames,
+  settings,
+  source,
+}: {
+  builtInLocations: Array<{ id: string }>;
+  code: string;
+  collectionLocations: Array<{ allSpies: boolean; name: string; roles: string[] }>;
+  playerNames: string[];
+  settings: { hideSpyCount: boolean; spyCount: number; timeLimit: number };
+  source: PassAndPlaySourceInput;
+}) {
+  return {
+    code,
+    timeLimit: settings.timeLimit,
+    spyCount: settings.spyCount,
+    hideSpyCount: settings.hideSpyCount,
+    autoStartTimer: false,
+    hostId: "",
+    players: {
+      create: playerNames.map((name, index) => ({
+        name,
+        isHost: index === 0,
+      })),
+    },
+    ...(source.kind === "collection"
+      ? {
+          customLocations: {
+            create: collectionLocations.map((location) => ({
+              name: location.name,
+              allSpies: location.allSpies,
+              selected: true,
+              roles: {
+                create: location.roles.map((roleName) => ({ name: roleName })),
+              },
+            })),
+          },
+        }
+      : {
+          selectedLocations: {
+            create: builtInLocations.map((location) => ({
+              locationId: location.id,
+            })),
+          },
+        }),
+  };
+}
+
+async function savePassAndPlayNames(hostId: string, playerNames: string[]) {
+  const user = await getAuthUser();
+  if (!user) {
+    return;
+  }
+
+  await prisma.$transaction([
+    prisma.player.update({
+      where: { id: hostId },
+      data: { userId: user.id },
+    }),
+    ...playerNames.map((name) =>
+      prisma.nameHistory.upsert({
+        where: { userId_name: { userId: user.id, name } },
+        update: { usedAt: new Date() },
+        create: { userId: user.id, name },
+      }),
+    ),
+  ]);
+}
+
 // ─── createRoom ────────────────────────────────────────────
 // Replaces POST /api/rooms
 
@@ -51,17 +174,9 @@ export async function createRoom(input: CreateRoomInput): Promise<ActionResult<C
   const { hostName, timeLimit, spyCount } = parsed.data;
 
   try {
-    // Generate unique room code (up to 10 attempts)
-    let code = "";
-    for (let attempt = 0; attempt < 10; attempt++) {
-      code = generateRoomCode();
-      const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) {
-        break;
-      }
-      if (attempt === 9) {
-        return fail("Failed to generate unique room code");
-      }
+    const code = await generateUniqueRoomCode();
+    if (!code) {
+      return fail("Failed to generate unique room code");
     }
 
     // Get all locations to auto-select them
@@ -227,54 +342,42 @@ export async function createPassAndPlayRoom(
     return fail(parsed.error.issues[0]?.message ?? "Invalid input");
   }
 
-  const {
-    playerNames,
-    timeLimit,
-    spyCount,
-    hideSpyCount: shouldHideSpyCount,
-    categories,
-  } = parsed.data;
+  const { players, settings, source } = parsed.data;
+  const playerNames = players.names;
 
   try {
-    // Generate unique room code
-    let code = "";
-    for (let attempt = 0; attempt < 10; attempt++) {
-      code = generateRoomCode();
-      const existing = await prisma.room.findUnique({ where: { code } });
-      if (!existing) {
-        break;
-      }
-      if (attempt === 9) {
-        return fail("Failed to generate unique room code");
-      }
+    const code = await generateUniqueRoomCode();
+    if (!code) {
+      return fail("Failed to generate unique room code");
     }
 
-    // Fetch locations filtered by selected categories
-    const allLocations = await prisma.location.findMany({
-      where: { category: { in: categories } },
-      select: { id: true },
-    });
+    let collectionLocations: Array<{ allSpies: boolean; name: string; roles: string[] }> = [];
+    let builtInLocations: Array<{ id: string }> = [];
+
+    if (source.kind === "collection") {
+      const collectionSource = await getCollectionPassAndPlayLocations(source);
+      if (!collectionSource.success) {
+        return fail(collectionSource.error);
+      }
+      collectionLocations = collectionSource.customLocations;
+    } else {
+      builtInLocations = await prisma.location.findMany({
+        where: { category: { in: source.categories } },
+        select: { id: true },
+      });
+    }
 
     // Create room + all players in a transaction
     const room = await prisma.$transaction(async (tx) => {
       const created = await tx.room.create({
-        data: {
+        data: buildPassAndPlayRoomCreateData({
+          builtInLocations,
           code,
-          timeLimit: timeLimit ?? DEFAULT_TIME_LIMIT,
-          spyCount: spyCount ?? 1,
-          hideSpyCount: shouldHideSpyCount ?? false,
-          autoStartTimer: false, // Timer starts paused for role reveal
-          hostId: "",
-          players: {
-            create: playerNames.map((name, index) => ({
-              name,
-              isHost: index === 0,
-            })),
-          },
-          selectedLocations: {
-            create: allLocations.map((loc) => ({ locationId: loc.id })),
-          },
-        },
+          collectionLocations,
+          playerNames,
+          settings,
+          source,
+        }),
         include: { players: { orderBy: { createdAt: "asc" } } },
       });
 
@@ -289,27 +392,7 @@ export async function createPassAndPlayRoom(
 
     const host = room.players[0];
 
-    // Link host to authenticated user and save all player names (non-blocking)
-    const saveNames = async () => {
-      const user = await getAuthUser();
-      if (!user) {
-        return;
-      }
-      await prisma.$transaction([
-        prisma.player.update({
-          where: { id: host.id },
-          data: { userId: user.id },
-        }),
-        ...playerNames.map((name) =>
-          prisma.nameHistory.upsert({
-            where: { userId_name: { userId: user.id, name } },
-            update: { usedAt: new Date() },
-            create: { userId: user.id, name },
-          }),
-        ),
-      ]);
-    };
-    await saveNames().catch(() => {});
+    await savePassAndPlayNames(host.id, playerNames).catch(() => {});
 
     return ok({
       roomId: room.id,

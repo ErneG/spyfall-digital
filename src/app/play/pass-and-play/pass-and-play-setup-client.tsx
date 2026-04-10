@@ -4,12 +4,13 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Compass, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { useAuth } from "@/domains/auth/hooks";
 import { startGame } from "@/domains/game/actions";
-import { DEFAULT_LOCATIONS } from "@/domains/location/data";
 import { createPassAndPlayRoom } from "@/domains/room/actions";
-import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
+import { type PassAndPlaySourceInput } from "@/domains/room/schema";
+import { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
@@ -18,17 +19,23 @@ import { LocationCatalogPreview } from "@/shared/ui/location-catalog-preview";
 
 import { PassAndPlayForm } from "../../pass-and-play-form";
 
+import { PassAndPlaySourceSection } from "./pass-and-play-source-section";
+import { usePassAndPlaySources } from "./use-pass-and-play-sources";
+
 const shellClassName =
   "rounded-[32px] border border-white/10 bg-white/[0.05] shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl";
 
 export function PassAndPlaySetupClient() {
   const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { session, setSession } = useSession();
   const [playerNames, setPlayerNames] = useState<string[]>(["", "", ""]);
   const [timeLimit, setTimeLimit] = useState(DEFAULT_TIME_LIMIT);
   const [spyCount, setSpyCount] = useState(1);
   const [hideSpyCount, setHideSpyCount] = useState(false);
-  const [categories, setCategories] = useState<string[]>([...LOCATION_CATEGORIES]);
+  const [categories, setCategories] = useState<LocationCategory[]>([...LOCATION_CATEGORIES]);
+  const [sourceMode, setSourceMode] = useState<"built-in" | "collection">("built-in");
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -36,25 +43,33 @@ export function PassAndPlaySetupClient() {
       router.replace(`/room/${session.roomCode}`);
     }
   }, [router, session]);
-
-  const previewLocations = useMemo(
-    () => DEFAULT_LOCATIONS.filter((location) => categories.includes(location.category)),
-    [categories],
-  );
-
-  const totalRoles = useMemo(
-    () => previewLocations.reduce((sum, location) => sum + location.roles.length, 0),
-    [previewLocations],
-  );
+  const {
+    availableCollections,
+    collectionDetailQuery,
+    collectionsQuery,
+    previewLocations,
+    source,
+    totalRoles,
+  } = usePassAndPlaySources({
+    authLoading,
+    categories,
+    isAuthenticated,
+    selectedCollectionId,
+    sourceMode,
+  });
 
   const passAndPlayMutation = useMutation({
     mutationFn: async (trimmedNames: string[]) => {
       const roomResult = await createPassAndPlayRoom({
-        playerNames: trimmedNames,
-        timeLimit,
-        spyCount,
-        hideSpyCount,
-        categories,
+        players: {
+          names: trimmedNames,
+        },
+        settings: {
+          timeLimit,
+          spyCount,
+          hideSpyCount,
+        },
+        source,
       });
       const room = unwrapAction(roomResult);
       const gameResult = await startGame({ roomId: room.roomId, playerId: room.hostPlayerId });
@@ -81,6 +96,20 @@ export function PassAndPlaySetupClient() {
       setError(caughtError.message);
     },
   });
+
+  const handleSourceChange = useCallback((nextSource: PassAndPlaySourceInput) => {
+    setError("");
+    if (nextSource.kind === "collection") {
+      setSourceMode("collection");
+      setSelectedCollectionId(nextSource.collectionId);
+      return;
+    }
+
+    setSourceMode("built-in");
+    setCategories(
+      nextSource.categories.length > 0 ? nextSource.categories : [...LOCATION_CATEGORIES],
+    );
+  }, []);
 
   const handlePlayerNameChange = useCallback((index: number, value: string) => {
     setPlayerNames((previous) => {
@@ -178,9 +207,17 @@ export function PassAndPlaySetupClient() {
               timeLimit={timeLimit}
               spyCount={spyCount}
               hideSpyCount={hideSpyCount}
-              categories={categories}
               error={error}
               isLoading={passAndPlayMutation.isPending}
+              sourceSection={
+                <PassAndPlaySourceSection
+                  collections={availableCollections}
+                  isAuthenticated={isAuthenticated}
+                  isLoadingCollections={collectionsQuery.isLoading}
+                  source={source}
+                  onSourceChange={handleSourceChange}
+                />
+              }
               onPlayerNameChange={handlePlayerNameChange}
               onAddPlayer={handleAddPlayer}
               onRemovePlayer={handleRemovePlayer}
@@ -188,7 +225,6 @@ export function PassAndPlaySetupClient() {
               onTimeLimitChange={setTimeLimit}
               onSpyCountChange={setSpyCount}
               onHideSpyCountChange={setHideSpyCount}
-              onCategoriesChange={setCategories}
               onBack={() => router.push("/")}
               onStart={handleStart}
             />
@@ -205,25 +241,43 @@ export function PassAndPlaySetupClient() {
                   See exactly what can appear
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-white/60">
-                  This preview updates instantly as categories change, so pass-and-play no longer
-                  hides the actual location pool behind a blind start button.
+                  {source.kind === "collection"
+                    ? "This preview mirrors the selected collection snapshot, so saved locations and custom role lists are visible before the round starts."
+                    : "This preview updates instantly as categories change, so pass-and-play no longer hides the actual location pool behind a blind start button."}
                 </p>
               </div>
               <Link
-                href="/library"
+                href={source.kind === "collection" ? "/collections" : "/library"}
                 className="inline-flex items-center gap-2 self-start rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white/70 transition hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
               >
                 <BookOpen className="size-4" />
-                Browse full library
+                {source.kind === "collection" ? "Open collections" : "Browse full library"}
               </Link>
             </div>
 
             <div className="mt-5">
-              <LocationCatalogPreview
-                locations={previewLocations}
-                emptyTitle="No locations selected"
-                emptyDescription="Choose at least one category to start building the round."
-              />
+              {source.kind === "collection" && collectionDetailQuery.isLoading ? (
+                <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-6 py-10 text-center">
+                  <h3 className="text-lg font-semibold text-white">Loading collection preview</h3>
+                  <p className="mt-2 text-sm text-white/55">
+                    Pulling the saved collection into the pass-and-play preview.
+                  </p>
+                </div>
+              ) : (
+                <LocationCatalogPreview
+                  locations={previewLocations}
+                  emptyTitle={
+                    source.kind === "collection"
+                      ? "No collection locations available"
+                      : "No locations selected"
+                  }
+                  emptyDescription={
+                    source.kind === "collection"
+                      ? "Choose a collection with saved locations to build this round."
+                      : "Choose at least one category to start building the round."
+                  }
+                />
+              )}
             </div>
           </section>
         </div>

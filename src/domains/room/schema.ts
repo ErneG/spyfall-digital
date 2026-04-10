@@ -83,20 +83,58 @@ export type RoomEvent = z.infer<typeof roomEventSchema>;
 
 // ─── Pass & Play schemas ────────────────────────────────────
 
-export const createPassAndPlayInput = z.object({
-  playerNames: z
-    .array(z.string().min(1, "Name is required").max(20).trim())
-    .min(3, "Need at least 3 players")
-    .max(12, "Maximum 12 players"),
-  timeLimit: z.number().int().min(360).max(600).default(480),
-  spyCount: z.number().int().min(1).max(2).default(1),
-  hideSpyCount: z.boolean().default(false),
-  /** Which location categories to include. Defaults to all. */
+export const builtInPassAndPlaySourceInput = z.object({
+  kind: z.literal("built-in"),
   categories: z
-    .array(z.string().min(1))
+    .array(z.enum(LOCATION_CATEGORIES))
     .min(1)
     .default([...LOCATION_CATEGORIES]),
 });
+export type BuiltInPassAndPlaySourceInput = z.infer<typeof builtInPassAndPlaySourceInput>;
+
+export const collectionPassAndPlaySourceInput = z.object({
+  kind: z.literal("collection"),
+  collectionId: z.string().min(1, "Collection is required"),
+});
+export type CollectionPassAndPlaySourceInput = z.infer<typeof collectionPassAndPlaySourceInput>;
+
+export const passAndPlaySourceInput = z.discriminatedUnion("kind", [
+  builtInPassAndPlaySourceInput,
+  collectionPassAndPlaySourceInput,
+]);
+export type PassAndPlaySourceInput = z.infer<typeof passAndPlaySourceInput>;
+
+export const passAndPlayPlayersInput = z.object({
+  names: z
+    .array(z.string().min(1, "Name is required").max(20).trim())
+    .min(3, "Need at least 3 players")
+    .max(12, "Maximum 12 players"),
+});
+export type PassAndPlayPlayersInput = z.infer<typeof passAndPlayPlayersInput>;
+
+export const passAndPlaySettingsInput = z.object({
+  timeLimit: z.number().int().min(360).max(600).default(480),
+  spyCount: z.number().int().min(1).max(2).default(1),
+  hideSpyCount: z.boolean().default(false),
+});
+export type PassAndPlaySettingsInput = z.infer<typeof passAndPlaySettingsInput>;
+
+export const createPassAndPlayInput = z
+  .object({
+    players: passAndPlayPlayersInput,
+    settings: passAndPlaySettingsInput.optional(),
+    source: passAndPlaySourceInput.optional(),
+  })
+  .transform((input) => ({
+    players: input.players,
+    settings: passAndPlaySettingsInput.parse(input.settings ?? {}),
+    source: passAndPlaySourceInput.parse(
+      input.source ?? {
+        kind: "built-in",
+        categories: [...LOCATION_CATEGORIES],
+      },
+    ),
+  }));
 export type CreatePassAndPlayInput = z.input<typeof createPassAndPlayInput>;
 
 export const createPassAndPlayOutput = z.object({

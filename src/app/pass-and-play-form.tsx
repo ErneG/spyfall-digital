@@ -5,7 +5,6 @@ import React from "react";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
-import { CategoryPicker } from "./category-picker";
 import { GameConfigSection } from "./game-config-section";
 import { PlayerListSection } from "./pass-and-play-form-parts";
 
@@ -16,9 +15,9 @@ export interface PassAndPlayFormProps {
   timeLimit: number;
   spyCount: number;
   hideSpyCount: boolean;
-  categories: string[];
   error: string;
   isLoading: boolean;
+  sourceSection?: React.ReactNode;
   onPlayerNameChange: (index: number, value: string) => void;
   onAddPlayer: () => void;
   onRemovePlayer: (index: number) => void;
@@ -26,7 +25,6 @@ export interface PassAndPlayFormProps {
   onTimeLimitChange: (value: number) => void;
   onSpyCountChange: (value: number) => void;
   onHideSpyCountChange: (checked: boolean) => void;
-  onCategoriesChange: (categories: string[]) => void;
   onBack: () => void;
   onStart: () => void;
 }
@@ -38,6 +36,7 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
   hideSpyCount,
   error,
   isLoading,
+  sourceSection,
   onPlayerNameChange,
   onAddPlayer,
   onRemovePlayer,
@@ -45,8 +44,6 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
   onTimeLimitChange,
   onSpyCountChange,
   onHideSpyCountChange,
-  categories,
-  onCategoriesChange,
   onBack,
   onStart,
 }: PassAndPlayFormProps) {
@@ -75,7 +72,7 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
           onHideSpyCountChange={onHideSpyCountChange}
         />
         <div className="h-px bg-white/5" />
-        <CategoryPicker categories={categories} onChange={onCategoriesChange} />
+        {sourceSection}
         {error && (
           <p className="text-spy-red text-[13px]">
             {t.errors[error as keyof typeof t.errors] ?? error}

@@ -68,8 +68,6 @@ export const ModeContent = memo(function ModeContent(props: ModeContentProps) {
           onTimeLimitChange={props.handlePnpTimeLimitChange}
           onSpyCountChange={props.handlePnpSpyCountChange}
           onHideSpyCountChange={props.handlePnpHideSpyCountChange}
-          categories={props.pnpCategories}
-          onCategoriesChange={props.handlePnpCategoriesChange}
         />
       );
   }

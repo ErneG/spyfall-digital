@@ -209,45 +209,63 @@ describe("roomEventSchema", () => {
 // ─── createPassAndPlayInput ────────────────────────────────────
 
 describe("createPassAndPlayInput", () => {
-  it("accepts valid input with defaults", () => {
+  it("accepts built-in source input with defaults", () => {
     const result = createPassAndPlayInput.safeParse({
-      playerNames: ["Alice", "Bob", "Charlie"],
+      players: { names: ["Alice", "Bob", "Charlie"] },
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.timeLimit).toBe(480);
-      expect(result.data.spyCount).toBe(1);
-      expect(result.data.hideSpyCount).toBe(false);
+      expect(result.data.settings.timeLimit).toBe(480);
+      expect(result.data.settings.spyCount).toBe(1);
+      expect(result.data.settings.hideSpyCount).toBe(false);
+      expect(result.data.source.kind).toBe("built-in");
+    }
+  });
+
+  it("accepts a collection-backed source", () => {
+    const result = createPassAndPlayInput.safeParse({
+      players: { names: ["Alice", "Bob", "Charlie"] },
+      source: {
+        kind: "collection",
+        collectionId: "collection-1",
+      },
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.source).toEqual({
+        kind: "collection",
+        collectionId: "collection-1",
+      });
     }
   });
 
   it("rejects fewer than 3 players", () => {
     const result = createPassAndPlayInput.safeParse({
-      playerNames: ["Alice", "Bob"],
+      players: { names: ["Alice", "Bob"] },
     });
     expect(result.success).toBe(false);
   });
 
   it("rejects more than 12 players", () => {
     const names = Array.from({ length: 13 }, (_, i) => `Player${i + 1}`);
-    const result = createPassAndPlayInput.safeParse({ playerNames: names });
+    const result = createPassAndPlayInput.safeParse({ players: { names } });
     expect(result.success).toBe(false);
   });
 
   it("rejects empty player names", () => {
     const result = createPassAndPlayInput.safeParse({
-      playerNames: ["Alice", "", "Charlie"],
+      players: { names: ["Alice", "", "Charlie"] },
     });
     expect(result.success).toBe(false);
   });
 
   it("trims player names", () => {
     const result = createPassAndPlayInput.safeParse({
-      playerNames: ["  Alice  ", "Bob", "Charlie"],
+      players: { names: ["  Alice  ", "Bob", "Charlie"] },
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.playerNames[0]).toBe("Alice");
+      expect(result.data.players.names[0]).toBe("Alice");
     }
   });
 });
