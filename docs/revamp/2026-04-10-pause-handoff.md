@@ -97,6 +97,21 @@ Note: plain `pnpm build` still fails in a bare shell without required env vars b
 - `get_screen_code` currently returns `htmlContent`, not `html`, in the response payload for these newer screens.
 - Stitch still tends to invent its own design-system asset and product language unless the prompt is extremely explicit.
 
+### User correction on the design direction
+
+The current generated designs are still not close enough to the intended result.
+
+This is the clarified requirement going forward:
+
+- the overall feel should be much closer to iOS
+- not just one settings page or one component, but the full product feel
+- rounded UI throughout
+- glassmorphic surfaces and atmospheric backgrounds
+- polished, calm motion that we can realistically implement with Framer Motion
+- a coherent color scheme that suggests mafia / spies / secrecy / intrigue
+- absolutely no purple tones anywhere in the app
+- best-practice UX and explicit accessibility requirements must be treated as part of the design brief, not as follow-up cleanup
+
 ## What is left
 
 ### 1. Finish the Stitch design loop before heavy visual integration
@@ -114,7 +129,11 @@ Acceptance bar:
 - no `database`, `repository`, `protocol`, or similar metaphors
 - no stock photography for the core product surfaces
 - no unnecessary top bars, bottom nav, or settings chrome on focused screens
-- design should feel Apple-adjacent, calm, social, and product-realistic
+- design should feel much closer to iOS overall polish and restraint
+- rounded glass UI should feel consistent across the product
+- palette should suggest intrigue / spies / mafia tension without using purple
+- motion should be calm, clean, and Framer Motion-friendly
+- accessibility and usability should be explicit acceptance criteria
 
 ### 2. Continue pass-and-play product polish
 
@@ -150,7 +169,8 @@ Add or expand coverage around:
 1. Read `.stitch/STITCH_NOTES.md` and `.stitch/SESSION_HANDOFF.md`.
 2. Continue iterating the home screen from `d15c7f5f545248c89ab086e8c34d23c4` until the copy and tertiary action are on-brief.
 3. Edit the pass-and-play setup screen `5023aa51a92e46ac9ba98efa347105ee` to remove the top app bar, remove stock imagery, and simplify the list treatment.
-4. Once one screen is clearly approved, start integrating that design direction into reusable React primitives rather than copying raw generated markup.
+4. Tighten the visual brief until the results feel genuinely iOS-like in overall quality, rounded UI, and glass layering.
+5. Once one screen is clearly approved, start integrating that design direction into reusable React primitives rather than copying raw generated markup.
 
 ## Working tree state at pause
 

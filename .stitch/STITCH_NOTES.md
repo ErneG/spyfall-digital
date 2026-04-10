@@ -61,6 +61,22 @@ GOOGLE_CLOUD_PROJECT=gen-lang-client-0797685586 STITCH_ACCESS_TOKEN="$ACCESS_TOK
 
 ## Current screen verdicts
 
+## User clarification that overrides the current generated direction
+
+The current designs still do not look enough like the intended product direction.
+
+What the user wants more explicitly:
+
+- the overall feel should be very close to iOS quality and restraint
+- not just “Apple-adjacent” in theory, but genuinely iOS-like in rounded geometry, glass layering, spacing, and polish
+- clean round UI with glassmorphic elements and atmospheric backgrounds
+- motion that feels native-quality and calm, designed with Framer Motion in mind
+- a stronger mafia / spies / secret-society undertone in the color language and atmosphere
+- no purple tones anywhere in the app
+- best-practice UX and real accessibility, not just aesthetic direction
+
+This means current Stitch outputs should be judged more strictly than before.
+
 ### Original home concept
 
 - Screen: `e8b8a13c92f441569ef592095924bba3`
@@ -95,6 +111,8 @@ GOOGLE_CLOUD_PROJECT=gen-lang-client-0797685586 STITCH_ACCESS_TOKEN="$ACCESS_TOK
   - secondary copy: `Connect with agents across the digital web.`
   - tertiary action drifted from `Open Library` to `Intel Repository`
   - tertiary icon drifted into `database`
+  - still does not feel close enough to iOS overall polish
+  - still misses the desired mafia / spy atmosphere in a clean, product-real way
 
 ### Pass-and-play setup
 
@@ -108,6 +126,28 @@ GOOGLE_CLOUD_PROJECT=gen-lang-client-0797685586 STITCH_ACCESS_TOKEN="$ACCESS_TOK
   - unnecessary top app bar / settings chrome
   - stock-photo imagery in the included-locations list
   - more stylized than the real component system should be
+  - still does not feel enough like a real iOS-quality setup flow
+
+## Design correction for the next Stitch session
+
+Use these as hard requirements:
+
+- the app should feel much closer to iOS overall
+- rounded UI everywhere
+- soft glassmorphism and layered atmospheric backgrounds
+- Framer Motion-ready transitions that feel clean and native-quality
+- a coherent noir / mafia / spies palette:
+  - frost
+  - smoke
+  - graphite
+  - muted teal / steel
+  - restrained oxblood red
+- no purple, violet, magenta, or lavender anywhere
+- no stock photography on core product surfaces
+- no fake “intel”, “repository”, “database”, “protocol”, or similar metaphors
+- no unnecessary top bars, bottom nav, or settings chrome on focused screens
+- follow real accessibility and UX principles, not just visual style
+- if a generated screen does not clearly feel like the intended iOS-inspired direction, reject it and iterate again
 
 ## Practical recommendation
 
@@ -118,4 +158,7 @@ Use the current home edit and pass-and-play setup screen as reference material o
 - home copy is fully product-correct
 - tertiary actions are phrased like real app navigation, not fictional product modules
 - setup no longer includes stock photos or settings chrome
+- the overall feel is much closer to iOS polish and rounded glass UI
+- the palette clearly suggests intrigue / spies / mafia tension without becoming campy
+- accessibility and usability are explicit acceptance criteria
 - the screens feel product-real rather than prompt-real
