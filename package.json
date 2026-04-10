@@ -19,7 +19,7 @@
     "db:studio": "prisma studio",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "vitest run",
+    "test": "vitest run --maxWorkers=1",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage --maxWorkers=1"
   },

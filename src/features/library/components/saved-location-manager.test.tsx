@@ -53,7 +53,6 @@ describe("SavedLocationManager", () => {
 
     render(<SavedLocationManager locations={[]} onDelete={vi.fn()} onSave={onSave} />);
 
-    await user.click(screen.getByRole("button", { name: /new saved location/i }));
     await user.type(screen.getByLabelText(/location name/i), "Harbor Control");
     await user.selectOptions(screen.getByLabelText(/category/i), "Transportation");
     await user.type(screen.getByLabelText(/role 1/i), "Controller");
@@ -74,7 +73,6 @@ describe("SavedLocationManager", () => {
 
     render(<SavedLocationManager locations={[]} onDelete={vi.fn()} onSave={onSave} />);
 
-    await user.click(screen.getByRole("button", { name: /new saved location/i }));
     await user.type(screen.getByLabelText(/location name/i), "Undercover Briefing");
     await user.click(screen.getByRole("switch", { name: /all spies/i }));
     await user.click(screen.getByRole("button", { name: /^save location$/i }));

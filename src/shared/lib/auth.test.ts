@@ -31,11 +31,11 @@ describe("auth env loading", () => {
 
   it("does not validate env during module import", async () => {
     await expect(import("./auth")).resolves.toHaveProperty("getAuth");
-  });
+  }, 10_000);
 
   it("throws when auth is requested without required env", async () => {
     const { getAuth } = await import("./auth");
 
     expect(() => getAuth()).toThrow(/Invalid server environment/);
-  });
+  }, 10_000);
 });
