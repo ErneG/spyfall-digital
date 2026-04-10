@@ -8,19 +8,19 @@ describe("Badge", () => {
     render(<Badge>Default</Badge>);
     const badge = screen.getByText("Default");
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toContain("1C1C1E");
+    expect(badge.className).toContain("bg-slate-950");
   });
 
   it("renders with secondary variant", () => {
     render(<Badge variant="secondary">Secondary</Badge>);
     const badge = screen.getByText("Secondary");
-    expect(badge.className).toContain("2C2C2E");
+    expect(badge.className).toContain("border-slate-200");
   });
 
   it("renders with destructive variant", () => {
     render(<Badge variant="destructive">Destructive</Badge>);
     const badge = screen.getByText("Destructive");
-    expect(badge.className).toContain("EF4444");
+    expect(badge.className).toContain("B5454F");
   });
 
   it("renders with outline variant", () => {
