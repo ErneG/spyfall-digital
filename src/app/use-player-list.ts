@@ -1,22 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type RefCallback } from "react";
+import { useCallback, useRef, type RefCallback } from "react";
 
+import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { MAX_PLAYERS } from "@/shared/lib/constants";
 
-export interface PlayerEntry {
-  id: string;
-  name: string;
-}
-
 interface UsePlayerListOptions {
-  playerNames: string[];
-  onPlayerNameChange: (index: number, value: string) => void;
+  players: PlayerDraft[];
+  onPlayerNameChange: (id: string, value: string) => void;
   onAddPlayer: () => void;
-  onRemovePlayer: (index: number) => void;
-  onReorderPlayers: (newNames: string[]) => void;
+  onRemovePlayer: (id: string) => void;
+  onReorderPlayers: (players: PlayerDraft[]) => void;
 }
 
 export function usePlayerList({
-  playerNames,
+  players,
   onPlayerNameChange,
   onAddPlayer,
   onRemovePlayer,
@@ -53,65 +49,33 @@ export function usePlayerList({
   );
 
   // ── Stable IDs for Motion Reorder tracking ──────────
-  const nextIdRef = useRef(playerNames.length);
-  const [entryIds, setEntryIds] = useState(() =>
-    playerNames.map((_, index) => `player-${String(index)}`),
-  );
-
-  useEffect(() => {
-    setEntryIds((currentIds) => {
-      if (currentIds.length === playerNames.length) {
-        return currentIds;
-      }
-      if (currentIds.length > playerNames.length) {
-        return currentIds.slice(0, playerNames.length);
-      }
-      const nextIds = [...currentIds];
-      while (nextIds.length < playerNames.length) {
-        nextIds.push(`player-${String(nextIdRef.current++)}`);
-      }
-      return nextIds;
-    });
-  }, [playerNames.length]);
-
-  const entries: PlayerEntry[] = useMemo(
-    () =>
-      playerNames.map((name, index) => ({
-        id: entryIds[index] ?? `player-missing-${String(index)}`,
-        name,
-      })),
-    [entryIds, playerNames],
-  );
-
-  // ── Handlers (translate stable IDs back to indices) ─
   const handleReorder = useCallback(
-    (reordered: PlayerEntry[]) => {
-      setEntryIds(reordered.map((entry) => entry.id));
-      onReorderPlayers(reordered.map((entry) => entry.name));
+    (reordered: PlayerDraft[]) => {
+      onReorderPlayers(reordered);
     },
     [onReorderPlayers],
   );
 
   const handleNameChange = useCallback(
     (id: string, value: string) => {
-      const index = entryIds.indexOf(id);
-      if (index !== -1) {
-        onPlayerNameChange(index, value);
-      }
+      onPlayerNameChange(id, value);
     },
-    [entryIds, onPlayerNameChange],
+    [onPlayerNameChange],
   );
 
   const handleRemove = useCallback(
     (id: string) => {
-      const index = entryIds.indexOf(id);
-      if (index !== -1) {
-        setEntryIds((currentIds) => currentIds.filter((_, currentIndex) => currentIndex !== index));
-        onRemovePlayer(index);
-      }
+      onRemovePlayer(id);
     },
-    [entryIds, onRemovePlayer],
+    [onRemovePlayer],
   );
 
-  return { entries, makeInputRef, handleEnter, handleReorder, handleNameChange, handleRemove };
+  return {
+    entries: players,
+    makeInputRef,
+    handleEnter,
+    handleReorder,
+    handleNameChange,
+    handleRemove,
+  };
 }

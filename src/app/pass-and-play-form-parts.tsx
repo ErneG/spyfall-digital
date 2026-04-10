@@ -4,12 +4,13 @@ import { GripVertical, Plus, X } from "lucide-react";
 import { Reorder, useDragControls } from "motion/react";
 import React, { useCallback } from "react";
 
+import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { useTranslation } from "@/shared/i18n/context";
 import { MIN_PLAYERS, MAX_PLAYERS } from "@/shared/lib/constants";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-import { type PlayerEntry, usePlayerList } from "./use-player-list";
+import { usePlayerList } from "./use-player-list";
 
 /* ── Hooks ──────────────────────────────────────────── */
 
@@ -42,7 +43,7 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
   inputRef,
   onEnter,
 }: {
-  entry: PlayerEntry;
+  entry: PlayerDraft;
   index: number;
   canRemove: boolean;
   onNameChange: (id: string, value: string) => void;
@@ -109,15 +110,15 @@ const PlayerNameRow = React.memo(function PlayerNameRow({
 /* ── Player list section ─────────────────────────────── */
 
 export interface PlayerListSectionProps {
-  playerNames: string[];
-  onPlayerNameChange: (index: number, value: string) => void;
+  players: PlayerDraft[];
+  onPlayerNameChange: (id: string, value: string) => void;
   onAddPlayer: () => void;
-  onRemovePlayer: (index: number) => void;
-  onReorderPlayers: (newNames: string[]) => void;
+  onRemovePlayer: (id: string) => void;
+  onReorderPlayers: (players: PlayerDraft[]) => void;
 }
 
 export const PlayerListSection = React.memo(function PlayerListSection({
-  playerNames,
+  players,
   onPlayerNameChange,
   onAddPlayer,
   onRemovePlayer,
@@ -126,7 +127,7 @@ export const PlayerListSection = React.memo(function PlayerListSection({
   const { t } = useTranslation();
   const { entries, makeInputRef, handleEnter, handleReorder, handleNameChange, handleRemove } =
     usePlayerList({
-      playerNames,
+      players,
       onPlayerNameChange,
       onAddPlayer,
       onRemovePlayer,
@@ -147,7 +148,7 @@ export const PlayerListSection = React.memo(function PlayerListSection({
             key={entry.id}
             entry={entry}
             index={index}
-            canRemove={playerNames.length > MIN_PLAYERS}
+            canRemove={players.length > MIN_PLAYERS}
             onNameChange={handleNameChange}
             onRemove={handleRemove}
             inputRef={makeInputRef(index)}
@@ -155,7 +156,7 @@ export const PlayerListSection = React.memo(function PlayerListSection({
           />
         ))}
       </Reorder.Group>
-      {playerNames.length < MAX_PLAYERS && (
+      {players.length < MAX_PLAYERS && (
         <Button
           variant="ghost"
           size="sm"

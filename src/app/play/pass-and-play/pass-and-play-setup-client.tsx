@@ -10,6 +10,14 @@ import { useAuth } from "@/domains/auth/hooks";
 import { startGame } from "@/domains/game/actions";
 import { createPassAndPlayRoom } from "@/domains/room/actions";
 import { type PassAndPlaySourceInput } from "@/domains/room/schema";
+import {
+  addPlayerDraft,
+  createInitialPlayerDrafts,
+  removePlayerDraft,
+  reorderPlayerDrafts,
+  updatePlayerDraftName,
+  type PlayerDraft,
+} from "@/features/pass-and-play/player-drafts";
 import { LOCATION_CATEGORIES, type LocationCategory } from "@/shared/config/location-catalog";
 import { useSession } from "@/shared/hooks/use-session";
 import { DEFAULT_TIME_LIMIT } from "@/shared/lib/constants";
@@ -29,7 +37,9 @@ export function PassAndPlaySetupClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { session, setSession } = useSession();
-  const [playerNames, setPlayerNames] = useState<string[]>(["", "", ""]);
+  const [playerDrafts, setPlayerDrafts] = useState<PlayerDraft[]>(() =>
+    createInitialPlayerDrafts(),
+  );
   const [timeLimit, setTimeLimit] = useState(DEFAULT_TIME_LIMIT);
   const [spyCount, setSpyCount] = useState(1);
   const [hideSpyCount, setHideSpyCount] = useState(false);
@@ -113,28 +123,24 @@ export function PassAndPlaySetupClient() {
     );
   }, []);
 
-  const handlePlayerNameChange = useCallback((index: number, value: string) => {
-    setPlayerNames((previous) => {
-      const next = [...previous];
-      next[index] = value;
-      return next;
-    });
+  const handlePlayerNameChange = useCallback((id: string, value: string) => {
+    setPlayerDrafts((previous) => updatePlayerDraftName(previous, id, value));
   }, []);
 
   const handleAddPlayer = useCallback(() => {
-    setPlayerNames((previous) => [...previous, ""]);
+    setPlayerDrafts((previous) => addPlayerDraft(previous));
   }, []);
 
-  const handleRemovePlayer = useCallback((index: number) => {
-    setPlayerNames((previous) => previous.filter((_, currentIndex) => currentIndex !== index));
+  const handleRemovePlayer = useCallback((id: string) => {
+    setPlayerDrafts((previous) => removePlayerDraft(previous, id));
   }, []);
 
-  const handleReorderPlayers = useCallback((newNames: string[]) => {
-    setPlayerNames(newNames);
+  const handleReorderPlayers = useCallback((nextDrafts: PlayerDraft[]) => {
+    setPlayerDrafts((previous) => reorderPlayerDrafts(previous, nextDrafts));
   }, []);
 
   const handleStart = useCallback(() => {
-    const trimmed = playerNames.map((name) => name.trim());
+    const trimmed = playerDrafts.map((draft) => draft.name.trim());
     if (trimmed.some((name) => !name)) {
       setError("All player names are required.");
       return;
@@ -146,7 +152,7 @@ export function PassAndPlaySetupClient() {
     }
     setError("");
     passAndPlayMutation.mutate(trimmed);
-  }, [passAndPlayMutation, playerNames]);
+  }, [passAndPlayMutation, playerDrafts]);
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#eef3f8] text-slate-950">
@@ -185,7 +191,7 @@ export function PassAndPlaySetupClient() {
               <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
                 Players
               </p>
-              <p className="mt-3 text-2xl font-semibold text-slate-950">{playerNames.length}</p>
+              <p className="mt-3 text-2xl font-semibold text-slate-950">{playerDrafts.length}</p>
             </div>
             <div className="rounded-3xl border border-white/75 bg-white/72 p-4">
               <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
@@ -207,7 +213,7 @@ export function PassAndPlaySetupClient() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           <section className={cn(shellClassName, "p-6")}>
             <PassAndPlayForm
-              playerNames={playerNames}
+              players={playerDrafts}
               timeLimit={timeLimit}
               spyCount={spyCount}
               hideSpyCount={hideSpyCount}

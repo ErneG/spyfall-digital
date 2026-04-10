@@ -2,6 +2,7 @@
 
 import React from "react";
 
+import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { useTranslation } from "@/shared/i18n/context";
 import { Button } from "@/shared/ui/button";
 
@@ -11,17 +12,17 @@ import { PlayerListSection } from "./pass-and-play-form-parts";
 /* ── Exported form component ─────────────────────────── */
 
 export interface PassAndPlayFormProps {
-  playerNames: string[];
+  players: PlayerDraft[];
   timeLimit: number;
   spyCount: number;
   hideSpyCount: boolean;
   error: string;
   isLoading: boolean;
   sourceSection?: React.ReactNode;
-  onPlayerNameChange: (index: number, value: string) => void;
+  onPlayerNameChange: (id: string, value: string) => void;
   onAddPlayer: () => void;
-  onRemovePlayer: (index: number) => void;
-  onReorderPlayers: (newNames: string[]) => void;
+  onRemovePlayer: (id: string) => void;
+  onReorderPlayers: (players: PlayerDraft[]) => void;
   onTimeLimitChange: (value: number) => void;
   onSpyCountChange: (value: number) => void;
   onHideSpyCountChange: (checked: boolean) => void;
@@ -30,7 +31,7 @@ export interface PassAndPlayFormProps {
 }
 
 export const PassAndPlayForm = React.memo(function PassAndPlayForm({
-  playerNames,
+  players,
   timeLimit,
   spyCount,
   hideSpyCount,
@@ -60,7 +61,7 @@ export const PassAndPlayForm = React.memo(function PassAndPlayForm({
       </div>
       <div className="space-y-4">
         <PlayerListSection
-          playerNames={playerNames}
+          players={players}
           onPlayerNameChange={onPlayerNameChange}
           onAddPlayer={onAddPlayer}
           onRemovePlayer={onRemovePlayer}
