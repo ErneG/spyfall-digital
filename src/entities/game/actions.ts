@@ -9,7 +9,7 @@ import {
   toggleTimer as domainToggleTimer,
 } from "@/domains/game/actions";
 
-export type { StartGameOutput } from "@/domains/game/schema";
+export type { StartGameOutput } from "./schema";
 
 export async function castVote(...args: Parameters<typeof domainCastVote>) {
   return domainCastVote(...args);
