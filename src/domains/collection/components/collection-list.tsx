@@ -1,14 +1,16 @@
 "use client";
 
-import { Plus, BookOpen, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, BookOpen, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { memo, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
 import { getCollections, createCollection, deleteCollection } from "../actions";
+
+import { CollectionListCard } from "./collection-list-card";
 
 import type { CollectionListItem } from "../schema";
 
@@ -22,19 +24,32 @@ export function CollectionListView() {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (authLoading) {
-      return;
-    }
-    if (!isAuthenticated) {
-      router.replace("/");
-      return;
-    }
-    getCollections().then((result) => {
+    let cancelled = false;
+
+    const loadCollections = async () => {
+      if (authLoading) {
+        return;
+      }
+      if (!isAuthenticated) {
+        router.replace("/");
+        return;
+      }
+
+      const result = await getCollections();
+      if (cancelled) {
+        return;
+      }
       if (result.success) {
         setCollections(result.data);
       }
       setLoading(false);
-    });
+    };
+
+    void loadCollections();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, authLoading, router]);
 
   const handleCreate = useCallback(async () => {
@@ -112,7 +127,7 @@ export function CollectionListView() {
         ) : (
           <div className="space-y-2">
             {collections.map((c) => (
-              <CollectionCard key={c.id} collection={c} onDelete={handleDelete} />
+              <CollectionListCard key={c.id} collection={c} onDelete={handleDelete} />
             ))}
           </div>
         )}
@@ -120,51 +135,3 @@ export function CollectionListView() {
     </main>
   );
 }
-
-// ─── Card ────────────────────────────────────────────────────
-
-interface CollectionCardProps {
-  collection: CollectionListItem;
-  onDelete: (id: string) => void;
-}
-
-const CollectionCard = memo(function CollectionCard({ collection, onDelete }: CollectionCardProps) {
-  const router = useRouter();
-
-  const handleClick = useCallback(() => {
-    router.push(`/collections/${collection.id}`);
-  }, [router, collection.id]);
-
-  const handleDelete = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onDelete(collection.id);
-    },
-    [onDelete, collection.id],
-  );
-
-  return (
-    <button
-      onClick={handleClick}
-      className="bg-surface-1 hover:bg-surface-2 flex w-full items-center gap-3 rounded-2xl p-4 text-left transition-colors"
-    >
-      <div className="flex size-10 items-center justify-center rounded-xl bg-[#8B5CF6]/12">
-        <BookOpen className="size-5 text-[#8B5CF6]" />
-      </div>
-      <div className="flex-1">
-        <p className="text-sm font-semibold text-white">{collection.name}</p>
-        <p className="text-muted-foreground text-xs">
-          {collection.locationCount} location{collection.locationCount !== 1 ? "s" : ""}
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        onClick={handleDelete}
-        aria-label={`Delete ${collection.name}`}
-      >
-        <Trash2 className="text-muted-foreground size-3.5" />
-      </Button>
-    </button>
-  );
-});

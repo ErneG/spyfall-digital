@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefCallback } from "react";
 
 import { MAX_PLAYERS } from "@/shared/lib/constants";
 
@@ -26,10 +26,10 @@ export function usePlayerList({
   const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());
 
   const makeInputRef = useCallback(
-    (index: number): React.RefCallback<HTMLInputElement> =>
-      (el) => {
-        if (el) {
-          inputRefs.current.set(index, el);
+    (index: number): RefCallback<HTMLInputElement> =>
+      (element) => {
+        if (element) {
+          inputRefs.current.set(index, element);
         } else {
           inputRefs.current.delete(index);
         }
@@ -54,49 +54,67 @@ export function usePlayerList({
 
   // ── Stable IDs for Motion Reorder tracking ──────────
   const nextIdRef = useRef(playerNames.length);
-  const idsRef = useRef<string[]>(playerNames.map((_, i) => `player-${String(i)}`));
+  const [entryIds, setEntryIds] = useState<string[]>(() =>
+    playerNames.map((_, index) => `player-${String(index)}`),
+  );
 
-  if (idsRef.current.length < playerNames.length) {
-    while (idsRef.current.length < playerNames.length) {
-      idsRef.current.push(`player-${String(nextIdRef.current++)}`);
-    }
-  } else if (idsRef.current.length > playerNames.length) {
-    idsRef.current = idsRef.current.slice(0, playerNames.length);
-  }
+  useEffect(() => {
+    setEntryIds((previous) => {
+      if (previous.length === playerNames.length) {
+        return previous;
+      }
+
+      if (previous.length > playerNames.length) {
+        return previous.slice(0, playerNames.length);
+      }
+
+      const next = [...previous];
+      while (next.length < playerNames.length) {
+        next.push(`player-${String(nextIdRef.current)}`);
+        nextIdRef.current += 1;
+      }
+
+      return next;
+    });
+  }, [playerNames.length]);
 
   const entries: PlayerEntry[] = useMemo(
-    () => playerNames.map((name, i) => ({ id: idsRef.current[i], name })),
-    [playerNames],
+    () =>
+      playerNames.map((name, index) => ({
+        id: entryIds[index] ?? `player-pending-${String(index)}`,
+        name,
+      })),
+    [entryIds, playerNames],
   );
 
   // ── Handlers (translate stable IDs back to indices) ─
   const handleReorder = useCallback(
     (reordered: PlayerEntry[]) => {
-      idsRef.current = reordered.map((e) => e.id);
-      onReorderPlayers(reordered.map((e) => e.name));
+      setEntryIds(reordered.map((entry) => entry.id));
+      onReorderPlayers(reordered.map((entry) => entry.name));
     },
     [onReorderPlayers],
   );
 
   const handleNameChange = useCallback(
     (id: string, value: string) => {
-      const index = idsRef.current.indexOf(id);
+      const index = entryIds.indexOf(id);
       if (index !== -1) {
         onPlayerNameChange(index, value);
       }
     },
-    [onPlayerNameChange],
+    [entryIds, onPlayerNameChange],
   );
 
   const handleRemove = useCallback(
     (id: string) => {
-      const index = idsRef.current.indexOf(id);
+      const index = entryIds.indexOf(id);
       if (index !== -1) {
-        idsRef.current.splice(index, 1);
+        setEntryIds((previous) => previous.filter((entryId) => entryId !== id));
         onRemovePlayer(index);
       }
     },
-    [onRemovePlayer],
+    [entryIds, onRemovePlayer],
   );
 
   return { entries, makeInputRef, handleEnter, handleReorder, handleNameChange, handleRemove };

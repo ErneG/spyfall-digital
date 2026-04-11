@@ -1,28 +1,43 @@
 "use client";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/domains/auth/hooks";
 
 import { getNameSuggestions } from "../actions";
 
+import { NameChip } from "./name-chip";
+
 interface NameSuggestionsProps {
   onSelect: (name: string) => void;
 }
 
-export const NameSuggestions = memo(function NameSuggestions({ onSelect }: NameSuggestionsProps) {
+export function NameSuggestions({ onSelect }: NameSuggestionsProps) {
   const { isAuthenticated } = useAuth();
   const [names, setNames] = useState<string[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!isAuthenticated) {
       return;
     }
-    void getNameSuggestions().then((result) => {
+
+    const loadSuggestions = async () => {
+      const result = await getNameSuggestions();
+      if (cancelled) {
+        return;
+      }
       if (result.success) {
         setNames(result.data);
       }
-    });
+    };
+
+    void loadSuggestions();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated]);
 
   if (!isAuthenticated || names.length === 0) {
@@ -36,27 +51,4 @@ export const NameSuggestions = memo(function NameSuggestions({ onSelect }: NameS
       ))}
     </div>
   );
-});
-
-// ─── Chip ────────────────────────────────────────────────────
-
-interface NameChipProps {
-  name: string;
-  onSelect: (name: string) => void;
 }
-
-const NameChip = memo(function NameChip({ name, onSelect }: NameChipProps) {
-  const handleClick = useCallback(() => {
-    onSelect(name);
-  }, [name, onSelect]);
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="bg-surface-2 text-muted-foreground hover:bg-surface-3 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors hover:text-white"
-    >
-      {name}
-    </button>
-  );
-});

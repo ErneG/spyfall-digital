@@ -80,8 +80,10 @@ export const LocationSettings = memo(function LocationSettings({
   }, [onOpenChange]);
   const handleOpenPicker = useCallback(() => setPickerOpen(true), []);
   const handleImported = useCallback(() => {
-    // Refetch location data after import
-    data.refetch();
+    void data.refetch();
+  }, [data]);
+  const handleSave = useCallback(() => {
+    void data.handleSave();
   }, [data]);
 
   return (
@@ -110,7 +112,7 @@ export const LocationSettings = memo(function LocationSettings({
           <Button variant="ghost" onClick={handleClose}>
             {t.common.cancel}
           </Button>
-          <Button onClick={data.handleSave} className="gap-1">
+          <Button onClick={handleSave} className="gap-1">
             <Check className="h-4 w-4" /> {t.common.save}
           </Button>
         </div>

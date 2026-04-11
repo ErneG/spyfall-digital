@@ -44,7 +44,7 @@ export function ProfileView() {
         setNames(namesResult.data);
       }
     };
-    load();
+    void load();
   }, [isAuthenticated, authLoading, router]);
 
   const handleSaveDisplayName = useCallback(async () => {
