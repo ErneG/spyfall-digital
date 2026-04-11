@@ -2,6 +2,10 @@ import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { fn } from "storybook/test";
 
+import {
+  createBuiltInContentSource,
+  type ContentSourceInput,
+} from "@/entities/library/content-source";
 import { DEFAULT_LOCATIONS } from "@/entities/library/default-locations";
 import { type PlayerDraft } from "@/features/pass-and-play/player-drafts";
 import { LOCATION_CATEGORIES } from "@/shared/config/location-catalog";
@@ -52,11 +56,7 @@ const reviewLocations = DEFAULT_LOCATIONS.filter((location) =>
   ["Entertainment", "Transportation", "Workplace"].includes(location.category),
 ).slice(0, 8);
 
-function PassAndPlaySetupReviewSurface({
-  source,
-}: {
-  source: { kind: "built-in"; categories: string[] } | { kind: "collection"; collectionId: string };
-}) {
+function PassAndPlaySetupReviewSurface({ source }: { source: ContentSourceInput }) {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#eef3f8] text-slate-950">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(255,255,255,0.55)_30%,transparent_54%),radial-gradient(circle_at_85%_18%,rgba(191,219,254,0.55),transparent_28%),radial-gradient(circle_at_78%_78%,rgba(207,250,254,0.44),transparent_24%),linear-gradient(180deg,#f8fbff_0%,#edf2f7_52%,#e8eef4_100%)]" />
@@ -181,9 +181,7 @@ function PassAndPlaySetupReviewSurface({
 
 export const BuiltInSetup: Story = {
   render: () => (
-    <PassAndPlaySetupReviewSurface
-      source={{ kind: "built-in", categories: [...LOCATION_CATEGORIES] }}
-    />
+    <PassAndPlaySetupReviewSurface source={createBuiltInContentSource([...LOCATION_CATEGORIES])} />
   ),
 };
 
