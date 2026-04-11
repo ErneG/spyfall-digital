@@ -399,7 +399,7 @@ export default defineConfig([
   },
 
   {
-    files: ["src/stories/**/*.{ts,tsx}", "src/stories/**/*.mdx"],
+    files: ["src/**/*.stories.{ts,tsx}", "src/**/*.stories.mdx"],
     rules: {
       "check-file/filename-naming-convention": "off",
       "check-file/folder-naming-convention": "off",
