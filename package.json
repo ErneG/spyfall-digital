@@ -21,7 +21,9 @@
     "build-storybook": "storybook build",
     "test": "vitest run --maxWorkers=1",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage --maxWorkers=1"
+    "test:coverage": "vitest run --coverage --maxWorkers=1",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -58,6 +60,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
+    "@playwright/test": "1.59.1",
     "@storybook/addon-a11y": "^10.3.3",
     "@storybook/addon-docs": "^10.3.3",
     "@storybook/addon-onboarding": "^10.3.3",
@@ -98,7 +101,7 @@
     "husky": "^9.1.7",
     "jsdom": "^29.0.1",
     "lint-staged": "^16.4.0",
-    "playwright": "^1.58.2",
+    "playwright": "^1.59.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "storybook": "^10.3.3",

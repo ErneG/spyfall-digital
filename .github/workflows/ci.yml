@@ -71,5 +71,11 @@ jobs:
       - name: Build app without runtime env
         run: env -u DATABASE_URL -u BETTER_AUTH_SECRET -u BETTER_AUTH_URL pnpm build
 
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end critical flows
+        run: pnpm test:e2e
+
       - name: Build Storybook
         run: pnpm build-storybook

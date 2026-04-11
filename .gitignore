@@ -54,3 +54,5 @@ public/swe-worker-*.js
 .claude/learnings/
 .claude/proposals/
 .playwright-mcp/
+playwright-report/
+test-results/
