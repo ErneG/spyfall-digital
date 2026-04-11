@@ -18,23 +18,21 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN pnpm build
 
-# ─── Migration runner (db push + seed) ───────────────────────
-FROM deps AS migrator
-WORKDIR /app
-COPY . .
-RUN pnpm db:generate
-CMD ["sh", "-c", "pnpm exec prisma db push --accept-data-loss && pnpm db:seed"]
-
 # ─── Production image ────────────────────────────────────────
-FROM node:22-alpine AS runner
+FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/src ./src
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "pnpm db:prepare:production && node server.js"]
