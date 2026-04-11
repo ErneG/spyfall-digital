@@ -29,6 +29,7 @@ export function renderInStorybookShell(children: ReactNode) {
 
 const preview: Preview = {
   parameters: {
+    layout: "fullscreen",
     backgrounds: {
       default: "app",
       values: [
