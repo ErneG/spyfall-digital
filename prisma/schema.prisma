@@ -19,7 +19,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  sessions      AuthSession[]
+  sessions      Session[]
   accounts      Account[]
   players       Player[]
   nameHistory   NameHistory[]
@@ -27,7 +27,7 @@ model User {
   savedLocations SavedLocation[]
 }
 
-model AuthSession {
+model Session {
   id        String   @id
   expiresAt DateTime
   token     String   @unique

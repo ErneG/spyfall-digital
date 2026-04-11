@@ -2,7 +2,7 @@
 
 import { LogIn, LogOut, User, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, useSyncExternalStore } from "react";
 
 import { useAuth } from "@/entities/auth/use-auth";
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
@@ -20,6 +20,11 @@ import { AuthDialog } from "./auth-dialog";
 export const AuthButton = memo(function AuthButton() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const handleSignInClick = useCallback(() => {
     setDialogOpen(true);
@@ -29,7 +34,7 @@ export const AuthButton = memo(function AuthButton() {
     await signOut();
   }, [signOut]);
 
-  if (isLoading) {
+  if (!isHydrated || isLoading) {
     return <div className="size-8 animate-pulse rounded-full bg-slate-200" />;
   }
 
