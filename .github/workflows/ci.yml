@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: spyfall
+          POSTGRES_PASSWORD: spyfall
+          POSTGRES_DB: spyfall
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U spyfall"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://spyfall:spyfall@localhost:5432/spyfall
+      BETTER_AUTH_SECRET: ci-secret-change-me
+      BETTER_AUTH_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Apply checked migrations
+        run: pnpm exec prisma migrate deploy
+
+      - name: Seed built-in catalog
+        run: pnpm db:seed
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Build app without runtime env
+        run: env -u DATABASE_URL -u BETTER_AUTH_SECRET -u BETTER_AUTH_URL pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end critical flows
+        run: pnpm test:e2e
+
+      - name: Build Storybook
+        run: pnpm build-storybook

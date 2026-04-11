@@ -36,9 +36,16 @@ export interface Translations {
     spies: string;
     spy: string;
     spiesPlural: string;
+    source: string;
     locations: string;
     locationsSelected: string; // "{n} of {total} locations selected"
     edit: string;
+    builtInCatalog: string;
+    collection: string;
+    advancedRoomCustomization: string;
+    importCollection: string;
+    collectionImportHint: string;
+    signInForCollections: string;
     autoStartTimer: string;
     hideSpyCount: string;
     moderatorMode: string;
@@ -105,6 +112,7 @@ export interface Translations {
     peekAtRole: string;
     peekTitle: string;
     peekSubtitle: string;
+    choosePlayer: string;
     spyGuessLocation: string;
     spyGuessTitle: string;
     spyGuessSubtitle: string;
@@ -159,6 +167,6 @@ export interface LocationEntry {
   roles: string[];
 }
 
-export type LocationTranslations = Record<string, LocationEntry>;
+export type LocationTranslations = Partial<Record<string, LocationEntry>>;
 
-export type CategoryTranslations = Record<string, string>;
+export type CategoryTranslations = Partial<Record<string, string>>;

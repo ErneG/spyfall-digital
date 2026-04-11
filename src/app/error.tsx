@@ -21,11 +21,9 @@ export default function Error({
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex max-w-md flex-col items-center gap-4 text-center">
-        <AlertTriangle className="h-10 w-10 text-destructive" />
+        <AlertTriangle className="text-destructive h-10 w-10" />
         <h2 className="text-lg font-semibold">{t.errors.somethingWentWrong}</h2>
-        <p className="text-sm text-muted-foreground">
-          {error.message || t.errors.unexpectedError}
-        </p>
+        <p className="text-muted-foreground text-sm">{error.message || t.errors.unexpectedError}</p>
         <Button onClick={handleRetry} variant="outline">
           {t.errors.tryAgain}
         </Button>

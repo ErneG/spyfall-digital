@@ -1,0 +1,233 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600&amp;family=Manrope:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#334e3c",
+              "surface-container-low": "#f0f4f6",
+              "surface-container-high": "#e1eaed",
+              "on-error": "#fff7f6",
+              "on-primary-container": "#385757",
+              "on-primary-fixed-variant": "#426161",
+              "on-tertiary-container": "#45604d",
+              "on-surface-variant": "#566164",
+              "inverse-primary": "#dbfdfc",
+              "primary-fixed": "#c7e9e8",
+              error: "#9f403d",
+              tertiary: "#4a6552",
+              "on-secondary-container": "#395663",
+              "inverse-surface": "#0b0f10",
+              "surface-container": "#e8eff1",
+              "on-primary-fixed": "#264444",
+              "error-container": "#fe8983",
+              "primary-dim": "#395858",
+              "on-surface": "#2a3437",
+              outline: "#727d80",
+              "surface-container-highest": "#d9e4e8",
+              "on-error-container": "#752121",
+              "tertiary-fixed-dim": "#cbead1",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#264350",
+              surface: "#f8fafb",
+              "on-tertiary-fixed-variant": "#4f6b57",
+              "secondary-container": "#c9e7f7",
+              "inverse-on-surface": "#9a9d9e",
+              "on-primary": "#dcfefe",
+              "on-secondary-fixed-variant": "#435f6d",
+              "on-secondary": "#f3faff",
+              "surface-variant": "#d9e4e8",
+              "surface-bright": "#f8fafb",
+              "tertiary-dim": "#3e5946",
+              "error-dim": "#4e0309",
+              "surface-dim": "#cfdce0",
+              "on-tertiary": "#e7ffeb",
+              secondary: "#466370",
+              "secondary-fixed": "#c9e7f7",
+              "outline-variant": "#a9b4b7",
+              "secondary-dim": "#3a5764",
+              primary: "#456464",
+              "on-background": "#2a3437",
+              "surface-tint": "#456464",
+              "secondary-fixed-dim": "#bbd9e9",
+              "tertiary-container": "#d9f9df",
+              "primary-fixed-dim": "#badbda",
+              "tertiary-fixed": "#d9f9df",
+              "primary-container": "#c7e9e8",
+              background: "#f8fafb",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            fontFamily: {
+              headline: ["Sora", "sans-serif"],
+              body: ["Manrope", "sans-serif"],
+              label: ["Manrope", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .lithic-gradient {
+        background: linear-gradient(135deg, #456464 0%, #c7e9e8 100%);
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-surface font-body text-on-surface flex min-h-screen flex-col overflow-x-hidden antialiased"
+  >
+    <!-- Background Atmospheric Motifs (Asymmetrical) -->
+    <div class="pointer-events-none fixed inset-0 z-0">
+      <div
+        class="absolute -top-[10%] -right-[20%] h-[60%] w-[80%] rounded-full opacity-20 blur-[120px]"
+        style="background: radial-gradient(circle, #c7e9e8 0%, transparent 70%)"
+      ></div>
+      <div
+        class="absolute bottom-[5%] -left-[10%] h-[50%] w-[60%] rounded-full opacity-10 blur-[100px]"
+        style="background: radial-gradient(circle, #456464 0%, transparent 70%)"
+      ></div>
+    </div>
+    <!-- Main Content Canvas -->
+    <main class="relative z-10 mx-auto w-full max-w-lg flex-1 px-8 pt-16 pb-12">
+      <!-- Logotype Header -->
+      <header class="mb-16">
+        <h1 class="font-headline text-primary text-sm font-semibold tracking-[0.1em] uppercase">
+          Spyfall Digital
+        </h1>
+      </header>
+      <!-- Hero Section -->
+      <section class="mb-12">
+        <h2
+          class="font-headline text-on-background text-[3.5rem] leading-[1.1] font-semibold tracking-[-0.02em]"
+        >
+          Choose how you want to play
+        </h2>
+      </section>
+      <!-- Primary Action: Pass & Play -->
+      <section class="mb-8">
+        <button class="group w-full text-left transition-all duration-300">
+          <div
+            class="lithic-gradient relative flex min-h-[340px] flex-col justify-between overflow-hidden rounded-[2rem] p-8 shadow-[0_40px_40px_-15px_rgba(42,52,55,0.06)]"
+          >
+            <!-- Texture Overlay -->
+            <div
+              class="absolute inset-0 opacity-20 mix-blend-soft-light"
+              data-alt="abstract flowing liquid metal textures with soft reflections and surgical precision depth"
+              style="
+                background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuDTQMOMSwiZJbCt5oVsZP7T6zenqfGi649vkYsi6Bbe2511r_v4aHLDdHmPxHn2hOI1V9K2z1LXJKHr92X-bbc0Sc255FzGQSRTna2z6RNmRJjU_UXj-As7Lmknx_Hx6Cx0kn4iaJhak_Q5H637H0RZn9jF0fzAd2Pbp4XP5ZjItM2Xwq3heL9rvA8lrrVbcRQ6csBSgtEH9yedMsr9LQJtfcYylFDXuOA76uNz-OTl8SvjNf5sALIAIQCvCHG3sj74ot61FyWf__Jl&quot;);
+                background-size: cover;
+              "
+            ></div>
+            <div class="relative z-10">
+              <div
+                class="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold tracking-widest text-white uppercase backdrop-blur-md"
+              >
+                <span class="material-symbols-outlined text-[14px]">group</span>
+                Local Session
+              </div>
+              <h3 class="font-headline mb-4 text-3xl font-semibold text-white">Pass &amp; Play</h3>
+              <p class="max-w-[260px] text-lg leading-relaxed text-white/80">
+                One shared device. Private handoff moments. Gather your circle and let the whispers
+                begin.
+              </p>
+            </div>
+            <div class="relative z-10 self-end">
+              <div
+                class="text-primary flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-lg transition-transform duration-300 group-hover:scale-110"
+              >
+                <span class="material-symbols-outlined text-3xl">arrow_forward</span>
+              </div>
+            </div>
+          </div>
+        </button>
+      </section>
+      <!-- Secondary Action: Online Room -->
+      <section class="mb-8">
+        <button class="group w-full text-left">
+          <div
+            class="glass-card flex items-center gap-6 rounded-[2rem] border border-white/40 p-6 shadow-[0_20px_40px_-10px_rgba(42,52,55,0.04)]"
+          >
+            <div
+              class="bg-surface-container text-secondary flex h-20 w-20 items-center justify-center rounded-2xl"
+            >
+              <span class="material-symbols-outlined text-4xl">public</span>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-headline text-on-surface text-xl font-semibold">Online Room</h4>
+              <p class="text-on-surface-variant mt-1 text-sm">
+                Connect with agents across the digital web.
+              </p>
+            </div>
+            <div class="text-outline-variant transition-transform group-hover:translate-x-1">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </div>
+          </div>
+        </button>
+      </section>
+      <!-- Tertiary Action: Intel Repository -->
+      <section class="mt-12 flex justify-center">
+        <button class="group flex flex-col items-center gap-3">
+          <div
+            class="text-outline-variant border-outline-variant/10 group-hover:bg-surface-container-low flex h-12 w-12 items-center justify-center rounded-full border transition-colors"
+          >
+            <span class="material-symbols-outlined">database</span>
+          </div>
+          <span
+            class="font-label text-outline text-[0.65rem] font-semibold tracking-[0.15em] uppercase"
+            >Intel Repository</span
+          >
+          <!-- Hover Underline (Tertiary style) -->
+          <div class="bg-primary h-[2px] w-0 transition-all duration-300 group-hover:w-full"></div>
+        </button>
+      </section>
+      <!-- Aesthetic Spacer -->
+      <div class="h-16"></div>
+    </main>
+    <!-- Visual Layering Element (Bottom right asymmetry) -->
+    <div class="pointer-events-none fixed right-0 bottom-0 h-32 w-32 opacity-10">
+      <div class="glass-card h-full w-full rounded-tl-[4rem]"></div>
+    </div>
+  </body>
+</html>

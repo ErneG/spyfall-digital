@@ -16,6 +16,31 @@ services:
       timeout: 3s
       retries: 5
 
+  migrate:
+    build:
+      context: .
+      target: migrator
+    environment:
+      DATABASE_URL: "postgresql://spyfall:spyfall@postgres:5432/spyfall"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  seed:
+    build:
+      context: .
+      target: migrator
+    command: ["pnpm", "db:seed"]
+    environment:
+      DATABASE_URL: "postgresql://spyfall:spyfall@postgres:5432/spyfall"
+      BETTER_AUTH_SECRET: "compose-secret-change-me"
+      BETTER_AUTH_URL: "http://localhost:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+
   app:
     build: .
     restart: unless-stopped
@@ -23,16 +48,17 @@ services:
       - "3000"
     environment:
       DATABASE_URL: "postgresql://spyfall:spyfall@postgres:5432/spyfall"
-      PRISMA_DEPLOY_STRATEGY: "auto"
+      BETTER_AUTH_SECRET: "compose-secret-change-me"
+      BETTER_AUTH_URL: "http://localhost:3000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 30s
 
 volumes:
   pgdata:

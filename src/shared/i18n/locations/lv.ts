@@ -1,5 +1,9 @@
 import type { LocationTranslations } from "../types";
 
+const PASSENGER = "Pasažieris";
+const SECURITY_GUARD = "Apsargs";
+const VISITOR = "Apmeklētājs";
+
 export const lvLocations: LocationTranslations = {
   // ─── Transports ─────────────────────────────────────────
   Airplane: {
@@ -15,18 +19,11 @@ export const lvLocations: LocationTranslations = {
   },
   "Ocean Liner": {
     name: "Okeāna laineris",
-    roles: ["Kapteinis", "Pasažieris", "Bārmenis", "Mūziķis", "Bagāts pāris", "Viesmīlis"],
+    roles: ["Kapteinis", PASSENGER, "Bārmenis", "Mūziķis", "Bagāts pāris", "Viesmīlis"],
   },
   "Passenger Train": {
     name: "Pasažieru vilciens",
-    roles: [
-      "Konduktors",
-      "Pasažieris",
-      "Mašīnists",
-      "Kurinātājs",
-      "Restorāna pavārs",
-      "Robežsargs",
-    ],
+    roles: ["Konduktors", PASSENGER, "Mašīnists", "Kurinātājs", "Restorāna pavārs", "Robežsargs"],
   },
   "Pirate Ship": {
     name: "Pirātu kuģis",
@@ -50,7 +47,7 @@ export const lvLocations: LocationTranslations = {
   Subway: {
     name: "Metro",
     roles: [
-      "Pasažieris",
+      PASSENGER,
       "Ielu mūziķis",
       "Kabatzaglis",
       "Transporta inspektors",
@@ -92,22 +89,22 @@ export const lvLocations: LocationTranslations = {
       "Atrakciju operators",
       "Talismans",
       "Ēdienu pārdevējs",
-      "Apmeklētājs",
-      "Apsargs",
+      VISITOR,
+      SECURITY_GUARD,
       "Biļešu pārdevējs",
     ],
   },
   "Art Museum": {
     name: "Mākslas muzejs",
-    roles: ["Kurators", "Mākslinieks", "Apsargs", "Apmeklētājs", "Mākslas zaglis", "Restaurators"],
+    roles: ["Kurators", "Mākslinieks", SECURITY_GUARD, VISITOR, "Mākslas zaglis", "Restaurators"],
   },
   "Gaming Convention": {
     name: "Spēļu konvents",
-    roles: ["Kosplejs", "Spēlētājs", "Pārdevējs", "Izstrādātājs", "Žurnālists", "Apsargs"],
+    roles: ["Kosplejs", "Spēlētājs", "Pārdevējs", "Izstrādātājs", "Žurnālists", SECURITY_GUARD],
   },
   Stadium: {
     name: "Stadions",
-    roles: ["Sportists", "Treneris", "Tiesnesis", "Skatītājs", "Apsargs", "Pārdevējs"],
+    roles: ["Sportists", "Treneris", "Tiesnesis", "Skatītājs", SECURITY_GUARD, "Pārdevējs"],
   },
 
   // ─── Naktsdzīve un pasākumi ─────────────────────────────
@@ -211,7 +208,7 @@ export const lvLocations: LocationTranslations = {
   // ─── Valdība un likums ──────────────────────────────────
   Embassy: {
     name: "Vēstniecība",
-    roles: ["Vēstnieks", "Diplomāts", "Apsargs", "Sekretārs", "Tūrists", "Bēglis"],
+    roles: ["Vēstnieks", "Diplomāts", SECURITY_GUARD, "Sekretārs", "Tūrists", "Bēglis"],
   },
   "Police Station": {
     name: "Policijas iecirknis",
@@ -230,7 +227,7 @@ export const lvLocations: LocationTranslations = {
   },
   Jail: {
     name: "Cietums",
-    roles: ["Ieslodzītais", "Apsargs", "Priekšnieks", "Advokāts", "Ziņotājs", "Apmeklētājs"],
+    roles: ["Ieslodzītais", "Apsargs", "Priekšnieks", "Advokāts", "Ziņotājs", VISITOR],
   },
 
   // ─── Militārais un kaujas ───────────────────────────────
@@ -293,11 +290,11 @@ export const lvLocations: LocationTranslations = {
   // ─── Veselības aprūpe ───────────────────────────────────
   Hospital: {
     name: "Slimnīca",
-    roles: ["Ārsts", "Medmāsa", "Pacients", "Ķirurgs", "Rezidents", "Apmeklētājs"],
+    roles: ["Ārsts", "Medmāsa", "Pacients", "Ķirurgs", "Rezidents", VISITOR],
   },
   "Retirement Home": {
     name: "Pansionāts",
-    roles: ["Medmāsa", "Iemītnieks", "Apmeklētājs", "Aktivitāšu vadītājs", "Šefpavārs", "Sētnieks"],
+    roles: ["Medmāsa", "Iemītnieks", VISITOR, "Aktivitāšu vadītājs", "Šefpavārs", "Sētnieks"],
   },
 
   // ─── Ārā un daba ────────────────────────────────────────
@@ -317,7 +314,7 @@ export const lvLocations: LocationTranslations = {
     roles: [
       "Zoodārza uzraugs",
       "Veterinārārsts",
-      "Apmeklētājs",
+      VISITOR,
       "Gids",
       "Dzīvnieku treneris",
       "Suvenīru veikala pārdevējs",

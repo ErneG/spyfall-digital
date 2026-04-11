@@ -1,7 +1,5 @@
 /** Discriminated union for all server action return types */
-export type ActionResult<T = void> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+export type ActionResult<T = void> = { success: true; data: T } | { success: false; error: string };
 
 export function ok<T>(data: T): ActionResult<T> {
   return { success: true, data };

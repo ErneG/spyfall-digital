@@ -1,0 +1,321 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 300,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .glass-card {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .shadow-ambient {
+        shadow: 0 20px 40px -5px rgba(42, 52, 57, 0.05);
+      }
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-container": "#d4e4fa",
+              "on-tertiary-fixed-variant": "#555873",
+              surface: "#f7f9fb",
+              "on-secondary-fixed": "#324052",
+              "tertiary-fixed-dim": "#cecfef",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#752121",
+              "surface-container-highest": "#d9e4ea",
+              "surface-variant": "#d9e4ea",
+              "on-secondary": "#f7f9ff",
+              "on-secondary-fixed-variant": "#4e5d6f",
+              "on-primary": "#f6f7ff",
+              "inverse-on-surface": "#9a9d9f",
+              secondary: "#526073",
+              "on-tertiary": "#fbf8ff",
+              "surface-dim": "#cfdce3",
+              "error-dim": "#4e0309",
+              "tertiary-dim": "#4f516c",
+              "surface-bright": "#f7f9fb",
+              "primary-container": "#d5e3fd",
+              background: "#f7f9fb",
+              "tertiary-fixed": "#dcddfe",
+              "primary-fixed-dim": "#c7d5ee",
+              "tertiary-container": "#dcddfe",
+              "secondary-fixed-dim": "#c6d6ec",
+              "on-background": "#2a3439",
+              "surface-tint": "#515f74",
+              primary: "#515f74",
+              "outline-variant": "#a9b4b9",
+              "secondary-dim": "#465467",
+              "secondary-fixed": "#d4e4fa",
+              "surface-container-high": "#e1e9ee",
+              "surface-container-low": "#f0f4f7",
+              "on-tertiary-fixed": "#393c55",
+              "primary-fixed": "#d5e3fd",
+              "inverse-primary": "#d5e3fd",
+              "on-surface-variant": "#566166",
+              "on-tertiary-container": "#4b4e69",
+              "on-primary-fixed-variant": "#4e5c71",
+              "on-primary-container": "#455367",
+              "on-error": "#fff7f6",
+              "surface-container": "#e8eff3",
+              "inverse-surface": "#0b0f10",
+              "on-secondary-container": "#445365",
+              tertiary: "#5b5d78",
+              error: "#9f403d",
+              outline: "#717c82",
+              "on-surface": "#2a3439",
+              "primary-dim": "#455368",
+              "error-container": "#fe8983",
+              "on-primary-fixed": "#324054",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+            fontFamily: {
+              headline: ["Inter"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container"
+  >
+    <!-- TopAppBar from JSON -->
+    <header
+      class="no-border tonal-shift flat no shadows fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-slate-50/70 px-6 py-4 backdrop-blur-xl dark:bg-slate-900/70"
+    >
+      <div class="flex items-center gap-4">
+        <button
+          class="rounded-full p-2 text-slate-600 transition-colors duration-200 hover:bg-slate-200/50 active:scale-95 dark:text-slate-300 dark:hover:bg-slate-800/50"
+        >
+          <span class="material-symbols-outlined" data-icon="menu">menu</span>
+        </button>
+      </div>
+      <h1 class="font-sans text-lg font-bold tracking-[0.2em] text-slate-700 dark:text-slate-200">
+        ETHEREAL
+      </h1>
+      <div class="flex items-center">
+        <div
+          class="bg-surface-container-highest h-8 w-8 cursor-pointer overflow-hidden rounded-full duration-200 active:scale-95"
+        >
+          <img
+            alt="User profile avatar"
+            data-alt="minimalist user profile avatar with clean lines and soft studio lighting on a neutral background"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOBrpgS8CsP3dMH9_R8THWJlOp9h0P_z1EN9j7pRyeSi5ub7NuDcEymg5bvDArB_E8nwISfoLKOJTd58ZYh72ey7zO1tX-UcOrDWyn0h2h32VAEFQuKhw22TxWogoi8DFhWyWL-gLwm4M_Dale6Ijg94rOJpD5o6ZoxKeOBh3Ikgw1sdxdvvVhZo_6eSnitZsMYVVjtyUhPV8t49HGpoe4UPhtS3nQjDczAlYVMQi6Z7Xv_qdzf4oT1TNFnNvkgeM034CxoEgRbLCo"
+          />
+        </div>
+      </div>
+    </header>
+    <main class="mx-auto flex min-h-screen max-w-2xl flex-col gap-10 px-6 pt-24 pb-32">
+      <!-- Hero Section -->
+      <section class="mt-4 flex flex-col gap-2">
+        <span class="text-primary/60 text-[11px] font-bold tracking-[0.15em] uppercase"
+          >Deployment Matrix</span
+        >
+        <h2 class="text-on-surface text-4xl font-extrabold tracking-tighter">Select Protocol</h2>
+      </section>
+      <!-- Primary Mode: Pass & Play -->
+      <section
+        class="group relative cursor-pointer transition-all duration-300 active:scale-[0.98]"
+      >
+        <div
+          class="bg-surface-container-lowest flex flex-col overflow-hidden rounded-xl border border-white/40 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]"
+        >
+          <div class="relative h-64">
+            <img
+              alt="Pass &amp; Play"
+              class="h-full w-full object-cover opacity-80 grayscale transition-all duration-700 group-hover:grayscale-0"
+              data-alt="close-up of elegant human hands holding a minimalist smartphone in a softly lit, clinical architectural space with muted tones"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC73eorJbJo1_e3VfloP-c8RDG19nUImjvw4M2EKF7zXZvUznFattGBCxqTN_SKddZ72oTinRtfcDXvUOOxPrx1e39L6XugV-BnK8wwzD7UloIaLAPMoecHNf0e4jgynOGNHe1ru9r3phB_uXXGWqfq3nWeJ0Tw5H_9kRHsqC5y1WV1b5zJLI-2ZkDJH6sbo1vkJDDj25wvuDWqNlYnuzWgaievipe5-zZy00EZBV3h_x10W27jUrHTbUq4f-lK7En9sJc_JU5x-xfM"
+            />
+            <div
+              class="from-surface-container-lowest absolute inset-0 bg-gradient-to-t via-transparent to-transparent"
+            ></div>
+          </div>
+          <div class="flex flex-col gap-3 p-8">
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-bold tracking-tight">Pass &amp; Play</h3>
+              <span
+                class="material-symbols-outlined text-primary"
+                data-icon="stadia_controller"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >stadia_controller</span
+              >
+            </div>
+            <p class="text-on-surface-variant max-w-md leading-relaxed font-light">
+              Gather around a single device. The classic social deduction experience designed for
+              local operative proximity.
+            </p>
+            <div
+              class="text-primary mt-4 flex items-center gap-2 text-sm font-semibold tracking-wide transition-all group-hover:gap-4"
+            >
+              INITIALIZE SESSION
+              <span class="material-symbols-outlined text-base" data-icon="arrow_forward"
+                >arrow_forward</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Secondary & Tertiary Grid -->
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Online Room -->
+        <section
+          class="bg-surface-container-low hover:bg-surface-container-lowest group cursor-pointer rounded-xl border border-white/20 p-8 transition-colors"
+        >
+          <div class="flex h-full flex-col justify-between gap-8">
+            <div
+              class="bg-primary-container flex h-12 w-12 items-center justify-center rounded-2xl"
+            >
+              <span class="material-symbols-outlined text-on-primary-container" data-icon="sensors"
+                >sensors</span
+              >
+            </div>
+            <div class="flex flex-col gap-2">
+              <h3 class="text-xl font-bold tracking-tight">Online Room</h3>
+              <p class="text-on-surface-variant text-sm leading-snug">
+                Connect with distant targets across the digital signal.
+              </p>
+            </div>
+            <div
+              class="text-primary/70 flex items-center pt-4 text-xs font-bold tracking-[0.1em] uppercase"
+            >
+              ESTABLISH LINK
+            </div>
+          </div>
+        </section>
+        <!-- Intel Repository -->
+        <section
+          class="bg-surface-container-low hover:bg-surface-container-lowest group cursor-pointer rounded-xl border border-white/20 p-8 transition-colors"
+        >
+          <div class="flex h-full flex-col justify-between gap-8">
+            <div
+              class="bg-secondary-container flex h-12 w-12 items-center justify-center rounded-2xl"
+            >
+              <span
+                class="material-symbols-outlined text-on-secondary-container"
+                data-icon="menu_book"
+                >menu_book</span
+              >
+            </div>
+            <div class="flex flex-col gap-2">
+              <h3 class="text-xl font-bold tracking-tight">Intel Repository</h3>
+              <p class="text-on-surface-variant text-sm leading-snug">
+                Access classified game rules and strategic location dossiers.
+              </p>
+            </div>
+            <div
+              class="text-primary/70 flex items-center pt-4 text-xs font-bold tracking-[0.1em] uppercase"
+            >
+              ACCESS DATABASE
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- Asymmetric Detail Section -->
+      <section class="mt-8 mb-12 flex items-start gap-12">
+        <div class="flex-1">
+          <h4 class="text-outline mb-4 text-sm font-bold tracking-widest uppercase">
+            Current Status
+          </h4>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between py-2">
+              <span class="text-on-surface-variant text-sm">Global Operatives</span>
+              <span class="font-mono text-sm font-medium">12,482</span>
+            </div>
+            <div class="bg-outline-variant/10 h-[1px] w-full"></div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-on-surface-variant text-sm">Active Servers</span>
+              <span class="font-mono text-sm font-medium">Stable</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-outline-variant/20 hidden h-32 w-px self-center md:block"></div>
+        <div class="hidden flex-1 md:block">
+          <p class="text-outline text-xs leading-relaxed italic">
+            "Information is the only currency that matters in the field. Trust no one, verify
+            everything."
+          </p>
+        </div>
+      </section>
+    </main>
+    <!-- BottomNavBar from JSON -->
+    <nav
+      class="no-border shadow-inner-white fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-[2rem] bg-slate-50/70 px-4 pt-4 pb-8 shadow-[0_-4px_20px_0_rgba(0,0,0,0.05)] backdrop-blur-xl dark:bg-slate-900/70"
+    >
+      <!-- Active: Play -->
+      <button
+        class="group flex flex-col items-center justify-center rounded-2xl bg-white/50 px-5 py-2 text-slate-900 transition-transform duration-300 active:scale-90 dark:bg-slate-800/50 dark:text-white"
+      >
+        <span
+          class="material-symbols-outlined text-slate-600 group-hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-200"
+          data-icon="stadia_controller"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >stadia_controller</span
+        >
+        <span class="mt-1 text-[11px] font-medium tracking-widest uppercase">Play</span>
+      </button>
+      <!-- Inactive: Intel -->
+      <button
+        class="group flex flex-col items-center justify-center px-5 py-2 text-slate-400 transition-transform duration-300 hover:text-slate-700 active:scale-90 dark:text-slate-500 dark:hover:text-slate-200"
+      >
+        <span
+          class="material-symbols-outlined group-hover:text-slate-700 dark:hover:text-slate-200"
+          data-icon="analytics"
+          >analytics</span
+        >
+        <span class="mt-1 text-[11px] font-medium tracking-widest uppercase">Intel</span>
+      </button>
+      <!-- Inactive: Settings -->
+      <button
+        class="group flex flex-col items-center justify-center px-5 py-2 text-slate-400 transition-transform duration-300 hover:text-slate-700 active:scale-90 dark:text-slate-500 dark:hover:text-slate-200"
+      >
+        <span
+          class="material-symbols-outlined group-hover:text-slate-700 dark:hover:text-slate-200"
+          data-icon="settings"
+          >settings</span
+        >
+        <span class="mt-1 text-[11px] font-medium tracking-widest uppercase">Settings</span>
+      </button>
+    </nav>
+  </body>
+</html>

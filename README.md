@@ -1,48 +1,76 @@
-## Spyfall Digital
+# Spyfall Digital
 
-Spyfall Digital is a Next.js 16 social deduction game with Prisma/Postgres, pass-and-play support, online rooms, and a user-editable library of locations and collections.
+Spyfall Digital is a Next.js 16 multiplayer and pass-and-play implementation of Spyfall. The current revamp prioritizes:
 
-## Getting Started
+1. a stable, fast pass-and-play experience
+2. a proper library for locations, roles, and collections
+3. converging online rooms onto the same product and architecture foundation
 
-Install dependencies and start the development server:
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- Prisma 7 with PostgreSQL
+- TanStack Query
+- Storybook 10
+- Vitest
+- ESLint flat config + Prettier
+
+## Local setup
+
+1. Install dependencies:
 
 ```bash
 pnpm install
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+2. Copy the example environment file and update secrets:
 
-## Database
+```bash
+cp .env.example .env
+```
 
-Generate the Prisma client, apply local schema changes, and seed the built-in location catalog:
+3. Start Postgres:
+
+```bash
+docker compose up -d postgres
+```
+
+4. Generate the Prisma client:
 
 ```bash
 pnpm db:generate
-pnpm db:push
+```
+
+5. Apply migrations:
+
+```bash
+pnpm exec prisma migrate deploy
+```
+
+6. Seed the built-in locations explicitly:
+
+```bash
 pnpm db:seed
 ```
 
-## Docker and Coolify Deployments
+7. Start the app:
 
-The production container prepares the database automatically before the app starts:
+```bash
+pnpm dev
+```
 
-1. `pnpm db:generate`
-2. `pnpm exec prisma migrate deploy` when checked Prisma migrations exist
-3. otherwise `pnpm exec prisma db push`
-4. `pnpm db:seed`
+The app runs on [http://localhost:3000](http://localhost:3000). `BETTER_AUTH_URL` should match that origin in development unless you intentionally proxy the app through a different host or port.
 
-That logic lives in [`scripts/prepare-production-db.mjs`](/Users/ernestsdane/Documents/GitHub/spyfall-digital/scripts/prepare-production-db.mjs) and is shared by the Docker image and `docker-compose`.
+## Environment variables
 
-Deployment notes:
+Required values are validated centrally in `src/shared/config/env.ts`.
 
-- `PRISMA_DEPLOY_STRATEGY=auto` is the default and recommended value for Coolify.
-- `PRISMA_DEPLOY_STRATEGY=migrate` forces `prisma migrate deploy`.
-- `PRISMA_DEPLOY_STRATEGY=push` forces `prisma db push`.
-- Checked Prisma migrations now live under `prisma/migrations`, so `auto` will use `migrate deploy` during Docker/Coolify startup.
-- If a database was already populated before this baseline migration existed, run `pnpm exec prisma migrate resolve --applied 0_init` once against that database before switching deployments to `migrate deploy`.
+- `DATABASE_URL`: PostgreSQL connection string
+- `BETTER_AUTH_SECRET`: Better Auth secret
+- `BETTER_AUTH_URL`: canonical app origin used by Better Auth, defaults to `http://localhost:3000` when omitted
 
-## Quality Checks
+## Quality commands
 
 ```bash
 pnpm lint
@@ -50,9 +78,35 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm build-storybook
+pnpm format:check
 ```
 
-## Learn More
+## Storybook
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
+Run Storybook locally with:
+
+```bash
+pnpm storybook
+```
+
+## Docker
+
+`docker compose up --build app` will build the app and run checked migrations first.
+
+Seeding is intentionally separate so production-style deployments do not mutate content on every boot. To seed a local Docker environment:
+
+```bash
+docker compose run --rm seed
+```
+
+## Deployment notes
+
+- Production deploys must use Prisma migrations, not `db push --accept-data-loss`.
+- Set `BETTER_AUTH_URL` to the public origin that serves the app.
+- Run `pnpm db:seed` only when you explicitly want to load the built-in catalog into a target environment.
+
+## Engineering guardrails
+
+- Read [docs/engineering/conventions.md](docs/engineering/conventions.md) before adding new modules or routes.
+- Keep route files thin and server-first.
+- Add `"use client"` only where interactivity requires it.

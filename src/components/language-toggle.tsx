@@ -13,7 +13,12 @@ export function LanguageToggle() {
   }, [locale, setLocale]);
 
   return (
-    <Button variant="ghost" size="sm" onClick={toggle} className="text-xs font-mono px-2">
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={toggle}
+      className="px-2 font-mono text-xs text-slate-600 hover:bg-slate-900/5 hover:text-slate-950"
+    >
       {locale === "en" ? "LV" : "EN"}
     </Button>
   );
