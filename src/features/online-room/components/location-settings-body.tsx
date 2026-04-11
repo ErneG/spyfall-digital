@@ -5,7 +5,7 @@ import React, { memo } from "react";
 
 import { LIBRARY_COLLECTIONS_ROUTE } from "@/features/library/routes";
 import { useTranslation } from "@/shared/i18n/context";
-import { Button } from "@/shared/ui/button";
+import { buttonVariants } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 
 import { CategoryGroupSection, CustomLocationRow } from "./location-settings-parts";
@@ -59,14 +59,17 @@ export const LocationSettingsBody = memo(function LocationSettingsBody({
                   collection-backed room source.
                 </p>
               </div>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+              <Link
+                href={LIBRARY_COLLECTIONS_ROUTE}
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "sm",
+                  className:
+                    "rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                })}
               >
-                <Link href={LIBRARY_COLLECTIONS_ROUTE}>Open Library collections</Link>
-              </Button>
+                Open Library collections
+              </Link>
             </div>
             {data.customLocations.length === 0 ? (
               <div className="rounded-[24px] border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
