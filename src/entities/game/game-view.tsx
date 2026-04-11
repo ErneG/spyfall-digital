@@ -1,3 +1,3 @@
 "use client";
 
-export { GameView } from "./components";
+export { GameView } from "@/domains/game/components/game-view";
