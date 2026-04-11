@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "A digital adaptation of the social deduction game Spyfall",
     start_url: "/",
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#000000",
+    background_color: "#eef3f8",
+    theme_color: "#f4f7fb",
     orientation: "portrait-primary",
     icons: [
       {

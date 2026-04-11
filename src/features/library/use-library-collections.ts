@@ -1,0 +1,55 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { useAuth } from "@/entities/auth/use-auth";
+import { getCollections } from "@/entities/library/actions";
+import { unwrapAction } from "@/shared/lib/unwrap-action";
+
+import type { CollectionListItem } from "@/entities/library/collection";
+
+const NOT_AUTHENTICATED_ERROR = "Not authenticated";
+
+export const libraryCollectionKeys = {
+  all: ["library", "collections"] as const,
+};
+
+interface LibraryCollectionsQueryState {
+  collections: CollectionListItem[];
+  isAuthenticated: boolean;
+}
+
+async function fetchLibraryCollections(): Promise<LibraryCollectionsQueryState> {
+  const result = await getCollections();
+  if (!result.success) {
+    if (result.error === NOT_AUTHENTICATED_ERROR) {
+      return {
+        collections: [],
+        isAuthenticated: false,
+      };
+    }
+
+    throw new Error(result.error);
+  }
+
+  return {
+    collections: unwrapAction(result),
+    isAuthenticated: true,
+  };
+}
+
+export function useLibraryCollections() {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const collectionsQuery = useQuery({
+    queryKey: libraryCollectionKeys.all,
+    queryFn: fetchLibraryCollections,
+    enabled: isAuthenticated,
+  });
+
+  return {
+    collections: isAuthenticated ? (collectionsQuery.data?.collections ?? []) : [],
+    error: isAuthenticated && collectionsQuery.isError ? collectionsQuery.error.message : null,
+    isAuthenticated,
+    isLoading: isAuthLoading || (isAuthenticated && collectionsQuery.isLoading),
+  };
+}

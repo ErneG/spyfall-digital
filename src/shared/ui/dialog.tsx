@@ -7,7 +7,6 @@ import * as React from "react";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
@@ -29,7 +28,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-black/60 duration-100",
+        "data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-[#dce7f1]/52 backdrop-blur-sm duration-100",
         className,
       )}
       {...props}
@@ -51,7 +50,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl bg-[#141414] p-4 text-sm duration-100 outline-none sm:max-w-sm",
+          "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[28px] border border-white/80 bg-white/82 p-4 text-sm text-slate-700 shadow-[0_32px_90px_rgba(148,163,184,0.22)] backdrop-blur-2xl duration-100 outline-none sm:max-w-sm",
           className,
         )}
         {...props}
@@ -89,7 +88,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-2xl border-t border-white/[0.04] bg-[#1C1C1E]/50 p-4 sm:flex-row sm:justify-end",
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-[28px] border-t border-slate-200/70 bg-white/72 p-4 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}

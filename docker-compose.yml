@@ -27,6 +27,20 @@ services:
         condition: service_healthy
     restart: "no"
 
+  seed:
+    build:
+      context: .
+      target: migrator
+    command: ["pnpm", "db:seed"]
+    environment:
+      DATABASE_URL: "postgresql://spyfall:spyfall@postgres:5432/spyfall"
+      BETTER_AUTH_SECRET: "compose-secret-change-me"
+      BETTER_AUTH_URL: "http://localhost:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: "no"
+
   app:
     build: .
     restart: unless-stopped
@@ -34,6 +48,8 @@ services:
       - "3000"
     environment:
       DATABASE_URL: "postgresql://spyfall:spyfall@postgres:5432/spyfall"
+      BETTER_AUTH_SECRET: "compose-secret-change-me"
+      BETTER_AUTH_URL: "http://localhost:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully

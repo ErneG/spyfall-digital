@@ -51,8 +51,6 @@ describe("playerSchema", () => {
 
   it("rejects missing required fields", () => {
     expect(playerSchema.safeParse({ id: "p1" }).success).toBe(false);
-    expect(
-      playerSchema.safeParse({ id: "p1", name: "Alice" }).success,
-    ).toBe(false);
+    expect(playerSchema.safeParse({ id: "p1", name: "Alice" }).success).toBe(false);
   });
 });

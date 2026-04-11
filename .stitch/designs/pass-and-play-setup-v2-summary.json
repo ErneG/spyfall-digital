@@ -1,0 +1,84 @@
+{
+  "projectId": "14798622379269638155",
+  "sessionId": "11815072406496055437",
+  "outputComponents": [
+    {
+      "design": {
+        "screens": [
+          {
+            "designSystem": {
+              "designSystem": {
+                "displayName": "Spyfall Digital V2 Light Glass",
+                "theme": {
+                  "bodyFont": "MANROPE",
+                  "colorMode": "LIGHT",
+                  "colorVariant": "FIDELITY",
+                  "customColor": "#7A9FB2",
+                  "designMd": "# Spyfall Digital V2 Design Direction\n\n## Product intent\n\nSpyfall Digital should feel calm, premium, and tactile. The core experience is social tension and secret knowledge, not a loud gamer dashboard.\n\nPass-and-play is the primary surface. The design needs to support private handoff moments, quick setup, readable role reveals, and confident round control on a single shared device.\n\n## Visual language\n\n- Apple-adjacent, not skeuomorphic and not a literal Apple clone\n- restrained glassmorphism with soft blur, layered translucency, and subtle edge highlights\n- cool neutral palette with deep graphite, smoke, frost, and muted blue-green accents\n- absolutely avoid purple-led palettes\n- avoid generic SaaS cards, neon gamer chrome, and “vibe-coded” gradients with no hierarchy\n\n## Color and atmosphere\n\n- backgrounds should feel atmospheric, not flat:\n  - dark mineral base\n  - soft radial glows in desaturated blue, steel, and moonlit cyan\n  - restrained contrast\n- surfaces should look like frosted panes over depth\n- use red only for danger or spy-state emphasis\n\n## Typography\n\n- premium, clean, system-adjacent typography\n- strong hierarchy with generous spacing\n- headlines should feel editorial and slightly dramatic\n- body copy should stay quiet and compact\n\n## Layout principles\n\n- mobile-first\n- large touch targets\n- setup screens should feel guided, not form-heavy\n- pass-and-play moments should create privacy through spacing, focus, and reduced clutter\n- keep one primary action per view\n\n## Motion\n\n- subtle stagger and panel rise on load\n- gentle blur and opacity transitions\n- avoid bouncy novelty motion\n- motion should support handoff, reveal, and confirmation states\n\n## Explicit rejections\n\n- no purple-first branding\n- no bright cyan-magenta gradients\n- no default dashboard cards with generic icons and pill badges everywhere\n- no crowded gamer UI\n- no arbitrary shadows or overdone glass just because “glassmorphism” was requested\n\n## Core screens to generate first\n\n1. Home mode picker with pass-and-play primary\n2. Pass-and-play setup with players, settings, source, and preview\n3. Pass-and-play reveal flow\n4. Library browser for built-in and custom locations\n5. Collection editor with role chips and location previews\n",
+                  "headlineFont": "SORA",
+                  "labelFont": "MANROPE",
+                  "overrideNeutralColor": "#E7EDF2",
+                  "overridePrimaryColor": "#7A9FB2",
+                  "overrideSecondaryColor": "#A9B8C6",
+                  "overrideTertiaryColor": "#88C1C7",
+                  "roundness": "ROUND_FULL"
+                }
+              },
+              "name": "assets/9802825457640323583",
+              "version": "1"
+            },
+            "deviceType": "MOBILE",
+            "generatedBy": "figaro_agent",
+            "height": "2728",
+            "htmlCode": {
+              "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzgyYzY0NDU5ODdmOTQwZTQ5M2I1MDVmYWRlNzY3MmRiEgsSBxCWg6vl6QYYAZIBJAoKcHJvamVjdF9pZBIWQhQxNDc5ODYyMjM3OTI2OTYzODE1NQ&filename=&opi=96797242",
+              "mimeType": "text/html",
+              "name": "projects/14798622379269638155/files/51855a8dea44428ba73a6e50152f964f"
+            },
+            "id": "5023aa51a92e46ac9ba98efa347105ee",
+            "name": "projects/14798622379269638155/screens/5023aa51a92e46ac9ba98efa347105ee",
+            "prompt": "Design a premium mobile setup screen for Spyfall Digital V2's Pass & Play mode. \n\nVisual Style: \n- Light-first Apple-adjacent visual language.\n- Soft glassmorphism with layered frosted panels.\n- Cool neutral tones, deep graphite text, and muted blue-green accents (#7A9FB2).\n- Generous spacing and large touch targets.\n- Calm, ceremonial, and private atmosphere.\n- NO purple, neon, gaming dashboard energy, dense forms, or sci-fi terms.\n\nContent & Copy:\n- Eyebrow: 'Pass & Play'\n- Headline: 'Set the round before anyone starts peeking.'\n- Supporting Copy: Explain that players, round settings, source selection, and the location list are visible before the game starts.\n\nFour Sections in Order:\n1. Players: Rows with drag handles and an 'Add Player' affordance.\n2. Round Settings: Time limit and spy count controls.\n3. Location Source: A clean toggle between 'Built-in Catalog' and 'Saved Collection'.\n4. Included Locations: A preview panel showing real location names (e.g., 'The Beach', 'The Embassy', 'Casino') with role counts.\n\nActions:\n- Primary CTA: 'Start round' (strong, premium button).\n- Secondary action: 'Back'.\n\nLayout:\n- Focused, guided setup experience.\n- Priority on hierarchy and breathability.\n- No bottom navigation on this screen to maintain focus.",
+            "screenMetadata": {
+              "agentType": "PRO_AGENT",
+              "status": "COMPLETE"
+            },
+            "screenType": "DESIGN",
+            "screenshot": {
+              "downloadUrl": "https://lh3.googleusercontent.com/aida/ADBb0uioAHc_N6QgOtRxLR66Zrux8O7857bw8hmK8kdcl2ihNeXjPByf6PziD-2KLrzO-ds6LXFhRPimN0zx3yaHVPejUdBsVO0Ra0kXULg9sZhcgHl_4OBQH3zNXQ_28s2cetlYET7AxoGbfZavmuyUc-KHnoOJoPjGFQ63TeFMDFuFUdIl4aGJHSkoyreH4NuI13H2vWgEmOk0VP-OWms5jRIZxSJdMe29Zlvgv1-COt_u9nxIMrkTkn8fEto",
+              "name": "projects/14798622379269638155/files/98bde7a402d344d58cd574c018040743"
+            },
+            "theme": {
+              "bodyFont": "MANROPE",
+              "colorMode": "LIGHT",
+              "colorVariant": "FIDELITY",
+              "customColor": "#7A9FB2",
+              "designMd": "# Spyfall Digital V2 Design Direction\n\n## Product intent\n\nSpyfall Digital should feel calm, premium, and tactile. The core experience is social tension and secret knowledge, not a loud gamer dashboard.\n\nPass-and-play is the primary surface. The design needs to support private handoff moments, quick setup, readable role reveals, and confident round control on a single shared device.\n\n## Visual language\n\n- Apple-adjacent, not skeuomorphic and not a literal Apple clone\n- restrained glassmorphism with soft blur, layered translucency, and subtle edge highlights\n- cool neutral palette with deep graphite, smoke, frost, and muted blue-green accents\n- absolutely avoid purple-led palettes\n- avoid generic SaaS cards, neon gamer chrome, and “vibe-coded” gradients with no hierarchy\n\n## Color and atmosphere\n\n- backgrounds should feel atmospheric, not flat:\n  - dark mineral base\n  - soft radial glows in desaturated blue, steel, and moonlit cyan\n  - restrained contrast\n- surfaces should look like frosted panes over depth\n- use red only for danger or spy-state emphasis\n\n## Typography\n\n- premium, clean, system-adjacent typography\n- strong hierarchy with generous spacing\n- headlines should feel editorial and slightly dramatic\n- body copy should stay quiet and compact\n\n## Layout principles\n\n- mobile-first\n- large touch targets\n- setup screens should feel guided, not form-heavy\n- pass-and-play moments should create privacy through spacing, focus, and reduced clutter\n- keep one primary action per view\n\n## Motion\n\n- subtle stagger and panel rise on load\n- gentle blur and opacity transitions\n- avoid bouncy novelty motion\n- motion should support handoff, reveal, and confirmation states\n\n## Explicit rejections\n\n- no purple-first branding\n- no bright cyan-magenta gradients\n- no default dashboard cards with generic icons and pill badges everywhere\n- no crowded gamer UI\n- no arbitrary shadows or overdone glass just because “glassmorphism” was requested\n\n## Core screens to generate first\n\n1. Home mode picker with pass-and-play primary\n2. Pass-and-play setup with players, settings, source, and preview\n3. Pass-and-play reveal flow\n4. Library browser for built-in and custom locations\n5. Collection editor with role chips and location previews\n",
+              "headlineFont": "SORA",
+              "labelFont": "MANROPE",
+              "overrideNeutralColor": "#E7EDF2",
+              "overridePrimaryColor": "#7A9FB2",
+              "overrideSecondaryColor": "#A9B8C6",
+              "overrideTertiaryColor": "#88C1C7",
+              "roundness": "ROUND_FULL"
+            },
+            "title": "Pass & Play Setup",
+            "width": "780"
+          }
+        ],
+        "theme": {}
+      }
+    },
+    {
+      "text": "I've designed the Pass & Play setup screen for Spyfall Digital. \n\nThe layout emphasizes a calm, ceremonial feel with generous spacing and a light-first glassmorphism style. I've organized the four requested sections—Players, Round Settings, Location Source, and Included Locations—into a clear, breathable hierarchy that guides the user through the setup process. The visual language uses soft frosted panels and cool neutral tones, keeping the experience focused and premium while ensuring privacy-friendly composition."
+    },
+    {
+      "suggestion": "Add a role reveal screen for when the round starts"
+    },
+    {
+      "suggestion": "Change the color accent from muted blue-green to a soft gold"
+    },
+    {
+      "suggestion": "Design the 'Add Player' modal"
+    }
+  ]
+}

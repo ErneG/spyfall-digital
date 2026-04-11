@@ -26,10 +26,7 @@ describe("Input", () => {
 
   it("accepts password type", () => {
     const { container } = render(<Input type="password" />);
-    expect(container.querySelector("input")).toHaveAttribute(
-      "type",
-      "password",
-    );
+    expect(container.querySelector("input")).toHaveAttribute("type", "password");
   });
 
   it("handles user input", async () => {

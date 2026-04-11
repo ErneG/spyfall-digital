@@ -1,8 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { LanguageToggle } from "@/components/language-toggle";
 import { Providers } from "@/components/providers";
-import { AuthButton } from "@/domains/auth/components/auth-button";
 
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
@@ -22,19 +20,24 @@ export const metadata: Metadata = {
   description:
     "A digital social deduction game — find the spy before they figure out the location!",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Spyfall",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#f4f7fb",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -45,17 +48,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-black">
-        <Providers>
-          <header className="flex items-center justify-end gap-1 p-2">
-            <LanguageToggle />
-            <AuthButton />
-          </header>
-          {children}
-        </Providers>
+      <body className="bg-background text-foreground flex min-h-full flex-col">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -23,7 +23,7 @@ describe("Button", () => {
   it("renders with secondary variant", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const button = screen.getByRole("button", { name: "Secondary" });
-    expect(button.className).toContain("1C1C1E");
+    expect(button.className).toContain("bg-slate-100");
   });
 
   it("renders with ghost variant", () => {
@@ -33,7 +33,7 @@ describe("Button", () => {
 
   it("renders with destructive variant", () => {
     render(<Button variant="destructive">Delete</Button>);
-    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("EF4444");
+    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("B5454F");
   });
 
   it("renders with link variant", () => {

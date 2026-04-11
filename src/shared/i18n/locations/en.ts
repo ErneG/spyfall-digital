@@ -1,5 +1,7 @@
 import type { LocationTranslations } from "../types";
 
+const SECURITY_GUARD = "Security Guard";
+
 export const enLocations: LocationTranslations = {
   // ─── Transportation ─────────────────────────────────────
   Airplane: {
@@ -53,19 +55,19 @@ export const enLocations: LocationTranslations = {
   },
   "Amusement Park": {
     name: "Amusement Park",
-    roles: ["Ride Operator", "Mascot", "Food Vendor", "Visitor", "Security Guard", "Ticket Seller"],
+    roles: ["Ride Operator", "Mascot", "Food Vendor", "Visitor", SECURITY_GUARD, "Ticket Seller"],
   },
   "Art Museum": {
     name: "Art Museum",
-    roles: ["Curator", "Artist", "Security Guard", "Visitor", "Art Thief", "Restoration Expert"],
+    roles: ["Curator", "Artist", SECURITY_GUARD, "Visitor", "Art Thief", "Restoration Expert"],
   },
   "Gaming Convention": {
     name: "Gaming Convention",
-    roles: ["Cosplayer", "Gamer", "Vendor", "Developer", "Journalist", "Security Guard"],
+    roles: ["Cosplayer", "Gamer", "Vendor", "Developer", "Journalist", SECURITY_GUARD],
   },
   Stadium: {
     name: "Stadium",
-    roles: ["Athlete", "Coach", "Referee", "Spectator", "Security Guard", "Vendor"],
+    roles: ["Athlete", "Coach", "Referee", "Spectator", SECURITY_GUARD, "Vendor"],
   },
 
   // ─── Nightlife & Events ─────────────────────────────────
@@ -138,7 +140,7 @@ export const enLocations: LocationTranslations = {
   // ─── Government & Law ───────────────────────────────────
   Embassy: {
     name: "Embassy",
-    roles: ["Ambassador", "Diplomat", "Security Guard", "Secretary", "Tourist", "Refugee"],
+    roles: ["Ambassador", "Diplomat", SECURITY_GUARD, "Secretary", "Tourist", "Refugee"],
   },
   "Police Station": {
     name: "Police Station",
@@ -174,7 +176,7 @@ export const enLocations: LocationTranslations = {
   // ─── Education & Science ────────────────────────────────
   School: {
     name: "School",
-    roles: ["Teacher", "Student", "Principal", "Janitor", "Cafeteria Lady", "Security Guard"],
+    roles: ["Teacher", "Student", "Principal", "Janitor", "Cafeteria Lady", SECURITY_GUARD],
   },
   University: {
     name: "University",
