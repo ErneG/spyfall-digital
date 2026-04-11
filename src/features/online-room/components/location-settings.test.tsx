@@ -14,7 +14,7 @@ vi.mock("@/shared/i18n/context", () => ({
         locationsSelected: "locations selected",
       },
       locationSettings: {
-        description: "Adjust the built-in pool and any room-only custom locations.",
+        description: "Adjust the built-in pool and review imported room-source snapshots.",
         title: "Advanced room customization",
       },
     },
@@ -47,11 +47,14 @@ vi.mock("./location-settings-parts", () => ({
 }));
 
 describe("LocationSettings", () => {
-  it("keeps advanced room customization focused on room-local editing", () => {
+  it("keeps advanced room customization focused on room source selection", () => {
     render(<LocationSettings open onOpenChange={vi.fn()} roomCode="ABCDE" playerId="player-1" />);
 
     expect(
       screen.getByText("Advanced room customization (2 locations selected)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Adjust the built-in pool and review imported room-source snapshots."),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /import from collection/i }),

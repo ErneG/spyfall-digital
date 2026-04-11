@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import {
-  createCustomLocation,
-  deleteCustomLocation,
-  updateCustomLocation,
-  updateLocationSelections,
-} from "@/entities/location/actions";
+import { updateCustomLocation, updateLocationSelections } from "@/entities/location/actions";
 import { fetchLocations } from "@/entities/location/query";
 
 import type { CustomLocationItem, LocationItem } from "@/entities/location/schema";
@@ -77,66 +72,8 @@ function useBuiltInLocationActions(
 }
 
 function useCustomLocationActions(
-  roomCode: string,
-  playerId: string,
   setCustomLocations: React.Dispatch<React.SetStateAction<CustomLocationItem[]>>,
 ) {
-  const saveCustomLocation = useCallback(
-    async (input: { id?: string; name: string; roles: string[]; allSpies: boolean }) => {
-      if (input.id) {
-        const result = await updateCustomLocation({
-          code: roomCode,
-          playerId,
-          locationId: input.id,
-          name: input.name,
-          roles: input.roles,
-          allSpies: input.allSpies,
-        });
-        if (result.success) {
-          setCustomLocations((previous) =>
-            previous.map((location) =>
-              location.id === input.id
-                ? {
-                    ...location,
-                    name: input.name,
-                    allSpies: input.allSpies,
-                    roles: input.roles.map((role, index) => ({
-                      id: `${input.id}-role-${index}`,
-                      name: role,
-                    })),
-                  }
-                : location,
-            ),
-          );
-          return true;
-        }
-        return false;
-      }
-
-      const result = await createCustomLocation({
-        code: roomCode,
-        playerId,
-        name: input.name,
-        roles: input.roles,
-        allSpies: input.allSpies,
-      });
-      if (result.success) {
-        setCustomLocations((previous) => [...previous, result.data]);
-        return true;
-      }
-      return false;
-    },
-    [roomCode, playerId, setCustomLocations],
-  );
-
-  const handleDeleteCustomLocation = useCallback(
-    async (locationId: string) => {
-      await deleteCustomLocation({ code: roomCode, playerId, locationId });
-      setCustomLocations((previous) => previous.filter((cl) => cl.id !== locationId));
-    },
-    [roomCode, playerId, setCustomLocations],
-  );
-
   const toggleCustomLocation = useCallback(
     (id: string, checked: boolean) => {
       setCustomLocations((previous) =>
@@ -148,8 +85,6 @@ function useCustomLocationActions(
 
   return {
     toggleCustomLocation,
-    deleteCustomLocation: handleDeleteCustomLocation,
-    saveCustomLocation,
   };
 }
 
@@ -161,7 +96,7 @@ export function useLocationData(
 ) {
   const state = useLocationState(roomCode, isOpen);
   const builtIn = useBuiltInLocationActions(state.setLocations);
-  const custom = useCustomLocationActions(roomCode, playerId, state.setCustomLocations);
+  const custom = useCustomLocationActions(state.setCustomLocations);
 
   const saveSelections = useCallback(async () => {
     const selectedIds = state.locations.filter((l) => l.selected).map((l) => l.id);
