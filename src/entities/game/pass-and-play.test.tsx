@@ -8,10 +8,8 @@ const { fetchPlayerRole } = vi.hoisted(() => ({
   fetchPlayerRole: vi.fn(),
 }));
 
-vi.mock("./query", async () => {
-  const actual = await vi.importActual("./query");
+vi.mock("./query", () => {
   return {
-    ...actual,
     fetchPlayerRole,
   };
 });
