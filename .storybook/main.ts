@@ -10,16 +10,10 @@ type StorybookAliasEntry = {
   replacement: string;
 };
 
-function normalizeAliases(
-  alias: NonNullable<NonNullable<StorybookConfig["viteFinal"]>> extends (config: infer T) => unknown
-    ? T extends { resolve?: { alias?: infer A } }
-      ? A
-      : never
-    : never,
-): StorybookAliasEntry[] {
+function normalizeAliases(alias: unknown): StorybookAliasEntry[] {
   if (Array.isArray(alias)) {
     return alias.filter(
-      (entry): entry is StorybookAliasEntry =>
+      (entry: unknown): entry is StorybookAliasEntry =>
         typeof entry === "object" &&
         entry !== null &&
         "find" in entry &&

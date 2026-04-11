@@ -22,13 +22,16 @@ describe("storybook main config", () => {
   it("aliases server-only auth and prisma modules to Storybook mocks", async () => {
     expect(config.viteFinal).toBeTypeOf("function");
 
-    const result = await config.viteFinal?.({
-      resolve: {
-        alias: {
-          "@base/alias": "/tmp/base-alias.ts",
+    const result = await config.viteFinal?.(
+      {
+        resolve: {
+          alias: {
+            "@base/alias": "/tmp/base-alias.ts",
+          },
         },
-      },
-    } as never);
+      } as never,
+      {} as never,
+    );
 
     const aliases = Array.isArray(result?.resolve?.alias)
       ? result.resolve.alias.filter(isStorybookAlias)
