@@ -1,26 +1,23 @@
 import { describe, expect, it, vi } from "vitest";
 
-const fetchLocationsMock = vi.fn();
+const getLocations = vi.fn();
 
-vi.mock("@/domains/location/hooks", () => ({
-  fetchLocations: fetchLocationsMock,
-  locationKeys: {
-    all: ["locations"],
-    forRoom: (roomCode: string) => ["locations", roomCode],
-  },
+vi.mock("@/entities/location/actions", () => ({
+  getLocations,
 }));
 
 describe("entities/location/query", () => {
-  it("re-exports the room location query helpers through the entity layer", async () => {
+  it("fetches room locations through the entity action layer", async () => {
     const payload = {
       locations: [{ id: "built-in-1", name: "Terminal", category: "Transit", selected: true }],
       customLocations: [],
     };
-    fetchLocationsMock.mockResolvedValue(payload);
+    getLocations.mockResolvedValue({ success: true, data: payload });
 
     const { fetchLocations, locationKeys } = await import("./query");
 
     await expect(fetchLocations("ABCDE")).resolves.toEqual(payload);
+    expect(getLocations).toHaveBeenCalledWith("ABCDE");
     expect(locationKeys.forRoom("ABCDE")).toEqual(["locations", "ABCDE"]);
   });
 });
