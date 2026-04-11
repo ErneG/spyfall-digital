@@ -18,12 +18,15 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN pnpm build
 
-# ─── Migration runner (checked migrations only) ──────────────
+# ─── Migration runner ───────────────────────────────────────
+# Uses `prisma db push` for idempotent schema sync: works on both fresh
+# databases and those already populated by prior `db push` runs, without
+# requiring a `_prisma_migrations` baseline to exist.
 FROM deps AS migrator
 WORKDIR /app
 COPY . .
 RUN pnpm db:generate
-CMD ["pnpm", "exec", "prisma", "migrate", "deploy"]
+CMD ["pnpm", "exec", "prisma", "db", "push"]
 
 # ─── Production image ────────────────────────────────────────
 FROM node:22-alpine AS runner
