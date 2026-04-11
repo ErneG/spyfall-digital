@@ -38,6 +38,9 @@ export const CurrentLocation: Story = {
 };
 
 export const SavedImports: Story = {
+  args: {
+    ...CurrentLocation.args,
+  },
   render: () => (
     <div className="w-full max-w-3xl">
       <SavedLocationImportList
@@ -58,7 +61,7 @@ export const SavedImports: Story = {
           {
             id: "saved-2",
             name: "Witness Safe House",
-            category: "Travel",
+            category: "Transportation",
             allSpies: true,
             roles: [],
           },
@@ -69,6 +72,9 @@ export const SavedImports: Story = {
 };
 
 export const ManualEntry: Story = {
+  args: {
+    ...CurrentLocation.args,
+  },
   render: () => (
     <div className="w-full max-w-2xl">
       <AddLocationForm onAdd={() => Promise.resolve(undefined)} />
