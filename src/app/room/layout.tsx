@@ -1,6 +1,6 @@
 import { AppShell } from "@/app/app-shell";
 
-export default function ShellLayout({
+export default function RoomLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
