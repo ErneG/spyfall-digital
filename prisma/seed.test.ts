@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { syncDefaultLocations } from "./seed-lib";
 
-import type { LocationSeed } from "../src/domains/location/schema";
+import type { DefaultLocation } from "../src/entities/library/default-locations";
 
 describe("syncDefaultLocations", () => {
   it("replaces roles when a seeded location already exists", async () => {
@@ -13,7 +13,7 @@ describe("syncDefaultLocations", () => {
       },
     };
 
-    const locations: LocationSeed[] = [
+    const locations: DefaultLocation[] = [
       {
         name: "Airplane",
         category: "Transportation",

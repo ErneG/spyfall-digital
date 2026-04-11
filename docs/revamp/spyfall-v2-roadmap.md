@@ -8,7 +8,7 @@ Rebuild Spyfall Digital into a coherent, premium-feeling app with:
 2. `Library and content management` as the second pillar
 3. `Online rooms` rebuilt on the same foundation after the first two are solid
 
-This is intentionally a product rebuild, not a patch train. Existing domain logic should be preserved where it is correct, but the current mixed architecture, placeholder editing flows, and mismatched UI patterns should continue to be removed.
+This is intentionally a product rebuild, not a patch train. Existing game and room logic should be preserved where it is correct, but the current mixed architecture, placeholder editing flows, and mismatched UI patterns should continue to be removed.
 
 ## Product principles
 
@@ -31,13 +31,9 @@ The long-term code shape remains:
   - reusable domain-level state transformations and shared product concepts
 - `src/shared`
   - UI primitives, tokens, config, helpers, and low-level hooks
-- `src/domains`
-  - legacy transitional area only during the revamp
-
-Target dependency direction:
+    Target dependency direction:
 
 - `app -> features -> entities -> shared`
-- `domains -> shared` only while legacy code still exists
 - `shared` must never import upward
 
 ## Phase breakdown
@@ -160,7 +156,7 @@ Phase 4 acceptance criteria:
 
 ### Phase 5: Online Room Convergence and Hardening
 
-Status: `Partially started`
+Status: `In progress`
 
 Completed:
 
@@ -173,7 +169,7 @@ Remaining work:
 
 - continue moving room state and UI onto the same feature/entity/shared foundation as pass-and-play
 - simplify resume/session behavior
-- continue removing legacy room setup and editing surfaces
+- continue removing room-only authoring paths that should live in Library
 - harden polling, focus/refetch behavior, and cache boundaries
 - bring room gameplay screens up to the same standard as pass-and-play
 
@@ -195,15 +191,13 @@ At the time of writing, the app has moved from a red baseline to a warning-only 
 - seed logging cleanup
 - any React or async-safety warnings that still indicate real fragility
 
-### 2. Legacy architecture extraction
+### 2. Architecture convergence follow-through
 
-The app still contains meaningful legacy code under `src/domains`. Continue extracting stable concepts into `src/features`, `src/entities`, and `src/shared` while leaving working behavior intact.
+The legacy `src/domains` layer has been removed. Continue tightening the final shape by:
 
-Target order:
-
-1. pass-and-play feature ownership
-2. library feature ownership
-3. room/runtime feature ownership
+1. keeping route files thin and server-first
+2. continuing to move cross-feature concepts into `src/entities`
+3. reducing any leftover duplication between pass-and-play and online-room runtime surfaces
 
 ### 3. UX consistency review
 

@@ -7,11 +7,11 @@ A digital adaptation of the social deduction game Spyfall, built as a PWA with N
 ## Tech Stack
 
 - **Framework**: Next.js 16 (App Router, React Compiler, Server Actions)
-- **UI**: shadcn/ui + Tailwind CSS v4 (dark mode by default)
+- **UI**: shadcn/ui + Tailwind CSS v4 (light-first glassmorphic shell)
 - **Database**: PostgreSQL + Prisma 7 (adapter pattern with `@prisma/adapter-pg`)
 - **Validation**: Zod 4 (single source of truth for all types)
 - **PWA**: Built-in Next.js manifest (`app/manifest.ts`)
-- **Real-time**: SSE for room state, polling for game state
+- **Real-time**: TanStack Query polling for room and game state
 - **Infra**: Docker Compose (PostgreSQL on port 5433)
 - **Design**: Stitch MCP + Nano Banana MCP
 
@@ -29,52 +29,39 @@ Stitch MCP (`mcp__stitch__*` tools) requires Google Cloud setup. If tools fail, 
 
 **If 403 recurs:** re-run steps 2–4, then restart Claude Code.
 
-## Architecture — Domain-Driven Design
+## Architecture — V2 Feature/Entity Shape
 
 ```
 src/
-├── app/                     # Routes only (THIN — import from domains)
-│   ├── page.tsx             # Home page
-│   ├── home-parts.tsx       # Home subcomponents + useHomeState hook
-│   ├── loading.tsx          # Global loading skeleton
-│   ├── error.tsx            # Global error boundary
-│   ├── room/[code]/         # Room page + loading/error boundaries
-│   └── api/                 # GET routes only (SSE + polling)
-│       ├── rooms/[code]/events/  # SSE stream
-│       └── games/[id]/          # Game state polling
-├── domains/                 # Business logic organized by domain
+├── app/                     # Thin route shells and page composition
+│   ├── (shell)/             # Standard app chrome for home, Library, profile
+│   ├── (immersive)/         # Focused runtime routes without the global shell
+│   ├── play/                # Pass-and-play setup entry
+│   ├── room/                # Online room lobby entry
+│   └── api/auth/            # Better Auth route
+├── features/                # Feature-owned UI and orchestration
+│   ├── pass-and-play/
+│   ├── online-room/
+│   ├── library/
+│   └── auth/
+├── entities/                # Shared domain behavior and action/query surfaces
 │   ├── room/
-│   │   ├── schema.ts        # Zod schemas → inferred types
-│   │   ├── actions.ts       # Server Actions (createRoom, joinRoom, updateConfig)
-│   │   ├── hooks.ts         # useRoomEvents (SSE with Zod validation)
-│   │   └── components/      # GameConfig, RoomCodeHeader, PlayerList, StartSection
 │   ├── game/
-│   │   ├── schema.ts        # Zod schemas → GameView, inputs/outputs
-│   │   ├── actions.ts       # Server Actions (startGame, castVote, endGame, etc.)
-│   │   ├── hooks.ts         # useGameState (polling with Zod), useTimer
-│   │   ├── logic.ts         # Pure game logic (no DB, no React)
-│   │   └── components/      # GameView, Timer, VotePanel, LocationGrid, RevealScreen
-│   └── location/
-│       ├── schema.ts        # Zod schemas for locations
-│       ├── actions.ts       # Server Actions (CRUD for location selections)
-│       ├── data.ts          # 54 seed locations
-│       └── components/      # LocationSettings dialog
-├── shared/                  # Infrastructure + cross-domain concerns
-│   ├── lib/                 # prisma, utils, constants, room-code generator
-│   ├── ui/                  # shadcn/ui components (base-ui, not radix)
-│   ├── hooks/               # useSession (cross-domain)
-│   └── types/               # ActionResult<T>, GamePhase, PlayerInfo
+│   ├── library/
+│   ├── location/
+│   └── auth/
+├── shared/                  # Infrastructure, UI primitives, config, hooks, i18n
 └── generated/               # Prisma client (gitignored)
 ```
 
 ## Dependency Direction
 
 ```
-app/ → domains/ → shared/
+app/ → features/ → entities/ → shared/
 ```
 
-- **Never** import from `app/` into `domains/` or `shared/`
-- **Never** import between domains directly — use `shared/types/`
+- **Never** import upward into `app/`, `features/`, or `entities/` from `shared/`
+- **Never** import across features — shared concepts belong in `entities/` or `shared/`
 - Components must not import Prisma — use Server Actions
 - ESLint enforces these boundaries
 
@@ -111,10 +98,10 @@ Inspired by [adrianocola/spyfall](https://github.com/adrianocola/spyfall):
 ### Architecture (SOLID + Clean Architecture)
 
 - **Zod-first types** — all types inferred from Zod schemas via `z.infer<>`. NEVER hand-write interfaces for data crossing boundaries
-- **Server Actions for all logic** — all mutations AND queries use Server Actions in `domains/*/actions.ts`
-- **SSE stays as API route** — only `app/api/rooms/[code]/events/` remains as an API route (streaming requires it)
-- **Domain isolation** — domains don't import from each other. Use `shared/types/` for cross-domain types
-- **Pure game logic** — `domains/game/logic.ts` has no DB, no React, no Next.js imports
+- **Entity-owned actions** — server actions and query surfaces live under `entities/*`
+- **Feature-owned UI** — product orchestration lives under `features/*`
+- **Query polling over SSE** — room and game state refresh through TanStack Query polling
+- **Pure game logic** — `entities/game/logic.ts` has no DB, no React, no Next.js imports
 - **ActionResult<T>** — all Server Actions return `{ success: true, data } | { success: false, error }`
 - **Validate at boundaries** — Zod `.safeParse()` at every Server Action entry point
 
@@ -181,20 +168,21 @@ This project has a self-improving hook system adapted from the final-medusa proj
 
 ## API Routes
 
-| Method | Path                       | Description                 |
-| ------ | -------------------------- | --------------------------- |
-| GET    | `/api/rooms/[code]/events` | SSE stream for room updates |
+| Method | Path                 | Description               |
+| ------ | -------------------- | ------------------------- |
+| ALL    | `/api/auth/[...all]` | Better Auth handler route |
 
-All other endpoints have been migrated to Server Actions in `domains/*/actions.ts`.
+All product reads and mutations otherwise flow through entity-owned action/query surfaces.
 
 ## Server Actions
 
-| Domain   | Action                     | Description                        |
+| Entity   | Action                     | Description                        |
 | -------- | -------------------------- | ---------------------------------- |
 | room     | `createRoom`               | Create a new room                  |
 | room     | `joinRoom`                 | Join an existing room              |
 | room     | `updateRoomConfig`         | Update room settings (host only)   |
 | room     | `createPassAndPlayRoom`    | Create pass-and-play room          |
+| room     | `applyRoomContentSource`   | Switch an online room source       |
 | game     | `getGameState`             | Get game state for a player        |
 | game     | `startGame`                | Start a new game round (host only) |
 | game     | `castVote`                 | Cast a vote against a suspect      |

@@ -85,7 +85,6 @@ export default defineConfig([
         { type: "app", pattern: "src/app/**" },
         { type: "feature", pattern: "src/features/**" },
         { type: "entity", pattern: "src/entities/**" },
-        { type: "domain", pattern: "src/domains/**" },
         { type: "shared", pattern: "src/shared/**" },
       ],
     },
@@ -173,7 +172,7 @@ export default defineConfig([
           rules: [
             {
               from: { type: "shared" },
-              disallow: { to: { type: ["app", "feature", "entity", "domain"] } },
+              disallow: { to: { type: ["app", "feature", "entity"] } },
             },
             {
               from: { type: "entity" },
@@ -184,12 +183,8 @@ export default defineConfig([
               allow: { to: { type: ["entity", "shared"] } },
             },
             {
-              from: { type: "domain" },
-              allow: { to: { type: ["shared"] } },
-            },
-            {
               from: { type: "app" },
-              allow: { to: { type: ["domain", "entity", "feature", "shared"] } },
+              allow: { to: { type: ["entity", "feature", "shared"] } },
             },
           ],
         },
@@ -205,7 +200,6 @@ export default defineConfig([
         "error",
         {
           "src/app/**": "NEXT_JS_APP_ROUTER_CASE",
-          "src/domains/**": "KEBAB_CASE",
           "src/entities/**": "KEBAB_CASE",
           "src/features/**": "KEBAB_CASE",
           "src/shared/**": "KEBAB_CASE",
@@ -259,14 +253,7 @@ export default defineConfig([
           patterns: [
             { group: ["@/app/*", "@/app/**"], message: "shared/ must not import from app/." },
             {
-              group: [
-                "@/domains/*",
-                "@/domains/**",
-                "@/features/*",
-                "@/features/**",
-                "@/entities/*",
-                "@/entities/**",
-              ],
+              group: ["@/features/*", "@/features/**", "@/entities/*", "@/entities/**"],
               message: "shared/ must stay at the bottom of the dependency graph.",
             },
           ],
@@ -276,7 +263,7 @@ export default defineConfig([
   },
 
   {
-    files: ["src/domains/**/hooks.ts", "src/shared/hooks/**/*.ts", "src/shared/hooks/**/*.tsx"],
+    files: ["src/shared/hooks/**/*.ts", "src/shared/hooks/**/*.tsx"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -293,7 +280,7 @@ export default defineConfig([
   },
 
   {
-    files: ["src/domains/**/components/**/*.tsx", "src/app/**/*.tsx"],
+    files: ["src/app/**/*.tsx", "src/features/**/*.tsx", "src/entities/**/*.tsx"],
     rules: {
       "no-restricted-globals": [
         "error",
@@ -321,7 +308,7 @@ export default defineConfig([
   },
 
   {
-    files: ["src/domains/**/schema.ts", "src/shared/types/**/*.ts"],
+    files: ["src/**/schema.ts", "src/shared/types/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -343,8 +330,9 @@ export default defineConfig([
 
   {
     files: [
-      "src/domains/**/actions.ts",
-      "src/domains/**/*.action.ts",
+      "src/entities/**/actions.ts",
+      "src/entities/**/*.action.ts",
+      "src/features/**/actions.ts",
       "src/features/**/*.action.ts",
     ],
     rules: {
@@ -355,9 +343,10 @@ export default defineConfig([
           patterns: [
             {
               group: [
-                "@/domains/*/components/*",
-                "@/domains/*/hooks*",
                 "@/features/*/components/*",
+                "@/features/*/hooks*",
+                "@/entities/*/components/*",
+                "@/entities/*/hooks*",
               ],
               message: "Server actions must not import client-only modules.",
             },
@@ -420,7 +409,7 @@ export default defineConfig([
   },
 
   {
-    files: ["src/domains/**/data.ts", "prisma/**/*.ts"],
+    files: ["src/entities/library/default-locations.ts", "prisma/**/*.ts"],
     rules: {
       "sonarjs/no-duplicate-string": "off",
     },

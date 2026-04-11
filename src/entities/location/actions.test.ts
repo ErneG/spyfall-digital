@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { domainActionLeak, prisma } = vi.hoisted(() => ({
-  domainActionLeak: vi.fn(() => {
-    throw new Error("entity actions should not delegate to domain actions");
-  }),
+const { prisma } = vi.hoisted(() => ({
   prisma: {
     room: {
       findUnique: vi.fn(),
@@ -32,14 +29,6 @@ type LocationTransactionClient = typeof prisma;
 type LocationTransactionInput =
   | ((client: LocationTransactionClient) => Promise<unknown>)
   | Promise<unknown>[];
-
-vi.mock("@/domains/location/actions", () => ({
-  createCustomLocation: domainActionLeak,
-  deleteCustomLocation: domainActionLeak,
-  getLocations: domainActionLeak,
-  updateCustomLocation: domainActionLeak,
-  updateLocationSelections: domainActionLeak,
-}));
 
 vi.mock("@/shared/lib/prisma", () => ({
   prisma,
@@ -91,7 +80,6 @@ describe("location entity actions", () => {
         { roomId: "room-1", locationId: "location-2" },
       ],
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("creates and updates custom locations inside the entity layer", async () => {
@@ -178,7 +166,6 @@ describe("location entity actions", () => {
         { customLocationId: "custom-1", name: "Lookout" },
       ],
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("loads built-in and custom locations for a room", async () => {
@@ -229,7 +216,6 @@ describe("location entity actions", () => {
         },
       },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("deletes a custom location for the room host", async () => {
@@ -255,6 +241,5 @@ describe("location entity actions", () => {
     expect(prisma.customLocation.delete).toHaveBeenCalledWith({
       where: { id: "custom-1" },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 });

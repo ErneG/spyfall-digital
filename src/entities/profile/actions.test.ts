@@ -16,10 +16,6 @@ const { getAuthUser, prisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/domains/profile/actions", () => {
-  throw new Error("entities/profile/actions should not import @/domains/profile/actions");
-});
-
 vi.mock("@/shared/lib/auth-session", () => ({
   getAuthUser,
 }));

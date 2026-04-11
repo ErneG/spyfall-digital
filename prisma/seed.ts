@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 
-import { DEFAULT_LOCATIONS } from "../src/domains/location/data";
+import { DEFAULT_LOCATIONS } from "../src/entities/library/default-locations";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { getServerEnv } from "../src/shared/config/env";
 

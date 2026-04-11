@@ -4,13 +4,12 @@
 
 Runtime dependencies should flow in one direction:
 
-- `src/app` can depend on `src/features`, `src/entities`, `src/domains`, and `src/shared`.
+- `src/app` can depend on `src/features`, `src/entities`, and `src/shared`.
 - `src/features` can depend on `src/entities` and `src/shared`.
 - `src/entities` can depend on `src/shared`.
-- `src/domains` is legacy code during the revamp and should only depend on `src/shared`.
-- `src/shared` must never import upward into app, features, entities, or domains.
+- `src/shared` must never import upward into app, features, or entities.
 
-This lets us migrate into the v2 shape without preserving the current cross-cutting coupling.
+This keeps the v2 shape explicit and avoids rebuilding a second cross-cutting middle layer.
 
 ## File naming
 

@@ -14,10 +14,6 @@ const locationFindMany = vi.fn();
 const locationCount = vi.fn();
 const transaction = vi.fn();
 
-vi.mock("@/domains/room/actions", () => {
-  throw new Error("entities/room/actions should not import @/domains/room/actions");
-});
-
 vi.mock("@/entities/room/apply-content-source", () => ({
   applyRoomContentSource: applyRoomContentSourceUseCase,
 }));

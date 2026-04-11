@@ -23,10 +23,6 @@ const { getAuthUser, prisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/domains/collection/actions", () => {
-  throw new Error("entities/library/actions should not import @/domains/collection/actions");
-});
-
 vi.mock("@/shared/lib/auth-session", () => ({
   getAuthUser,
 }));

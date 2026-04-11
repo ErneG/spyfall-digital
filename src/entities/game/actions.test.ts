@@ -56,10 +56,6 @@ type GameTransactionInput =
   | ((client: GameTransactionClient) => Promise<unknown>)
   | Promise<unknown>[];
 
-vi.mock("@/domains/game/actions", () => {
-  throw new Error("entities/game/actions should not import @/domains/game/actions");
-});
-
 vi.mock("./action-helpers", () => helpers);
 vi.mock("./logic", () => logic);
 
