@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { domainActionLeak, getAuthUser, prisma } = vi.hoisted(() => ({
-  domainActionLeak: vi.fn(() => {
-    throw new Error("entity actions should not delegate to domain actions");
-  }),
+const { getAuthUser, prisma } = vi.hoisted(() => ({
   getAuthUser: vi.fn(),
   prisma: {
     locationCollection: {
@@ -19,13 +16,9 @@ const { domainActionLeak, getAuthUser, prisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@/domains/profile/actions", () => ({
-  deleteNameFromHistory: domainActionLeak,
-  getNameHistory: domainActionLeak,
-  getNameSuggestions: domainActionLeak,
-  getProfile: domainActionLeak,
-  updateProfile: domainActionLeak,
-}));
+vi.mock("@/domains/profile/actions", () => {
+  throw new Error("entities/profile/actions should not import @/domains/profile/actions");
+});
 
 vi.mock("@/shared/lib/auth-session", () => ({
   getAuthUser,
@@ -68,7 +61,6 @@ describe("profile entity actions", () => {
     expect(prisma.locationCollection.count).toHaveBeenCalledWith({
       where: { userId: "user-1" },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("updates the current user's display name", async () => {
@@ -83,7 +75,6 @@ describe("profile entity actions", () => {
       where: { id: "user-1" },
       data: { displayName: "Midnight" },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("returns recent name history and suggestions", async () => {
@@ -115,7 +106,6 @@ describe("profile entity actions", () => {
       take: 5,
       select: { name: true },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 
   it("deletes a saved name for the signed-in user", async () => {
@@ -129,6 +119,5 @@ describe("profile entity actions", () => {
     expect(prisma.nameHistory.delete).toHaveBeenCalledWith({
       where: { userId_name: { userId: "user-1", name: "Nova" } },
     });
-    expect(domainActionLeak).not.toHaveBeenCalled();
   });
 });

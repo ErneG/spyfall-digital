@@ -6,10 +6,10 @@ import { fail, ok, type ActionResult } from "@/shared/types/action-result";
 
 import {
   deleteNameInput,
+  updateProfileInput,
   type DeleteNameInput,
   type NameHistoryItem,
   type ProfileOutput,
-  updateProfileInput,
   type UpdateProfileInput,
 } from "./schema";
 

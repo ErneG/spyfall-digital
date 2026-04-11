@@ -28,6 +28,11 @@ const { domainActionLeak, prisma } = vi.hoisted(() => ({
   },
 }));
 
+type LocationTransactionClient = typeof prisma;
+type LocationTransactionInput =
+  | ((client: LocationTransactionClient) => Promise<unknown>)
+  | Promise<unknown>[];
+
 vi.mock("@/domains/location/actions", () => ({
   createCustomLocation: domainActionLeak,
   deleteCustomLocation: domainActionLeak,
@@ -45,12 +50,12 @@ describe("location entity actions", () => {
     vi.resetModules();
     vi.clearAllMocks();
 
-    prisma.$transaction.mockImplementation(async (input: unknown) => {
-      if (typeof input === "function") {
-        return input(prisma);
+    prisma.$transaction.mockImplementation((input: LocationTransactionInput) => {
+      if (Array.isArray(input)) {
+        return Promise.all(input);
       }
 
-      return input;
+      return input(prisma);
     });
   });
 
