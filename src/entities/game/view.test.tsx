@@ -1,11 +1,44 @@
-import { describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
-import { GameView as DomainGameView } from "@/domains/game/components/game-view";
+import { I18nProvider } from "@/shared/i18n/context";
 
-import { GameView } from "./view";
+const { useGameView } = vi.hoisted(() => ({
+  useGameView: vi.fn(),
+}));
 
-describe("game entity view", () => {
-  it("re-exports the online game view", () => {
-    expect(GameView).toBe(DomainGameView);
+vi.mock("./use-game-view", () => ({
+  useGameView,
+}));
+
+describe("game entity view surface", () => {
+  it("renders the loading state through the entity-owned view", async () => {
+    const { GameView } = await import("./view");
+
+    useGameView.mockReturnValue({
+      game: null,
+      isLoading: true,
+      t: {
+        common: { loading: "Loading..." },
+      },
+    });
+
+    render(
+      <I18nProvider>
+        <GameView
+          gameId="game-1"
+          playerId="player-1"
+          isHost={false}
+          roomCode="ABCDE"
+          timeLimit={480}
+          gameStartedAt={null}
+          hideSpyCount={false}
+          spyCount={1}
+          isTimerRunning={true}
+        />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });
