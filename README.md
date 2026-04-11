@@ -39,8 +39,8 @@ Deployment notes:
 - `PRISMA_DEPLOY_STRATEGY=auto` is the default and recommended value for Coolify.
 - `PRISMA_DEPLOY_STRATEGY=migrate` forces `prisma migrate deploy`.
 - `PRISMA_DEPLOY_STRATEGY=push` forces `prisma db push`.
-- This branch does not currently include checked Prisma migrations, so `auto` will fall back to `db push` until migrations are committed under `prisma/migrations`.
-- Once checked migrations exist, the same deploy path will automatically switch to `migrate deploy`.
+- Checked Prisma migrations now live under `prisma/migrations`, so `auto` will use `migrate deploy` during Docker/Coolify startup.
+- If a database was already populated before this baseline migration existed, run `pnpm exec prisma migrate resolve --applied 0_init` once against that database before switching deployments to `migrate deploy`.
 
 ## Quality Checks
 
