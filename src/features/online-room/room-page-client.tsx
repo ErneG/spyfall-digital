@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { GameView } from "@/entities/game/view";
 import { getPassAndPlayRuntimeRoute } from "@/features/pass-and-play/routes";
 
 import { RoomLobby, RoomLoadingSpinner } from "./room-page-parts";
+import { getOnlineRoomRuntimeRoute } from "./routes";
 import { useRoomPage } from "./use-room-page";
 
 interface RoomPageClientProps {
@@ -22,7 +22,11 @@ export function RoomPageClient({ code }: RoomPageClientProps) {
     if (session?.mode === "pass-and-play") {
       router.replace(getPassAndPlayRuntimeRoute(code));
     }
-  }, [code, router, session]);
+
+    if (session?.mode === "online" && room && room.state !== "LOBBY" && room.currentGameId) {
+      router.replace(getOnlineRoomRuntimeRoute(code));
+    }
+  }, [code, room, router, session]);
 
   if (!isLoaded || !session) {
     return null;
@@ -33,20 +37,7 @@ export function RoomPageClient({ code }: RoomPageClientProps) {
   }
 
   if (room && room.state !== "LOBBY" && room.currentGameId) {
-    return (
-      <GameView
-        gameId={room.currentGameId}
-        playerId={session.playerId}
-        isHost={session.isHost}
-        roomCode={code}
-        timeLimit={room.timeLimit}
-        gameStartedAt={room.gameStartedAt}
-        hideSpyCount={room.hideSpyCount}
-        spyCount={room.spyCount}
-        isTimerRunning={room.timerRunning}
-        players={room.players}
-      />
-    );
+    return <RoomLoadingSpinner label={t.common.loading} />;
   }
 
   if (!room) {

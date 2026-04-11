@@ -128,7 +128,8 @@ describe("RoomPageClient", () => {
 
     await renderRoomPageClient();
 
-    expect(screen.getByText("Online Game game-2")).toBeInTheDocument();
+    expect(replace).toHaveBeenCalledWith("/room/ABCDE/play");
+    expect(screen.getByText("Loading room")).toBeInTheDocument();
   });
 
   it("falls back to the room loading state when room data is missing", async () => {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react";
 
 import { createRoom, joinRoom } from "@/entities/room/actions";
+import { getOnlineRoomLobbyRoute } from "@/features/online-room/routes";
 import { useSession } from "@/shared/hooks/use-session";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
@@ -32,7 +33,7 @@ function useMutations(params: MutationParams) {
     },
     onSuccess: ({ playerId, code: roomCode, roomId }) => {
       setSession({ mode: "online", playerId, roomCode, roomId, isHost: true });
-      router.push(`/room/${roomCode}`);
+      router.push(getOnlineRoomLobbyRoute(roomCode));
     },
     onError: (caughtError) => setError(caughtError.message),
   });
@@ -44,7 +45,7 @@ function useMutations(params: MutationParams) {
     },
     onSuccess: ({ playerId, code: joinedCode, roomId }) => {
       setSession({ mode: "online", playerId, roomCode: joinedCode, roomId, isHost: false });
-      router.push(`/room/${joinedCode}`);
+      router.push(getOnlineRoomLobbyRoute(joinedCode));
     },
     onError: (caughtError) => setError(caughtError.message),
   });
@@ -66,7 +67,7 @@ export function useHomeState() {
 
   useEffect(() => {
     if (session?.roomCode) {
-      router.replace(`/room/${session.roomCode}`);
+      router.replace(getOnlineRoomLobbyRoute(session.roomCode));
     }
   }, [session, router]);
 

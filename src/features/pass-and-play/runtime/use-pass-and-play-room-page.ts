@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { startGame } from "@/entities/game/actions";
 import { useRoomState } from "@/entities/room/query";
 import { getPassAndPlayAutoStartRequest } from "@/entities/room/runtime";
+import { getOnlineRoomLobbyRoute } from "@/features/online-room/routes";
 import { useSession } from "@/shared/hooks/use-session";
 import { useTranslation } from "@/shared/i18n/context";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
@@ -51,7 +52,7 @@ export function usePassAndPlayRoomPage(code: string) {
     }
 
     if (session.mode === "online") {
-      router.replace(`/room/${normalizedCode}`);
+      router.replace(getOnlineRoomLobbyRoute(normalizedCode));
     }
   }, [isLoaded, normalizedCode, router, session]);
 

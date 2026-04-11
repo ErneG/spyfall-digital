@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/entities/auth/use-auth";
 import { type ContentSourceInput } from "@/entities/library/content-source";
 import { LIBRARY_COLLECTIONS_ROUTE, LIBRARY_ROUTE } from "@/features/library/routes";
+import { getOnlineRoomLobbyRoute } from "@/features/online-room/routes";
 import {
   addPlayerDraft,
   createInitialPlayerDrafts,
@@ -54,7 +55,7 @@ export function PassAndPlaySetupClient() {
       router.replace(
         session.mode === "pass-and-play"
           ? getPassAndPlayRuntimeRoute(session.roomCode)
-          : `/room/${session.roomCode}`,
+          : getOnlineRoomLobbyRoute(session.roomCode),
       );
     }
   }, [router, session]);
