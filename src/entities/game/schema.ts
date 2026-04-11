@@ -15,6 +15,12 @@ export const castVoteInput = z.object({
 });
 export type CastVoteInput = z.infer<typeof castVoteInput>;
 
+export const getGameStateInput = z.object({
+  gameId: z.string().min(1),
+  playerId: z.string().min(1),
+});
+export type GetGameStateInput = z.infer<typeof getGameStateInput>;
+
 export const endGameInput = z.object({
   gameId: z.string().min(1),
   playerId: z.string().min(1),
