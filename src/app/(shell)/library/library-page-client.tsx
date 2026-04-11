@@ -113,7 +113,17 @@ export function LibraryPageClient() {
             </div>
           </div>
 
-          {isLoading || isAuthenticated ? (
+          {isLoading && !isAuthenticated ? (
+            <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/68 px-6 py-12 text-center">
+              <h3 className="text-xl font-semibold text-slate-950">
+                Checking your library access…
+              </h3>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+                Loading your saved locations and collections so the authoring tools only appear when
+                your account is ready.
+              </p>
+            </div>
+          ) : isAuthenticated ? (
             <SavedLocationManager
               error={error}
               isDeleting={isDeleting}

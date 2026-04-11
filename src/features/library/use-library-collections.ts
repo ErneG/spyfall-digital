@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { useAuth } from "@/entities/auth/use-auth";
 import { getCollections } from "@/entities/library/actions";
 import { unwrapAction } from "@/shared/lib/unwrap-action";
 
@@ -38,15 +39,17 @@ async function fetchLibraryCollections(): Promise<LibraryCollectionsQueryState> 
 }
 
 export function useLibraryCollections() {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const collectionsQuery = useQuery({
     queryKey: libraryCollectionKeys.all,
     queryFn: fetchLibraryCollections,
+    enabled: isAuthenticated,
   });
 
   return {
-    collections: collectionsQuery.data?.collections ?? [],
-    error: collectionsQuery.isError ? collectionsQuery.error.message : null,
-    isAuthenticated: collectionsQuery.data?.isAuthenticated ?? true,
-    isLoading: collectionsQuery.isLoading,
+    collections: isAuthenticated ? (collectionsQuery.data?.collections ?? []) : [],
+    error: isAuthenticated && collectionsQuery.isError ? collectionsQuery.error.message : null,
+    isAuthenticated,
+    isLoading: isAuthLoading || (isAuthenticated && collectionsQuery.isLoading),
   };
 }

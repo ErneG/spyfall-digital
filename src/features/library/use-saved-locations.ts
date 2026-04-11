@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useAuth } from "@/entities/auth/use-auth";
 import {
   deleteSavedLocation,
   getSavedLocations,
@@ -42,11 +43,13 @@ async function fetchSavedLocations(): Promise<SavedLocationsQueryState> {
 }
 
 export function useSavedLocations() {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const queryClient = useQueryClient();
 
   const savedLocationsQuery = useQuery({
     queryKey: libraryKeys.savedLocations(),
     queryFn: fetchSavedLocations,
+    enabled: isAuthenticated,
   });
 
   const saveMutation = useMutation({
@@ -68,12 +71,12 @@ export function useSavedLocations() {
     error:
       saveMutation.error?.message ??
       deleteMutation.error?.message ??
-      (savedLocationsQuery.isError ? savedLocationsQuery.error.message : null),
-    isAuthenticated: savedLocationsQuery.data?.isAuthenticated ?? true,
+      (isAuthenticated && savedLocationsQuery.isError ? savedLocationsQuery.error.message : null),
+    isAuthenticated,
     isDeleting: deleteMutation.isPending,
-    isLoading: savedLocationsQuery.isLoading,
+    isLoading: isAuthLoading || (isAuthenticated && savedLocationsQuery.isLoading),
     isSaving: saveMutation.isPending,
-    locations: savedLocationsQuery.data?.locations ?? [],
+    locations: isAuthenticated ? (savedLocationsQuery.data?.locations ?? []) : [],
     onDelete: deleteMutation.mutateAsync,
     onSave: saveMutation.mutateAsync,
   };
