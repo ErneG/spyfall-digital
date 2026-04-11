@@ -9,18 +9,6 @@ import { StartSection } from "./components/start-section";
 import type { PlayerInfo } from "@/shared/types/common";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-const meta = {
-  title: "Online Room/Room Lobby",
-  parameters: {
-    layout: "fullscreen",
-  },
-  tags: ["autodocs"],
-} satisfies Meta<typeof RoomLobbyReviewSurface>;
-
-export default meta;
-
-type Story = StoryObj<typeof meta>;
-
 interface RoomLobbyReviewSurfaceProps {
   code: string;
   currentPlayerId: string;
@@ -174,6 +162,19 @@ function RoomLobbyReviewSurface({
     </main>
   );
 }
+
+const meta = {
+  title: "Online Room/Room Lobby",
+  component: RoomLobbyReviewSurface,
+  parameters: {
+    layout: "fullscreen",
+  },
+  tags: ["autodocs"],
+} satisfies Meta<typeof RoomLobbyReviewSurface>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
 
 export const HostLobby: Story = {
   args: {
